@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>波波島 🏝️</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #87CEEB;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 8px;
+      overflow-x: hidden;
+    }
+    .game {
+      background: #fffef9;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      max-width: 980px;
+      width: 100%;
+      overflow: hidden;
+      border: 4px solid #5d9a6e;
+    }
+    .header {
+      background: linear-gradient(90deg, #4caf50, #26a69a, #42a5f5);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .header h1 { font-size: 1.25rem; }
+    .header-stats { display: flex; gap: 8px; font-size: 0.8rem; font-weight: 600; }
+    .stat-chip { background: rgba(255,255,255,0.28); padding: 3px 9px; border-radius: 16px; }
+    .nav { display: flex; background: #e8f5e9; border-bottom: 2px solid #c8e6c9; }
+    .nav-btn {
+      flex: 1; padding: 9px 4px; border: none; background: transparent;
+      font-family: inherit; font-size: 0.8rem; font-weight: 700; color: #2e7d32; cursor: pointer;
+    }
+    .nav-btn:hover, .nav-btn.active { background: #a5d6a7; color: #1b5e20; }
+    .screen { display: none; padding: 10px; min-height: 520px; }
+    .screen.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .island-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      aspect-ratio: 1.15 / 1;
+      background: linear-gradient(180deg, #7ec8e3 0%, #87CEEB 35%, #5dade2 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 3px solid #4a90a4;
+    }
+    .island-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 30% 12% at 15% 80%, rgba(255,255,255,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 25% 10% at 80% 85%, rgba(255,255,255,0.2) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .land {
+      position: absolute;
+      left: 8%; top: 10%;
+      width: 84%; height: 78%;
+      background: #8fbc6a;
+      border-radius: 48% 52% 45% 55% / 42% 48% 52% 58%;
+      box-shadow: inset 0 -20px 40px rgba(60,100,40,0.25), 0 8px 0 #6b9a4e, 0 12px 20px rgba(0,0,0,0.15);
+      z-index: 2;
+    }
+    .land::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: inherit;
+      background: #f5deb3;
+      z-index: -1;
+      box-shadow: 0 4px 0 #e8c99b;
+    }
+    .land::after {
+      content: '';
+      position: absolute;
+      left: 15%; top: 20%;
+      width: 70%; height: 55%;
+      background: #9dcc7a;
+      border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
+      opacity: 0.5;
+    }
+    .spot {
+      position: absolute;
+      z-index: 10;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.2s;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+    }
+    .spot:hover { transform: scale(1.15) translate(-43%, -43%); z-index: 20; }
+    .spot.locked { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.7); }
+    .spot.locked:hover { transform: translate(-50%,-50%); }
+    .spot-icon { font-size: 1.8rem; display: block; line-height: 1; animation: float 3s ease-in-out infinite; }
+    .spot:nth-child(odd) .spot-icon { animation-delay: 0.5s; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .spot-label {
+      font-size: 0.65rem; font-weight: 800; color: #1b5e20;
+      background: rgba(255,255,255,0.85); padding: 1px 6px; border-radius: 8px;
+      white-space: nowrap; margin-top: 2px; display: inline-block; border: 1.5px solid #81c784;
+    }
+    .spot.locked .spot-label { background: rgba(200,200,200,0.8); border-color: #999; color: #666; }
+    .deco { position: absolute; z-index: 3; pointer-events: none; font-size: 1.3rem; opacity: 0.85; }
+    .sun {
+      position: absolute; top: 4%; right: 6%; width: 50px; height: 50px;
+      background: radial-gradient(circle, #ffe566 30%, #ffcc00 60%, transparent 70%);
+      border-radius: 50%; z-index: 1; animation: sunPulse 4s ease infinite;
+    }
+    @keyframes sunPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .cloud {
+      position: absolute; background: rgba(255,255,255,0.85); border-radius: 40px; z-index: 1;
+      animation: cloudMove 25s linear infinite;
+    }
+    .cloud::before, .cloud::after { content: ''; position: absolute; background: rgba(255,255,255,0.85); border-radius: 50%; }
+    .cloud1 { width: 60px; height: 22px; top: 8%; left: -70px; animation-duration: 30s; }
+    .cloud1::before { width: 28px; height: 28px; top: -14px; left: 10px; }
+    .cloud1::after { width: 22px; height: 22px; top: -10px; left: 30px; }
+    .cloud2 { width: 45px; height: 16px; top: 18%; left: -50px; animation-duration: 38s; animation-delay: -10s; }
+    .cloud2::before { width: 20px; height: 20px; top: -10px; left: 8px; }
+    .cloud2::after { width: 16px; height: 16px; top: -8px; left: 24px; }
+    @keyframes cloudMove { from { transform: translateX(0); } to { transform: translateX(900px); } }
+    .map-footer { text-align: center; padding: 8px; font-size: 0.8rem; color: #555; }
+    .map-log {
+      max-width: 720px; margin: 8px auto 0; background: #f5f5f5; border-radius: 10px;
+      padding: 8px 12px; max-height: 90px; overflow-y: auto; font-size: 0.8rem;
+      line-height: 1.45; border: 2px solid #e0e0e0;
+    }
+
+    .zone-panel { max-width: 500px; margin: 0 auto; text-align: center; }
+    .zone-panel .big { font-size: 3.5rem; margin-bottom: 4px; }
+    .zone-panel h2 { font-size: 1.3rem; color: #2e7d32; }
+    .zone-panel .desc { font-size: 0.85rem; color: #666; margin: 6px 0 14px; }
+    .action-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .btn {
+      padding: 10px 18px; border: none; border-radius: 28px; font-family: inherit;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; color: white; transition: all 0.2s;
+    }
+    .btn:hover { transform: scale(1.05); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-explore { background: linear-gradient(90deg, #66bb6a, #43a047); }
+    .btn-shop { background: linear-gradient(90deg, #ffa726, #fb8c00); }
+    .btn-back { background: linear-gradient(90deg, #90a4ae, #78909c); }
+    .btn-primary { background: linear-gradient(90deg, #42a5f5, #1e88e5); }
+    .btn-pink { background: linear-gradient(90deg, #ec407a, #d81b60); }
+    .btn-purple { background: linear-gradient(90deg, #ab47bc, #8e24aa); }
+    .log-box {
+      background: #f5f5f5; border-radius: 10px; padding: 8px 12px; max-height: 140px;
+      overflow-y: auto; font-size: 0.82rem; line-height: 1.45; border: 2px solid #e0e0e0; text-align: left;
+    }
+
+    .section-title { font-size: 1.05rem; font-weight: 800; color: #2e7d32; margin-bottom: 10px; text-align: center; }
+    .pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .pet-card {
+      background: linear-gradient(145deg, #fff8e1, #e8f5e9); border-radius: 12px; padding: 10px;
+      text-align: center; border: 3px solid transparent; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .pet-card:hover { border-color: #81c784; transform: translateY(-2px); }
+    .pet-card.active-team { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
+    .pet-card .emoji { font-size: 2.3rem; }
+    .pet-card .name { font-weight: 700; font-size: 0.9rem; color: #33691e; }
+    .pet-card .meta { font-size: 0.72rem; color: #666; margin-top: 2px; }
+    .hp-mini { height: 7px; background: #e0e0e0; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+    .hp-mini-fill { height: 100%; background: #66bb6a; border-radius: 4px; }
+    .team-label { position: absolute; top: 3px; left: 3px; background: #ff7043; color: white; font-size: 0.6rem; padding: 1px 5px; border-radius: 6px; font-weight: 700; }
+    .item-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+    .item-card { background: #e3f2fd; border-radius: 10px; padding: 10px; text-align: center; border: 2px solid #90caf9; }
+    .item-card .emoji { font-size: 1.6rem; }
+    .item-card .name { font-weight: 700; font-size: 0.85rem; }
+    .item-card .count { font-size: 0.75rem; color: #1565c0; }
+    .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; }
+    .shop-item { background: linear-gradient(145deg, #fff3e0, #fce4ec); border-radius: 12px; padding: 12px; text-align: center; border: 2px solid #ffcc80; }
+    .shop-item .emoji { font-size: 1.8rem; }
+    .shop-item .name { font-weight: 700; margin: 3px 0; font-size: 0.9rem; }
+    .shop-item .price { color: #e65100; font-weight: 700; font-size: 0.85rem; }
+    .shop-item .desc { font-size: 0.7rem; color: #666; margin: 3px 0 6px; }
+
+    .battle-arena {
+      display: flex; justify-content: space-between; align-items: flex-end; min-height: 170px;
+      background: linear-gradient(180deg, #e8f5e9, #fff8e1); border-radius: 14px; padding: 12px 8px;
+      border: 3px solid #c8e6c9; margin-bottom: 8px; position: relative;
+    }
+    .fighter { text-align: center; width: 42%; position: relative; }
+    .fighter-emoji { font-size: 3.8rem; display: block; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.12)); }
+    .fighter.player .fighter-emoji { animation: bounce 2s ease-in-out infinite; }
+    .fighter.enemy .fighter-emoji { animation: bounce 2.2s ease-in-out infinite 0.2s; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .fighter.attacking .fighter-emoji { animation: atk 0.35s ease; }
+    .fighter.enemy.attacking .fighter-emoji { animation: atkE 0.35s ease; }
+    @keyframes atk { 0% { transform: translateX(0); } 40% { transform: translateX(30px) scale(1.08); } 100% { transform: translateX(0); } }
+    @keyframes atkE { 0% { transform: translateX(0); } 40% { transform: translateX(-30px) scale(1.08); } 100% { transform: translateX(0); } }
+    .fighter.hurt .fighter-emoji { animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+    .fighter-name { font-weight: 700; font-size: 0.88rem; color: #5d4037; margin-top: 2px; }
+    .hp-bar-wrap { margin-top: 3px; background: #eee; border-radius: 9px; height: 16px; overflow: hidden; border: 2px solid #ddd; position: relative; }
+    .hp-bar { height: 100%; border-radius: 7px; transition: width 0.4s ease; background: linear-gradient(90deg, #66bb6a, #43a047); }
+    .hp-bar.med { background: linear-gradient(90deg, #ffca28, #ffa000); }
+    .hp-bar.low { background: linear-gradient(90deg, #ef5350, #c62828); }
+    .hp-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 0.65rem; font-weight: 700; color: #333; text-shadow: 0 0 2px #fff; }
+    .vs { align-self: center; background: #ec407a; color: white; font-weight: 800; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .battle-log { background: #fafafa; border-radius: 10px; padding: 6px 10px; height: 72px; overflow-y: auto; font-size: 0.78rem; margin-bottom: 8px; border: 2px solid #eee; line-height: 1.4; }
+    .battle-log .e { margin-bottom: 2px; }
+    .e.p { color: #1565c0; } .e.en { color: #c62828; } .e.sys { color: #6a1b9a; font-weight: 600; }
+    .e.heal { color: #2e7d32; } .e.crit { color: #ef6c00; font-weight: 700; } .e.miss { color: #757575; } .e.lucky { color: #f9a825; font-weight: 700; }
+    .battle-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .act-box { background: #fce4ec; border-radius: 10px; padding: 6px; border: 2px solid #f8bbd0; }
+    .act-box h4 { text-align: center; font-size: 0.8rem; color: #c2185b; margin-bottom: 4px; }
+    .act-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .act-btn { padding: 7px 3px; border: none; border-radius: 8px; font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; color: white; }
+    .act-btn:hover:not(:disabled) { transform: scale(1.04); }
+    .act-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .act-skill { background: linear-gradient(135deg, #ce93d8, #ab47bc); }
+    .act-item { background: linear-gradient(135deg, #80cbc4, #26a69a); }
+    .act-btn .sub { font-size: 0.6rem; opacity: 0.9; display: block; }
+    .dmg-pop { position: absolute; left: 50%; top: 12%; transform: translateX(-50%); font-weight: 800; font-size: 1.15rem; pointer-events: none; animation: floatUp 0.8s ease forwards; z-index: 5; }
+    .dmg-pop.d { color: #e53935; } .dmg-pop.h { color: #43a047; } .dmg-pop.c { color: #ff6f00; font-size: 1.35rem; } .dmg-pop.m { color: #757575; font-size: 0.95rem; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 100% { opacity: 0; transform: translateX(-50%) translateY(-40px); } }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .overlay.hidden { display: none; }
+    .modal { background: white; border-radius: 18px; padding: 24px 20px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 16px 40px rgba(0,0,0,0.2); }
+    .modal .big { font-size: 3.5rem; margin-bottom: 6px; }
+    .modal h2 { font-size: 1.35rem; margin-bottom: 4px; }
+    .modal p { color: #666; margin-bottom: 14px; font-size: 0.9rem; white-space: pre-line; }
+
+    @media (max-width: 560px) {
+      .fighter-emoji { font-size: 3.2rem; }
+      .battle-actions { grid-template-columns: 1fr; }
+      .spot-icon { font-size: 1.5rem; }
+      .spot-label { font-size: 0.58rem; }
+      .island-wrap { aspect-ratio: 1 / 1; }
+    }
+
+    .farm-wrap { max-width: 900px; margin: 0 auto; }
+    #farm-game {
+      display: block; width: 100%; height: auto; aspect-ratio: 1000 / 700;
+      background: #7fae5a; border-radius: 14px; border: 3px solid #5d9a6e;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15); touch-action: none;
+    }
+    .farm-footer { text-align: center; padding: 8px; font-size: 0.8rem; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="header">
+      <h1>🏝️ 波波島</h1>
+      <div class="header-stats">
+        <span class="stat-chip" id="coin-display">💰 0</span>
+        <span class="stat-chip" id="level-display">⭐ Lv.1</span>
+        <span class="stat-chip" id="pet-count">🐾 0</span>
+        <span class="stat-chip" id="user-display" style="display:none"></span>
+        <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" data-screen="map">🗺️ 島嶼</button>
+      <button class="nav-btn" data-screen="team">🐾 隊伍</button>
+      <button class="nav-btn" data-screen="bag">🎒 背包</button>
+      <button class="nav-btn" data-screen="codex">📖 圖鑑</button>
+      <button class="nav-btn" data-screen="farm">🌾 農場</button>
+    </div>
+
+    <div id="map" class="screen active">
+      <div class="island-wrap" id="island-wrap">
+        <div class="sun"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="land" id="land">
+          <span class="deco" style="left:12%;top:15%">🌲</span>
+          <span class="deco" style="left:18%;top:22%">🌲</span>
+          <span class="deco" style="left:8%;top:28%">🌳</span>
+          <span class="deco" style="left:70%;top:12%">🌴</span>
+          <span class="deco" style="left:78%;top:18%">🌴</span>
+          <span class="deco" style="left:55%;top:8%">🌼</span>
+          <span class="deco" style="left:40%;top:70%">🌿</span>
+          <span class="deco" style="left:25%;top:65%">🌸</span>
+          <span class="deco" style="left:85%;top:55%">🪨</span>
+          <span class="deco" style="left:10%;top:55%">🍄</span>
+        </div>
+      </div>
+      <div class="map-footer">👆 點擊島上的地點開始探索</div>
+      <div class="map-log" id="map-log"></div>
+    </div>
+
+    <div id="zone" class="screen">
+      <div class="zone-panel">
+        <div class="big" id="zone-emoji">🌳</div>
+        <h2 id="zone-name">神秘森林</h2>
+        <p class="desc" id="zone-desc"></p>
+        <div class="action-row" id="zone-actions"></div>
+        <div class="log-box" id="zone-log"></div>
+      </div>
+    </div>
+
+    <div id="team" class="screen">
+      <div class="section-title">🐾 出戰隊伍（最多 3 隻，第一隻上場）</div>
+      <div class="pet-list" id="team-list"></div>
+      <div class="section-title" style="margin-top:14px">📦 擁有的寵物（點擊加入／移出）</div>
+      <div class="pet-list" id="owned-list"></div>
+    </div>
+
+    <div id="bag" class="screen">
+      <div class="section-title">🎒 背包</div>
+      <div class="item-list" id="item-list"></div>
+    </div>
+
+    <div id="codex" class="screen">
+      <div class="section-title">📖 寵物圖鑑</div>
+      <div class="pet-list" id="codex-list"></div>
+    </div>
+
+    <div id="farm" class="screen">
+      <div class="farm-wrap">
+        <canvas id="farm-game" width="1000" height="700"></canvas>
+      </div>
+      <div class="farm-footer">🌾 WASD / 方向鍵移動、1 2 3 選種子、E 種植/收成/購買/販賣/進出農舍、F 澆水、Space 睡覺、H 開關說明</div>
+    </div>
+
+    <div id="battle" class="screen">
+      <div class="battle-arena">
+        <div class="fighter player" id="p-fighter">
+          <span class="fighter-emoji" id="p-emoji">🐱</span>
+          <div class="fighter-name" id="p-name">-</div>
+          <div class="hp-bar-wrap"><div class="hp-bar" id="p-hp" style="width:100%"></div><div class="hp-txt" id="p-hp-txt">100/100</div></div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="fighter enemy" id="e-fighter">
+          <span class="fighter-emoji" id="e-emoji">🐶</span>
+          <div class="fighter-name" id="e-name">-</div>
+          <div class="hp-bar-wrap"><div class="hp-bar" id="e-hp" style="width:100%"></div><div class="hp-txt" id="e-hp-txt">100/100</div></div>
+        </div>
+      </div>
+      <div class="battle-log" id="b-log"></div>
+      <div class="battle-actions">
+        <div class="act-box"><h4>⚔️ 技能</h4><div class="act-grid" id="skill-btns"></div></div>
+        <div class="act-box"><h4>🎁 道具</h4><div class="act-grid" id="item-btns"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="login-overlay">
+    <div class="modal">
+      <div class="big">🏝️</div>
+      <h2>歡迎來到波波島</h2>
+      <p style="margin-bottom:10px;">登入或註冊帳號，開始你的冒險！</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+        <input id="login-username" type="text" placeholder="玩家名稱" maxlength="12" autocomplete="off"
+          style="padding:9px 12px;border-radius:20px;border:2px solid #a5d6a7;font-family:inherit;font-size:0.9rem;text-align:center;">
+        <input id="login-password" type="password" placeholder="密碼" autocomplete="off"
+          style="padding:9px 12px;border-radius:20px;border:2px solid #a5d6a7;font-family:inherit;font-size:0.9rem;text-align:center;">
+      </div>
+      <div id="login-error" style="color:#e53935;font-size:0.8rem;margin-bottom:10px;display:none;"></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="login-btn">登入</button>
+        <button class="btn btn-explore" id="register-btn">註冊新帳號</button>
+      </div>
+      <p style="margin-top:12px;font-size:0.68rem;color:#999;">＊帳號資料僅儲存在目前使用的瀏覽器中，換裝置或清除瀏覽器資料會遺失存檔。</p>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="result-modal">
+    <div class="modal">
+      <div class="big" id="res-emoji">🎉</div>
+      <h2 id="res-title">勝利！</h2>
+      <p id="res-msg"></p>
+      <div id="res-actions" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"></div>
+    </div>
+  </div>
+  <div class="overlay hidden" id="capture-modal">
+    <div class="modal">
+      <div class="big" id="cap-emoji">🐱</div>
+      <h2>野生寵物出現！</h2>
+      <p id="cap-msg"></p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-pink" id="cap-fight">⚔️ 戰鬥</button>
+        <button class="btn btn-purple" id="cap-catch">🎾 捕捉</button>
+        <button class="btn btn-back" id="cap-run">🏃 逃跑</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ====== Supabase 設定：請換成你自己專案的網址與 anon key ====== */
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* ============================================================= */
+
+const ALL_PETS = [
+  {id:'cat',name:'小貓咪',emoji:'🐱',type:'敏捷',maxHp:95,crit:0.22,dodge:0.18,
+    skills:[{name:'肉球拍拍',emoji:'🐾',power:18,critB:0.05},{name:'療癒呼嚕',emoji:'😻',heal:22},{name:'閃閃衝刺',emoji:'✨',power:28,critB:0.12},{name:'毛線纏繞',emoji:'🧶',power:12,effect:'slow',hit:0.85}]},
+  {id:'dog',name:'汪汪狗',emoji:'🐶',type:'力量',maxHp:115,crit:0.15,dodge:0.10,
+    skills:[{name:'汪汪大叫',emoji:'🔊',power:20,critB:0.08},{name:'舔舔療癒',emoji:'👅',heal:26},{name:'撲倒擁抱',emoji:'🤗',power:32,critB:0.05},{name:'挖洞突擊',emoji:'🕳️',power:16,effect:'stun',hit:0.70}]},
+  {id:'bunny',name:'蹦蹦兔',emoji:'🐰',type:'平衡',maxHp:100,crit:0.18,dodge:0.15,
+    skills:[{name:'蹦蹦跳',emoji:'⤴️',power:19,critB:0.06},{name:'胡蘿蔔力量',emoji:'🥕',heal:20},{name:'長耳巴掌',emoji:'👂',power:26,critB:0.10},{name:'超級可愛',emoji:'🥰',power:10,effect:'charm',hit:0.80}]},
+  {id:'panda',name:'圓圓熊貓',emoji:'🐼',type:'坦克',maxHp:135,crit:0.10,dodge:0.06,
+    skills:[{name:'滾滾攻擊',emoji:'🌀',power:22,critB:0.04},{name:'竹子大餐',emoji:'🎋',heal:30},{name:'熊抱壓制',emoji:'🐻',power:34,critB:0.03},{name:'裝睡迷惑',emoji:'😴',power:8,effect:'confuse',hit:0.75}]},
+  {id:'fox',name:'小狐狸',emoji:'🦊',type:'技巧',maxHp:88,crit:0.25,dodge:0.20,
+    skills:[{name:'尾巴掃掃',emoji:'🦊',power:17,critB:0.08},{name:'莓果能量',emoji:'🫐',heal:18},{name:'幻影戲法',emoji:'🎭',power:27,critB:0.15},{name:'小小火焰',emoji:'🔥',power:14,effect:'burn',hit:0.78}]},
+  {id:'penguin',name:'滑滑企鵝',emoji:'🐧',type:'冰系',maxHp:108,crit:0.16,dodge:0.12,
+    skills:[{name:'溜冰衝刺',emoji:'⛸️',power:21,critB:0.07},{name:'小魚零食',emoji:'🐟',heal:24},{name:'肚皮滑行',emoji:' freeze',power:29,critB:0.06},{name:'雪球攻擊',emoji:'❄️',power:13,effect:'freeze',hit:0.72}]},
+  {id:'owl',name:'咕咕貓頭鷹',emoji:'🦉',type:'智慧',maxHp:92,crit:0.20,dodge:0.16,
+    skills:[{name:'夜間突襲',emoji:'🌙',power:20,critB:0.10},{name:'羽毛療癒',emoji:'🪶',heal:21},{name:'智慧一擊',emoji:'📚',power:25,critB:0.12},{name:'催眠曲',emoji:'🎵',power:9,effect:'stun',hit:0.68}]},
+  {id:'frog',name:'跳跳蛙',emoji:'🐸',type:'水系',maxHp:98,crit:0.14,dodge:0.22,
+    skills:[{name:'彈跳攻擊',emoji:'🔝',power:19,critB:0.06},{name:'池塘恢復',emoji:'💧',heal:23},{name:'舌頭黏黏',emoji:'👅',power:24,critB:0.08},{name:'黏液減速',emoji:'🟢',power:11,effect:'slow',hit:0.82}]},
+  {id:'chick',name:'小雞寶',emoji:'🐤',type:'火種',maxHp:85,crit:0.19,dodge:0.14,
+    skills:[{name:'啄啄',emoji:'🐤',power:16,critB:0.07},{name:'暖暖羽毛',emoji:'🔥',heal:19},{name:'小雞衝刺',emoji:'💨',power:26,critB:0.11},{name:'火花四濺',emoji:'✨',power:12,effect:'burn',hit:0.76}]},
+  {id:'bear',name:'小熊熊',emoji:'🐻',type:'力量',maxHp:125,crit:0.12,dodge:0.08,
+    skills:[{name:'熊掌拍',emoji:'🐾',power:23,critB:0.05},{name:'蜂蜜罐',emoji:'🍯',heal:28},{name:'怒吼',emoji:'📢',power:33,critB:0.04},{name:'威嚇',emoji:'😤',power:10,effect:'charm',hit:0.70}]}
+];
+
+const ZONES = [
+  {id:'plaza',  name:'中央廣場', emoji:'🏞️', desc:'島的中心，可以休息與購物。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:48, y:48},
+  {id:'meadow', name:'陽光草地', emoji:'🌻', desc:'開滿花的溫柔草地，適合新手。', unlock:0, danger:1, pets:['cat','bunny','chick'], x:55, y:28},
+  {id:'forest', name:'神秘森林', emoji:'🌳', desc:'樹影幢幢，敏捷小動物的家。', unlock:2, danger:2, pets:['fox','owl','frog'], x:22, y:32},
+  {id:'beach',  name:'波波海灘', emoji:'🏖️', desc:'陽光沙灘，冰系寵物常出沒。', unlock:4, danger:2, pets:['penguin','frog','dog'], x:65, y:72},
+  {id:'cave',   name:'咕咕洞窟', emoji:'🕳️', desc:'陰涼洞穴，坦克型寵物棲息地。', unlock:6, danger:3, pets:['panda','bear','owl'], x:18, y:62},
+  {id:'volcano',name:'小火山',   emoji:'🌋', desc:'熱氣騰騰的力量試煉場。', unlock:9, danger:3, pets:['dog','bear','chick'], x:78, y:38},
+  {id:'rainbow',name:'彩虹山頂', emoji:'🌈', desc:'傳說稀有寵物會出現的地方！', unlock:12, danger:4, pets:['fox','bunny','owl','chick'], x:42, y:12}
+];
+
+const SHOP_ITEMS = [
+  {id:'potion',name:'愛心藥水',emoji:'❤️',price:30,heal:40,desc:'恢復 40 HP'},
+  {id:'super',name:'超級藥水',emoji:'💖',price:60,heal:70,desc:'恢復 70 HP'},
+  {id:'boost',name:'力量糖果',emoji:'🍬',price:40,effect:'atkUp',desc:'下次攻擊 +50%'},
+  {id:'shield',name:'防護泡泡',emoji:'🫧',price:40,effect:'defUp',desc:'下次受傷減半'},
+  {id:'star',name:'幸運星星',emoji:'⭐',price:50,effect:'luckUp',desc:'提升幸運'},
+  {id:'ball',name:'捕捉球',emoji:'🎾',price:25,effect:'ball',desc:'提高捕捉率'}
+];
+
+const S = {
+  coins:80, level:1, exp:0, wins:0,
+  unlocked:['plaza','meadow'],
+  owned:[], team:[],
+  items:{potion:2,super:0,boost:1,shield:1,star:0,ball:3},
+  currentZone:null, battling:false,
+  player:null, enemy:null, wild:null,
+  atkBoost:false, defBoost:false, forceCrit:false,
+  eEffects:{}, playerTurn:true,
+  pendingCatch:null
+};
+
+const $ = id => document.getElementById(id);
+const roll = c => Math.random() < c;
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const getBase = id => ALL_PETS.find(p=>p.id===id);
+const clonePet = (base,lv=1) => {
+  const p = {id:base.id,name:base.name,emoji:base.emoji,type:base.type,
+    maxHp:Math.floor(base.maxHp*(1+(lv-1)*0.08)),hp:0,level:lv,exp:0,
+    crit:base.crit,dodge:base.dodge};
+  p.hp = p.maxHp; return p;
+};
+
+function addLog(boxId, text) {
+  const box = $(boxId);
+  const d = document.createElement('div');
+  d.textContent = text;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function updateHeader() {
+  $('coin-display').textContent = '💰 '+S.coins;
+  $('level-display').textContent = '⭐ Lv.'+S.level;
+  $('pet-count').textContent = '🐾 '+S.owned.length;
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
+  if(id==='map') renderIsland();
+  if(id==='team') renderTeam();
+  if(id==='bag') renderBag();
+  if(id==='codex') renderCodex();
+}
+
+function attachStaticHandlers() {
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
+  });
+  $('cap-fight').onclick = ()=> startWildBattle();
+  $('cap-catch').onclick = ()=> tryCatch();
+  $('cap-run').onclick = ()=>{ $('capture-modal').classList.add('hidden'); addLog('zone-log','你決定先離開…'); };
+}
+
+function startNewGame() {
+  S.owned.push(clonePet(getBase('cat')));
+  S.team = [0];
+  updateHeader();
+  renderIsland();
+  addLog('map-log','🏝️ 歡迎來到波波島！你獲得了「小貓咪」！');
+  addLog('map-log','點擊島上的 🌻陽光草地 開始探索吧～');
+}
+
+/* ---------------- 登入 / 帳號存檔系統（Supabase 版）---------------- */
+let currentUser = null;   // 顯示用玩家名稱
+let currentUserId = null; // Supabase auth 使用者 id
+let autosaveTimer = null;
+let authBusy = false;
+
+// Supabase Auth 需要 email 格式，這裡把「玩家名稱」轉成一個內部用的假 email，
+// 讓使用者體驗上仍然只需要輸入「玩家名稱」+「密碼」。
+function usernameToEmail(username) {
+  const safe = username.toLowerCase().trim().replace(/[^a-z0-9_.-]/g, '');
+  return safe + '@boboisland.local';
+}
+
+function showLoginError(msg) {
+  const el = $('login-error');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setLoginButtonsBusy(busy) {
+  authBusy = busy;
+  $('login-btn').disabled = busy;
+  $('register-btn').disabled = busy;
+}
+
+function getSaveData() {
+  return {
+    island: {
+      coins: S.coins, level: S.level, exp: S.exp, wins: S.wins,
+      unlocked: S.unlocked, owned: S.owned, team: S.team, items: S.items
+    },
+    farm: (window.FarmGame ? window.FarmGame.getState() : null)
+  };
+}
+
+function loadGameData(saved) {
+  if (saved && saved.island) Object.assign(S, saved.island);
+  updateHeader();
+  renderIsland();
+  addLog('map-log','👋 歡迎回來，'+currentUser+'！');
+  if (saved && saved.farm && window.FarmGame) window.FarmGame.loadState(saved.farm);
+}
+
+// 把目前進度寫回 Supabase 的 saves 資料表（需要先在 Supabase 建好資料表與 RLS，見說明文件）
+async function persistCurrentUser() {
+  if (!currentUserId) return;
+  const { error } = await sb.from('saves').upsert({
+    user_id: currentUserId,
+    username: currentUser,
+    data: getSaveData(),
+    updated_at: new Date().toISOString()
+  });
+  if (error) console.error('存檔失敗：', error.message);
+}
+
+async function enterGame(username, userId, savedData) {
+  currentUser = username;
+  currentUserId = userId;
+  showLoginError('');
+  $('login-overlay').classList.add('hidden');
+  $('user-display').textContent = '👤 '+username;
+  $('user-display').style.display = 'inline-block';
+  $('logout-btn').style.display = 'inline-block';
+
+  if (savedData) loadGameData(savedData);
+  else startNewGame();
+
+  if (autosaveTimer) clearInterval(autosaveTimer);
+  autosaveTimer = setInterval(persistCurrentUser, 8000);
+}
+
+async function doLogin() {
+  if (authBusy) return;
+  const username = $('login-username').value.trim();
+  const password = $('login-password').value;
+  if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
+
+  setLoginButtonsBusy(true);
+  const email = usernameToEmail(username);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    showLoginError('帳號不存在或密碼錯誤');
+    setLoginButtonsBusy(false);
+    return;
+  }
+
+  const userId = data.user.id;
+  const { data: row, error: readErr } = await sb
+    .from('saves')
+    .select('data')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (readErr) console.error('讀取存檔失敗：', readErr.message);
+
+  setLoginButtonsBusy(false);
+  enterGame(username, userId, row ? row.data : null);
+}
+
+async function doRegister() {
+  if (authBusy) return;
+  const username = $('login-username').value.trim();
+  const password = $('login-password').value;
+  if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
+  if (username.length < 2 || username.length > 12) { showLoginError('名稱請輸入 2-12 個字'); return; }
+  if (password.length < 6) { showLoginError('密碼至少需要 6 個字元'); return; }
+
+  setLoginButtonsBusy(true);
+  const email = usernameToEmail(username);
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { username } }
+  });
+  if (error) {
+    showLoginError(error.message.includes('already') ? '這個名稱已經被使用了，換一個試試' : error.message);
+    setLoginButtonsBusy(false);
+    return;
+  }
+  if (!data.session) {
+    // 若 Supabase 專案開啟了「Confirm email」，這裡會拿不到 session。
+    // 建議在 Authentication → Providers → Email 把 Confirm email 關掉，方便這種假 email 的用法。
+    showLoginError('註冊成功，但需要 Email 驗證，請到 Supabase 專案關閉 Confirm email 後再試一次。');
+    setLoginButtonsBusy(false);
+    return;
+  }
+
+  const userId = data.user.id;
+  await sb.from('saves').upsert({ user_id: userId, username, data: null });
+  setLoginButtonsBusy(false);
+  enterGame(username, userId, null);
+}
+
+async function doLogout() {
+  if (currentUserId) await persistCurrentUser();
+  await sb.auth.signOut();
+  location.reload();
+}
+
+function attachLoginHandlers() {
+  $('login-btn').addEventListener('click', doLogin);
+  $('register-btn').addEventListener('click', doRegister);
+  $('logout-btn').addEventListener('click', doLogout);
+  $('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  $('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-password').focus(); });
+}
+window.addEventListener('beforeunload', () => { if (currentUserId) persistCurrentUser(); });
+
+function renderIsland() {
+  document.querySelectorAll('.spot').forEach(s=>s.remove());
+  const land = $('land');
+  ZONES.forEach(z=>{
+    const unlocked = S.unlocked.includes(z.id);
+    const spot = document.createElement('div');
+    spot.className = 'spot' + (unlocked?'':' locked');
+    spot.style.left = z.x + '%';
+    spot.style.top = z.y + '%';
+    spot.style.transform = 'translate(-50%,-50%)';
+    spot.innerHTML = '<span class="spot-icon">' + (unlocked?z.emoji:'🔒') + '</span><span class="spot-label">' + z.name + '</span>';
+    if(unlocked) spot.onclick = (e)=>{ e.stopPropagation(); openZone(z); };
+    land.appendChild(spot);
+  });
+}
+
+function openZone(z) {
+  S.currentZone = z;
+  $('zone-emoji').textContent = z.emoji;
+  $('zone-name').textContent = z.name;
+  $('zone-desc').textContent = z.desc + (z.danger? '　危險度 '+('⭐'.repeat(z.danger)) : '');
+  const actions = $('zone-actions');
+  actions.innerHTML = '';
+  if(z.rest){
+    const b=document.createElement('button'); b.className='btn btn-explore'; b.textContent='😴 休息回復';
+    b.onclick=()=>{ S.owned.forEach(p=>p.hp=p.maxHp); addLog('zone-log','所有寵物恢復精神了！❤️'); };
+    actions.appendChild(b);
+  }
+  if(z.shop){
+    const b=document.createElement('button'); b.className='btn btn-shop'; b.textContent='🛒 商店';
+    b.onclick=()=>openShop(); actions.appendChild(b);
+  }
+  if(z.pets&&z.pets.length){
+    const b=document.createElement('button'); b.className='btn btn-explore'; b.textContent='🔍 探索';
+    b.onclick=()=>explore(); actions.appendChild(b);
+  }
+  const back=document.createElement('button'); back.className='btn btn-back'; back.textContent='← 回到島上';
+  back.onclick=()=>showScreen('map'); actions.appendChild(back);
+  $('zone-log').innerHTML='';
+  addLog('zone-log','你來到了 '+z.name+'。');
+  showScreen('zone');
+}
+
+function explore() {
+  const z=S.currentZone;
+  if(!z||!z.pets.length) return;
+  if(S.team.length===0){ addLog('zone-log','⚠️ 請先在「隊伍」設定出戰寵物！'); return; }
+  addLog('zone-log','你在附近搜索…');
+  setTimeout(()=>{
+    const r=Math.random();
+    if(r<0.70){
+      const pid=z.pets[rand(0,z.pets.length-1)];
+      const base=getBase(pid);
+      const lv=Math.max(1,S.level+rand(-1,2));
+      S.wild=clonePet(base,lv);
+      $('cap-emoji').textContent=S.wild.emoji;
+      $('cap-msg').textContent='野生的 '+S.wild.name+'（Lv.'+S.wild.level+'）出現了！\n❤️ '+S.wild.hp+' HP　💥 暴擊 '+(S.wild.crit*100).toFixed(0)+'%';
+      $('capture-modal').classList.remove('hidden');
+    } else if(r<0.90){
+      const found=SHOP_ITEMS[rand(0,SHOP_ITEMS.length-1)];
+      S.items[found.id]=(S.items[found.id]||0)+1;
+      addLog('zone-log','🎁 發現了 '+found.emoji+found.name+'！');
+      updateHeader();
+    } else {
+      addLog('zone-log','什麼都沒發現…再試試看。');
+    }
+  },400);
+}
+
+function tryCatch() {
+  if(!S.wild) return;
+  let rate=0.35+(1-S.wild.hp/S.wild.maxHp)*0.4;
+  if((S.items.ball||0)>0){ rate+=0.2; S.items.ball--; addLog('zone-log','使用了捕捉球！🎾'); }
+  rate=Math.min(0.85,rate);
+  if(roll(rate)){
+    S.owned.push(S.wild);
+    addLog('zone-log','🎉 成功捕捉了 '+S.wild.emoji+S.wild.name+'！');
+    $('capture-modal').classList.add('hidden');
+    checkUnlocks(); updateHeader(); S.wild=null;
+  } else {
+    addLog('zone-log',S.wild.name+' 掙脫了！');
+    $('cap-msg').textContent=S.wild.name+' 掙脫了！還要繼續嗎？\n❤️ '+S.wild.hp+'/'+S.wild.maxHp;
+  }
+}
+
+function startWildBattle() {
+  $('capture-modal').classList.add('hidden');
+  const teamPet=S.owned[S.team[0]];
+  if(!teamPet||teamPet.hp<=0){ addLog('zone-log','⚠️ 出戰寵物沒體力了，請回廣場休息！'); return; }
+  const base=getBase(teamPet.id);
+  S.player=Object.assign({},teamPet,{skills:base.skills,crit:base.crit,dodge:base.dodge});
+  const ebase=getBase(S.wild.id);
+  S.enemy=Object.assign({},S.wild,{skills:ebase.skills,crit:ebase.crit,dodge:ebase.dodge});
+  S.battling=true; S.playerTurn=true;
+  S.atkBoost=S.defBoost=S.forceCrit=false; S.eEffects={};
+  S.pendingCatch=null;
+  startBattleUI();
+}
+
+function startBattleUI() {
+  $('p-emoji').textContent=S.player.emoji;
+  $('p-name').textContent=S.player.name+' Lv.'+S.player.level;
+  $('e-emoji').textContent=S.enemy.emoji;
+  $('e-name').textContent=S.enemy.name+' Lv.'+S.enemy.level;
+  updateBattleHp();
+  $('b-log').innerHTML='';
+  addBLog('戰鬥開始！'+S.player.name+' vs '+S.enemy.name,'sys');
+  renderBattleSkills();
+  renderBattleItems();
+  setBattleBtns(true);
+  showScreen('battle');
+}
+
+function updateBattleHp() {
+  const pp=Math.max(0,S.player.hp/S.player.maxHp*100);
+  const ep=Math.max(0,S.enemy.hp/S.enemy.maxHp*100);
+  $('p-hp').style.width=pp+'%';
+  $('p-hp').className='hp-bar'+(pp<=30?' low':pp<=60?' med':'');
+  $('p-hp-txt').textContent=S.player.hp+'/'+S.player.maxHp;
+  $('e-hp').style.width=ep+'%';
+  $('e-hp').className='hp-bar'+(ep<=30?' low':ep<=60?' med':'');
+  $('e-hp-txt').textContent=S.enemy.hp+'/'+S.enemy.maxHp;
+}
+function addBLog(t,c){ const d=document.createElement('div'); d.className='e '+(c||''); d.textContent=t; $('b-log').appendChild(d); $('b-log').scrollTop=$('b-log').scrollHeight; }
+
+function renderBattleSkills() {
+  const box=$('skill-btns');
+  box.innerHTML='';
+  if(!S.player||!S.player.skills) return;
+  S.player.skills.forEach(sk=>{
+    const b=document.createElement('button');
+    b.className='act-btn act-skill';
+    b.disabled = !S.playerTurn || !S.battling;
+    b.innerHTML=sk.emoji+' '+sk.name+(sk.heal?'<span class="sub">回復</span>':sk.effect?'<span class="sub">狀態</span>':'');
+    b.onclick=()=>useSkill(sk);
+    box.appendChild(b);
+  });
+}
+function renderBattleItems() {
+  const box=$('item-btns');
+  box.innerHTML='';
+  ['potion','super','boost','shield','star'].forEach(id=>{
+    const cnt=S.items[id]||0;
+    const info=SHOP_ITEMS.find(i=>i.id===id);
+    if(!info) return;
+    const b=document.createElement('button');
+    b.className='act-btn act-item';
+    b.innerHTML=info.emoji+' '+info.name+'<span class="sub">×'+cnt+'</span>';
+    b.disabled = cnt<=0 || !S.playerTurn || !S.battling;
+    b.onclick=()=>useItem(id);
+    box.appendChild(b);
+  });
+}
+
+/* FIX: properly enable/disable by re-rendering both */
+function setBattleBtns(on){
+  S.playerTurn = on;
+  renderBattleSkills();
+  renderBattleItems();
+}
+
+function showPop(target,text,type){
+  const el=$(target==='p'?'p-fighter':'e-fighter');
+  const p=document.createElement('div'); p.className='dmg-pop '+type; p.textContent=text;
+  el.appendChild(p); setTimeout(()=>p.remove(),800);
+}
+function calcAtk(atk,def,sk,isP){
+  const hit=sk.hit!=null?sk.hit:0.92;
+  if(!roll(hit)) return {type:'miss',dmg:0};
+  if(roll(def.dodge)) return {type:'dodge',dmg:0};
+  let dmg=sk.power+rand(-4,6);
+  let crit=S.forceCrit||roll(atk.crit+(sk.critB||0));
+  if(S.forceCrit) S.forceCrit=false;
+  if(crit) dmg=Math.floor(dmg*1.75);
+  if(isP&&S.atkBoost){ dmg=Math.floor(dmg*1.5); S.atkBoost=false; }
+  if(isP&&S.eEffects.slow) dmg=Math.floor(dmg*1.2);
+  if(isP&&S.eEffects.charm) dmg=Math.floor(dmg*0.7);
+  if(!isP&&S.defBoost){ dmg=Math.floor(dmg*0.5); S.defBoost=false; }
+  return {type:crit?'crit':'hit', dmg:Math.max(4,dmg)};
+}
+
+function useSkill(sk){
+  if(!S.playerTurn||!S.battling) return;
+  setBattleBtns(false);
+  $('p-fighter').classList.add('attacking'); setTimeout(()=>$('p-fighter').classList.remove('attacking'),350);
+  if(sk.heal){
+    let h=sk.heal; if(roll(0.15)){ h=Math.floor(h*1.5); addBLog('🍀 幸運大回復！','lucky'); }
+    S.player.hp=Math.min(S.player.maxHp,S.player.hp+h);
+    addBLog(S.player.name+' 使用 '+sk.emoji+sk.name+'，回復 '+h+'！','heal');
+    showPop('p','+'+h,'h'); updateBattleHp();
+  } else {
+    const r=calcAtk(S.player,S.enemy,sk,true);
+    if(r.type==='miss'){ addBLog(sk.name+' 沒打中！','miss'); showPop('e','MISS','m'); }
+    else if(r.type==='dodge'){ addBLog(S.enemy.name+' 閃過了！','miss'); showPop('e','閃避','m'); }
+    else {
+      S.enemy.hp=Math.max(0,S.enemy.hp-r.dmg);
+      if(r.type==='crit'){ addBLog('💥 暴擊！造成 '+r.dmg+' 傷害！','crit'); showPop('e','CRIT -'+r.dmg,'c'); }
+      else { addBLog(S.player.name+' 使用 '+sk.emoji+sk.name+'，造成 '+r.dmg+' 傷害','p'); showPop('e','-'+r.dmg,'d'); }
+      if(sk.effect&&roll(0.75)){ S.eEffects[sk.effect]=2; addBLog(S.enemy.name+' 陷入狀態！','sys'); }
+      $('e-fighter').classList.add('hurt'); setTimeout(()=>$('e-fighter').classList.remove('hurt'),350);
+      updateBattleHp();
+    }
+  }
+  if(S.enemy.hp<=0){ setTimeout(()=>endBattle(true),700); return; }
+  setTimeout(enemyTurn,800);
+}
+
+function useItem(id){
+  if(!S.playerTurn||!S.battling||!(S.items[id]>0)) return;
+  setBattleBtns(false); S.items[id]--;
+  const info=SHOP_ITEMS.find(i=>i.id===id);
+  if(info.heal){ S.player.hp=Math.min(S.player.maxHp,S.player.hp+info.heal); addBLog('使用 '+info.emoji+info.name+'，回復 '+info.heal+'！','heal'); showPop('p','+'+info.heal,'h'); updateBattleHp(); }
+  else if(info.effect==='atkUp'){ S.atkBoost=true; addBLog('力量提升！','sys'); }
+  else if(info.effect==='defUp'){ S.defBoost=true; addBLog('防護展開！','sys'); }
+  else if(info.effect==='luckUp'){ addBLog('幸運上升！','lucky'); }
+  setTimeout(enemyTurn,700);
+}
+
+function enemyTurn(){
+  if(!S.battling) return;
+  if(S.eEffects.stun>0||S.eEffects.freeze>0){ addBLog(S.enemy.name+' 無法行動…','sys'); tickEffects(); setBattleBtns(true); return; }
+  const skills=S.enemy.skills;
+  let sk=(S.enemy.hp<S.enemy.maxHp*0.35&&Math.random()<0.5)?(skills.find(s=>s.heal)||skills[0]):skills[rand(0,skills.length-1)];
+  $('e-fighter').classList.add('attacking'); setTimeout(()=>$('e-fighter').classList.remove('attacking'),350);
+  if(sk.heal){
+    S.enemy.hp=Math.min(S.enemy.maxHp,S.enemy.hp+sk.heal);
+    addBLog(S.enemy.name+' 使用 '+sk.emoji+sk.name+'，回復 '+sk.heal,'heal');
+    showPop('e','+'+sk.heal,'h'); updateBattleHp();
+  } else {
+    const r=calcAtk(S.enemy,S.player,sk,false);
+    if(r.type==='miss'){ addBLog(S.enemy.name+' 的攻擊落空！','miss'); showPop('p','MISS','m'); }
+    else if(r.type==='dodge'){ addBLog(S.player.name+' 閃過了！','miss'); showPop('p','閃避','m'); }
+    else {
+      S.player.hp=Math.max(0,S.player.hp-r.dmg);
+      if(r.type==='crit'){ addBLog('💥 暴擊！受到 '+r.dmg+' 傷害！','crit'); showPop('p','CRIT -'+r.dmg,'c'); }
+      else { addBLog(S.enemy.name+' 使用 '+sk.emoji+sk.name+'，造成 '+r.dmg+' 傷害','en'); showPop('p','-'+r.dmg,'d'); }
+      $('p-fighter').classList.add('hurt'); setTimeout(()=>$('p-fighter').classList.remove('hurt'),350);
+      updateBattleHp();
+    }
+  }
+  const idx=S.team[0]; if(S.owned[idx]) S.owned[idx].hp=S.player.hp;
+  if(S.player.hp<=0){ setTimeout(()=>endBattle(false),700); return; }
+  tickEffects(); setBattleBtns(true);
+}
+function tickEffects(){ for(const k in S.eEffects){ S.eEffects[k]--; if(S.eEffects[k]<=0) delete S.eEffects[k]; } }
+
+function endBattle(win){
+  S.battling=false;
+  setBattleBtns(false);
+  const idx=S.team[0];
+  if(S.owned[idx]) S.owned[idx].hp=Math.max(0,S.player.hp);
+
+  const actions = $('res-actions');
+  actions.innerHTML = '';
+
+  if(win){
+    S.wins++;
+    const coins=15+rand(5,25)+(S.currentZone?S.currentZone.danger*8:0);
+    const expG=12+rand(5,15);
+    S.coins+=coins; S.exp+=expG;
+    while(S.exp>=S.level*30){ S.exp-=S.level*30; S.level++; }
+    if(S.owned[idx]){
+      S.owned[idx].exp=(S.owned[idx].exp||0)+expG;
+      if(S.owned[idx].exp>=S.owned[idx].level*25){
+        S.owned[idx].exp=0; S.owned[idx].level++;
+        S.owned[idx].maxHp=Math.floor(getBase(S.owned[idx].id).maxHp*(1+(S.owned[idx].level-1)*0.08));
+        S.owned[idx].hp=S.owned[idx].maxHp;
+      }
+    }
+    checkUnlocks(); updateHeader();
+    $('res-emoji').textContent='🎉';
+    $('res-title').textContent='勝利！';
+    $('res-msg').textContent='獲得 💰'+coins+'　經驗 +'+expG+'\n目前勝場：'+S.wins;
+
+    // 可以收服對手
+    if(S.wild){
+      S.pendingCatch = Object.assign({}, S.wild, {hp: S.wild.maxHp});
+      const catchBtn = document.createElement('button');
+      catchBtn.className = 'btn btn-purple';
+      catchBtn.textContent = '🎾 收服 ' + S.wild.emoji + S.wild.name;
+      catchBtn.onclick = () => {
+        // 血量越低越好收服；戰鬥後血量已是 0，所以成功率較高
+        let rate = 0.55;
+        if((S.items.ball||0)>0){ rate += 0.25; S.items.ball--; }
+        rate = Math.min(0.95, rate);
+        if(roll(rate)){
+          S.owned.push(S.pendingCatch);
+          updateHeader();
+          $('res-msg').textContent += '\n🎉 成功收服了 '+S.pendingCatch.emoji+S.pendingCatch.name+'！';
+          catchBtn.disabled = true;
+          catchBtn.textContent = '已收服 ✓';
+        } else {
+          $('res-msg').textContent += '\n💨 '+S.pendingCatch.name+' 逃走了…';
+          catchBtn.disabled = true;
+          catchBtn.textContent = '收服失敗';
+        }
+        S.pendingCatch = null;
+      };
+      actions.appendChild(catchBtn);
+    }
+
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-primary';
+    okBtn.textContent = '確定';
+    okBtn.onclick = () => {
+      S.wild = null; S.pendingCatch = null;
+      $('result-modal').classList.add('hidden');
+      showScreen('map');
+    };
+    actions.appendChild(okBtn);
+  } else {
+    $('res-emoji').textContent='😿';
+    $('res-title').textContent='敗北…';
+    $('res-msg').textContent='寵物倒下了。回廣場休息再出發吧！';
+    S.wild = null;
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-primary';
+    okBtn.textContent = '確定';
+    okBtn.onclick = () => {
+      $('result-modal').classList.add('hidden');
+      showScreen('map');
+    };
+    actions.appendChild(okBtn);
+  }
+  $('result-modal').classList.remove('hidden');
+}
+
+function checkUnlocks(){
+  ZONES.forEach(z=>{
+    if(!S.unlocked.includes(z.id)&&S.wins>=z.unlock){
+      S.unlocked.push(z.id);
+      addLog('map-log','🔓 新地點出現：'+z.emoji+z.name+'！');
+    }
+  });
+}
+
+function openShop(){
+  const actions=$('zone-actions'); actions.innerHTML='';
+  const back=document.createElement('button'); back.className='btn btn-back'; back.textContent='← 返回';
+  back.onclick=()=>openZone(S.currentZone); actions.appendChild(back);
+  $('zone-log').innerHTML='';
+  const title=document.createElement('div'); title.className='section-title'; title.style.margin='6px 0'; title.textContent='🛒 波波商店';
+  $('zone-log').appendChild(title);
+  const grid=document.createElement('div'); grid.className='shop-grid';
+  SHOP_ITEMS.forEach(it=>{
+    const card=document.createElement('div'); card.className='shop-item';
+    card.innerHTML='<div class="emoji">'+it.emoji+'</div><div class="name">'+it.name+'</div><div class="price">💰 '+it.price+'</div><div class="desc">'+it.desc+'</div>';
+    const btn=document.createElement('button'); btn.className='btn btn-shop'; btn.style.padding='5px 12px'; btn.style.fontSize='0.8rem'; btn.textContent='購買';
+    btn.onclick=()=>{ if(S.coins<it.price){ addLog('zone-log','金錢不足！'); return; } S.coins-=it.price; S.items[it.id]=(S.items[it.id]||0)+1; updateHeader(); addLog('zone-log','買下了 '+it.emoji+it.name+'！'); };
+    card.appendChild(btn); grid.appendChild(card);
+  });
+  $('zone-log').appendChild(grid);
+}
+
+function renderTeam(){
+  const teamBox=$('team-list'), ownedBox=$('owned-list');
+  teamBox.innerHTML=''; ownedBox.innerHTML='';
+  S.team.forEach(idx=>{ const p=S.owned[idx]; if(p) teamBox.appendChild(makePetCard(p,idx,true)); });
+  if(!S.team.length) teamBox.innerHTML='<p style="text-align:center;color:#888;grid-column:1/-1">尚未設定出戰寵物</p>';
+  S.owned.forEach((p,idx)=>{ const card=makePetCard(p,idx,S.team.includes(idx)); card.onclick=()=>toggleTeam(idx); ownedBox.appendChild(card); });
+}
+function makePetCard(p,idx,inTeam){
+  const base=getBase(p.id);
+  const div=document.createElement('div');
+  div.className='pet-card'+(inTeam?' active-team':'');
+  const pct=Math.max(0,p.hp/p.maxHp*100);
+  div.innerHTML=(inTeam?'<span class="team-label">出戰</span>':'')+'<div class="emoji">'+p.emoji+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+base.type+'<br>❤️ '+p.hp+'/'+p.maxHp+'</div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>';
+  return div;
+}
+function toggleTeam(idx){
+  const pos=S.team.indexOf(idx);
+  if(pos>=0) S.team.splice(pos,1);
+  else { if(S.team.length>=3){ alert('最多 3 隻！'); return; } S.team.push(idx); }
+  renderTeam();
+}
+function renderBag(){
+  const box=$('item-list'); box.innerHTML=''; let has=false;
+  SHOP_ITEMS.forEach(it=>{
+    const cnt=S.items[it.id]||0; if(cnt<=0) return; has=true;
+    const d=document.createElement('div'); d.className='item-card';
+    d.innerHTML='<div class="emoji">'+it.emoji+'</div><div class="name">'+it.name+'</div><div class="count">×'+cnt+'</div><div style="font-size:0.7rem;color:#666;margin-top:3px">'+it.desc+'</div>';
+    box.appendChild(d);
+  });
+  if(!has) box.innerHTML='<p style="text-align:center;color:#888;grid-column:1/-1">背包是空的</p>';
+}
+function renderCodex(){
+  const box=$('codex-list'); box.innerHTML='';
+  ALL_PETS.forEach(p=>{
+    const owned=S.owned.some(o=>o.id===p.id);
+    const d=document.createElement('div'); d.className='pet-card'; d.style.opacity=owned?1:0.4;
+    d.innerHTML='<div class="emoji">'+(owned?p.emoji:'❓')+'</div><div class="name">'+(owned?p.name:'？？？')+'</div><div class="meta">'+(owned?p.type+'　❤️'+p.maxHp+'<br>💥'+(p.crit*100).toFixed(0)+'% 💨'+(p.dodge*100).toFixed(0)+'%':'尚未發現')+'</div>';
+    box.appendChild(d);
+  });
+}
+
+attachStaticHandlers();
+attachLoginHandlers();
+</script>
+
+<script>
+(() => {
+  const canvas = document.getElementById('farm-game');
+  const ctx = canvas.getContext('2d');
+  const WIDTH = 1000, HEIGHT = 700;
+  const FONT_FAMILY = "'Noto Sans TC','Microsoft JhengHei','PingFang TC','Heiti TC',sans-serif";
+  const FONT_S = `17px ${FONT_FAMILY}`;
+  const FONT_M = `21px ${FONT_FAMILY}`;
+  const FONT_B = `bold 30px ${FONT_FAMILY}`;
+
+  // ---------- 顏色（沿用原本 pygame 版本的配色）----------
+  const GRASS_LIGHT=[150,210,105], GRASS_DARK=[108,168,75];
+  const DIRT_LIGHT=[176,128,82], DIRT_DARK=[118,80,48];
+  const WET_DIRT=[105,85,75], WET_DIRT_LIGHT=[128,104,92];
+  const WATER=[80,170,220], WATER_DEEP=[45,120,175];
+  const WOOD=[150,95,50], ROOF=[120,60,50], ROOF_LIGHT=[165,90,70];
+  const BLACK=[35,35,35], WHITE=[245,245,245];
+  const PANEL=[250,245,220], PANEL_SHADE=[232,220,185], PANEL_BORDER=[120,85,45];
+  const PLAYER_COLOR=[70,100,210], PLAYER_COLOR_DARK=[48,72,165];
+  const GOLD=[235,185,70];
+  const LEAF_FALL_COLORS=[[210,150,60],[225,175,70],[195,120,55],[170,195,90]];
+  const FLOWER_COLORS=[[240,130,160],[250,220,100],[200,150,235],[255,255,255]];
+
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+  const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const lerp = (a,b,t) => a + (b-a)*t;
+  const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+  const lerpColor = (c1,c2,t) => [
+    Math.round(clamp(lerp(c1[0],c2[0],t),0,255)),
+    Math.round(clamp(lerp(c1[1],c2[1],t),0,255)),
+    Math.round(clamp(lerp(c1[2],c2[2],t),0,255))
+  ];
+
+  // ---------- Rect 工具（模仿 pygame.Rect）----------
+  class Rect {
+    constructor(x,y,w,h){ this.x=x; this.y=y; this.w=w; this.h=h; }
+    get right(){ return this.x+this.w; }
+    get bottom(){ return this.y+this.h; }
+    get centerx(){ return this.x+this.w/2; }
+    get centery(){ return this.y+this.h/2; }
+    inflate(dx,dy){ return new Rect(this.x-dx, this.y-dy, this.w+dx*2, this.h+dy*2); }
+    collide(o){ return !(o.x>this.x+this.w || o.x+o.w<this.x || o.y>this.y+this.h || o.y+o.h<this.y); }
+    contains(px,py){ return px>=this.x && px<=this.x+this.w && py>=this.y && py<=this.y+this.h; }
+  }
+
+  // ---------- 繪圖輔助 ----------
+  function roundRectPath(x,y,w,h,r){
+    r = Math.max(0, Math.min(r, w/2, h/2));
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);
+    ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);
+    ctx.arcTo(x,y,x+r,y,r);
+    ctx.closePath();
+  }
+
+  function drawGradientRect(x,y,w,h,top,bottom,radius=0){
+    if (w<=0||h<=0) return;
+    const grad = ctx.createLinearGradient(0,y,0,y+h);
+    grad.addColorStop(0, rgb(top));
+    grad.addColorStop(1, rgb(bottom));
+    ctx.save();
+    if (radius>0){ roundRectPath(x,y,w,h,radius); ctx.clip(); }
+    ctx.fillStyle = grad;
+    ctx.fillRect(x,y,w,h);
+    ctx.restore();
+  }
+
+  function drawShadow(cx,bottomY,w,h,alpha=75){
+    if (w<=0||h<=0) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, bottomY-h/2, w/2, h/2, 0, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(15,20,15,${alpha/255})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGlow(cx,cy,radius,color,maxAlpha=90,layers=4){
+    if (radius<=0) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i=layers;i>=1;i--){
+      const r = Math.max(1, radius*i/layers);
+      const alpha = clamp((maxAlpha*(1-i/layers)+6)/255, 0, 1);
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle = rgba(color, alpha);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function roundedPanel(x,y,w,h, fillTop, fillBottom, borderColor, radius=12, borderWidth=3){
+    ctx.save();
+    roundRectPath(x+3, y+6, w, h, radius);
+    ctx.fillStyle = 'rgba(20,15,10,0.25)';
+    ctx.fill();
+    ctx.restore();
+    drawGradientRect(x,y,w,h,fillTop,fillBottom,radius);
+    ctx.save();
+    roundRectPath(x,y,w,h,radius);
+    ctx.lineWidth = borderWidth;
+    ctx.strokeStyle = rgb(borderColor);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawText(text, font, color, x, y){
+    ctx.fillStyle = Array.isArray(color) ? rgb(color) : color;
+    ctx.font = font;
+    ctx.textBaseline = 'top';
+    ctx.fillText(text, x, y);
+  }
+
+  // ---------- 場景座標（沿用原始版面配置）----------
+  const farm_x=250, farm_y=175, tile_size=55, rows=4, cols=6;
+  const house = new Rect(705,105,190,145);
+  const house_door = new Rect(house.centerx-23, house.bottom-45, 46,45);
+  const shop = new Rect(55,210,145,130);
+  const shipping_bin = new Rect(825,420,105,70);
+  const river_y = 575;
+  const inside_room = new Rect(95,90,810,500);
+  const inside_door = new Rect(450,520,100,45);
+  const bed = new Rect(650,160,165,95);
+
+  let player = new Rect(262,184,30,36);
+  const WALK_SPEED = 230; // px / 秒
+  let target_x = player.x, target_y = player.y;
+  let scene = "outside";
+
+  let anim_clock = 0, facing = "down";
+  let leaf_particles = [], firefly_particles = [], near_glow_phase = 0;
+
+  let crops = [], watered = [];
+  for (let r=0;r<rows;r++){
+    const cr=[], wr=[];
+    for (let c=0;c<cols;c++){ cr.push(null); wr.push(false); }
+    crops.push(cr); watered.push(wr);
+  }
+
+  const crop_data = {
+    carrot: { name:"紅蘿蔔", seed_name:"紅蘿蔔種子", buy:10, sell:25, grow_minutes:80, color:[240,120,45] },
+    corn: { name:"玉米", seed_name:"玉米種子", buy:18, sell:45, grow_minutes:130, color:[245,210,60] },
+    pumpkin: { name:"南瓜", seed_name:"南瓜種子", buy:30, sell:80, grow_minutes:190, color:[230,125,35] }
+  };
+  const crop_order = ["carrot","corn","pumpkin"];
+  const inventory = { seeds:{carrot:0,corn:0,pumpkin:0}, produce:{carrot:0,corn:0,pumpkin:0} };
+
+  let selected_crop = "carrot";
+  let day = 1, day_minutes = 7*60;
+  let time_accumulator = 0;
+  const seconds_per_game_minute = 0.15;
+  let money = 100;
+  let show_help = false;
+  let message = "先到左邊商店買種子，再回農田種植。";
+  let message_timer = 300/60; // 秒
+
+  // ---------- 對外存讀檔介面（供登入系統使用）----------
+  window.FarmGame = {
+    getState(){
+      return {
+        day, day_minutes, money, selected_crop,
+        inventory: JSON.parse(JSON.stringify(inventory)),
+        crops: crops.map(row => row.map(c => c ? { kind:c.kind, growth:c.growth } : null)),
+        watered: watered.map(row => row.slice())
+      };
+    },
+    loadState(state){
+      if (!state) return;
+      if (typeof state.day === "number") day = state.day;
+      if (typeof state.day_minutes === "number") day_minutes = state.day_minutes;
+      if (typeof state.money === "number") money = state.money;
+      if (state.selected_crop) selected_crop = state.selected_crop;
+      if (state.inventory){
+        Object.assign(inventory.seeds, state.inventory.seeds || {});
+        Object.assign(inventory.produce, state.inventory.produce || {});
+      }
+      if (state.crops){
+        for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+          const saved = state.crops[r] && state.crops[r][c];
+          crops[r][c] = saved ? { kind: saved.kind, growth: saved.growth } : null;
+        }
+      }
+      if (state.watered){
+        for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+          watered[r][c] = !!(state.watered[r] && state.watered[r][c]);
+        }
+      }
+    }
+  };
+
+  // ---------- 場景裝飾（草叢、花朵、樹）----------
+  function overlapsAny(rects, x, y, pad=6){
+    for (const r of rects){ if (r.inflate(pad,pad).contains(x,y)) return true; }
+    return false;
+  }
+  const decor_blockers = [house, shop, shipping_bin, new Rect(farm_x, farm_y, cols*tile_size, rows*tile_size)];
+
+  let grass_tufts = [];
+  for (let i=0;i<240;i++){
+    const tx = 4 + Math.random()*(WIDTH-8);
+    const ty = 4 + Math.random()*(river_y-16);
+    if (overlapsAny(decor_blockers, tx, ty, 4)) continue;
+    const tsize = 2 + Math.floor(Math.random()*4);
+    const shade = [GRASS_LIGHT, GRASS_DARK, GRASS_DARK][Math.floor(Math.random()*3)];
+    grass_tufts.push([tx,ty,tsize,shade]);
+  }
+
+  let flower_spots = [];
+  for (let i=0;i<22;i++){
+    const fx = 15 + Math.random()*(WIDTH-30);
+    const fy = 15 + Math.random()*(river_y-40);
+    if (overlapsAny(decor_blockers, fx, fy, 10)) continue;
+    flower_spots.push([fx, fy, FLOWER_COLORS[Math.floor(Math.random()*FLOWER_COLORS.length)]]);
+  }
+
+  const tree_spots = [[80,420],[150,500],[650,420],[690,480],[940,315]];
+
+  // ---------- 遊戲邏輯函式 ----------
+  function setMessage(text){ message = text; message_timer = 4; }
+
+  function isNear(target, distance=28){
+    return player.collide(target.inflate(distance, distance));
+  }
+
+  function getFieldTile(){
+    if (scene !== "outside") return null;
+    const cx = player.centerx, cy = player.centery;
+    if (!(farm_x <= cx && cx < farm_x + cols*tile_size)) return null;
+    if (!(farm_y <= cy && cy < farm_y + rows*tile_size)) return null;
+    const col = Math.floor((cx-farm_x)/tile_size);
+    const row = Math.floor((cy-farm_y)/tile_size);
+    return [row,col];
+  }
+
+  const cropIsMature = crop => crop.growth >= crop_data[crop.kind].grow_minutes*3;
+  const cropStage = crop => Math.min(3, Math.floor(crop.growth / crop_data[crop.kind].grow_minutes));
+  const formatTime = () => {
+    const h = Math.floor(day_minutes/60), m = day_minutes%60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  };
+
+  function growCrops(minutes){
+    for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+      const crop = crops[r][c];
+      if (crop && watered[r][c] && !cropIsMature(crop)) crop.growth += minutes;
+    }
+  }
+
+  function advanceTime(minutes){
+    let remaining = minutes;
+    while (remaining > 0){
+      const untilMidnight = 24*60 - day_minutes;
+      const step = Math.min(remaining, untilMidnight);
+      growCrops(step);
+      day_minutes += step;
+      remaining -= step;
+      if (day_minutes >= 24*60){ day += 1; day_minutes = 6*60; }
+    }
+  }
+
+  const isNight = minutes => { const m = minutes % (24*60); return m >= 20*60 || m <= 4*60; };
+
+  function getTimePhase(minutes){
+    const m = minutes % (24*60);
+    if (m >= 0 && m <= 3*60) return [[20,25,65],140];
+    if (m > 3*60 && m <= 5*60){ const t=(m-3*60)/(2*60); return [lerpColor([20,25,65],[255,190,120],t), Math.round(lerp(140,90,t))]; }
+    if (m > 5*60 && m < 7*60){ const t=(m-5*60)/(2*60); return [[255,190,120], Math.round(lerp(90,0,t))]; }
+    if (m >= 7*60 && m <= 17*60) return null;
+    if (m > 17*60 && m <= 19*60){ const t=(m-17*60)/(2*60); return [[255,150,80], Math.round(lerp(0,90,t))]; }
+    if (m > 19*60 && m <= 22*60){ const t=(m-19*60)/(3*60); return [lerpColor([255,150,80],[20,25,65],t), Math.round(lerp(90,140,t))]; }
+    return [[20,25,65],140];
+  }
+
+  function plantOrHarvest(){
+    const tile = getFieldTile();
+    if (tile){
+      const [row,col] = tile;
+      const crop = crops[row][col];
+      if (!crop){
+        if (inventory.seeds[selected_crop] <= 0){ setMessage("背包裡沒有這種種子，去商店購買吧！"); return; }
+        crops[row][col] = { kind: selected_crop, growth: 0 };
+        watered[row][col] = false;
+        inventory.seeds[selected_crop] -= 1;
+        setMessage(`種下了${crop_data[selected_crop].name}，按 F 澆水後時間會讓它成長。`);
+        return;
+      }
+      if (cropIsMature(crop)){
+        const kind = crop.kind;
+        inventory.produce[kind] += 1;
+        crops[row][col] = null;
+        watered[row][col] = false;
+        setMessage(`收成了 1 個${crop_data[kind].name}，已放進背包！`);
+        return;
+      }
+      setMessage("這株作物還在成長中。");
+      return;
+    }
+    if (scene==="outside" && isNear(house_door,22)){ enterHouse(); return; }
+    if (scene==="outside" && isNear(shop)){ buySeed(); return; }
+    if (scene==="outside" && isNear(shipping_bin)){ sellProduce(); return; }
+    if (scene==="inside" && isNear(inside_door,18)){ leaveHouse(); return; }
+    setMessage("站到可互動的位置後再按 E。");
+  }
+
+  function waterCrop(){
+    const tile = getFieldTile();
+    if (!tile){ setMessage("站在有作物的農田上才能澆水。"); return; }
+    const [row,col] = tile;
+    const crop = crops[row][col];
+    if (!crop){ setMessage("這格是空地，先按 E 種植吧。"); return; }
+    if (cropIsMature(crop)){ setMessage("作物已成熟，可以按 E 收成！"); return; }
+    if (watered[row][col]){ setMessage("這格已經澆過水，等待時間讓它慢慢成長吧。"); return; }
+    watered[row][col] = true;
+    setMessage("澆水完成！遊戲時間會持續流動，作物會慢慢長大。");
+  }
+
+  function buySeed(){
+    const data = crop_data[selected_crop];
+    if (money < data.buy){ setMessage("金錢不夠，先去出貨箱販賣農產品吧！"); return; }
+    money -= data.buy;
+    inventory.seeds[selected_crop] += 1;
+    setMessage(`買了 1 包${data.seed_name}，花費 $${data.buy}。`);
+  }
+
+  function sellProduce(){
+    let total = 0, sold = 0;
+    for (const kind of crop_order){
+      const amount = inventory.produce[kind];
+      total += amount * crop_data[kind].sell;
+      sold += amount;
+      inventory.produce[kind] = 0;
+    }
+    if (sold === 0){ setMessage("背包裡沒有農產品可以販賣。"); return; }
+    money += total;
+    setMessage(`賣出了 ${sold} 個農產品，獲得 $${total}！`);
+  }
+
+  function enterHouse(){
+    scene = "inside";
+    player.x = 450; player.y = 490;
+    target_x = player.x; target_y = player.y;
+    setMessage("進入農舍。走到床邊後按 SPACE 睡覺。");
+  }
+
+  function leaveHouse(){
+    scene = "outside";
+    player.x = 757; player.y = 184;
+    target_x = player.x; target_y = player.y;
+    setMessage("回到農場了。");
+  }
+
+  function sleepNextDay(){
+    if (scene !== "inside" || !isNear(bed,35)){ setMessage("要進入農舍，站到床邊才能睡覺！"); return; }
+    const minutesUntilMorning = 24*60 - day_minutes;
+    advanceTime(minutesUntilMorning);
+    setMessage(`睡了一覺，現在是第 ${day} 天 ${formatTime()}。`);
+  }
+
+  function tryMove(key){
+    if (player.x !== target_x || player.y !== target_y) return;
+    let moveX = 0, moveY = 0;
+    if (key === "a" || key === "arrowleft"){ moveX = -tile_size; facing = "left"; }
+    else if (key === "d" || key === "arrowright"){ moveX = tile_size; facing = "right"; }
+    else if (key === "w" || key === "arrowup"){ moveY = -tile_size; facing = "up"; }
+    else if (key === "s" || key === "arrowdown"){ moveY = tile_size; facing = "down"; }
+    else return;
+    const newX = target_x + moveX, newY = target_y + moveY;
+    const boundary = scene === "outside"
+      ? new Rect(0,0,WIDTH, river_y-10)
+      : inside_room.inflate(-25,-25);
+    if (boundary.x <= newX && newX <= boundary.right - player.w &&
+        boundary.y <= newY && newY <= boundary.bottom - player.h){
+      target_x = newX; target_y = newY;
+    }
+  }
+
+  function updatePlayer(dt){
+    const step = WALK_SPEED * dt;
+    if (player.x < target_x) player.x = Math.min(player.x+step, target_x);
+    else if (player.x > target_x) player.x = Math.max(player.x-step, target_x);
+    else if (player.y < target_y) player.y = Math.min(player.y+step, target_y);
+    else if (player.y > target_y) player.y = Math.max(player.y-step, target_y);
+  }
+
+  // ---------- 落葉 / 螢火蟲 ----------
+  function spawnLeaf(){
+    if (leaf_particles.length >= 26) return;
+    const [tx,ty] = tree_spots[Math.floor(Math.random()*tree_spots.length)];
+    leaf_particles.push({
+      x: tx + 5 + Math.random()*50,
+      y: ty + 5 + Math.random()*30,
+      vy: 18 + Math.random()*14,
+      sway: 0.6 + Math.random(),
+      phase: Math.random()*Math.PI*2,
+      size: 3 + Math.floor(Math.random()*3),
+      color: LEAF_FALL_COLORS[Math.floor(Math.random()*4)]
+    });
+  }
+  function updateLeaves(dt){
+    if (scene !== "outside") return;
+    if (Math.random() < 0.02) spawnLeaf();
+    for (let i=leaf_particles.length-1;i>=0;i--){
+      const leaf = leaf_particles[i];
+      leaf.y += leaf.vy * dt;
+      leaf.phase += dt * leaf.sway * 3;
+      if (leaf.y > river_y) leaf_particles.splice(i,1);
+    }
+  }
+  function drawLeaves(){
+    for (const leaf of leaf_particles){
+      const swayX = Math.sin(leaf.phase) * 10;
+      ctx.fillStyle = rgb(leaf.color);
+      ctx.beginPath();
+      ctx.ellipse(leaf.x+swayX+leaf.size, leaf.y+leaf.size/2, leaf.size, leaf.size/2, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function updateFireflies(dt){
+    if (scene !== "outside" || !isNight(day_minutes)){ firefly_particles.length = 0; return; }
+    if (firefly_particles.length < 10 && Math.random() < 0.03){
+      const [tx,ty] = tree_spots[Math.floor(Math.random()*tree_spots.length)];
+      firefly_particles.push({ x: tx-10+Math.random()*70, y: ty-10+Math.random()*50, phase: Math.random()*Math.PI*2, drift: -8+Math.random()*16 });
+    }
+    for (const fly of firefly_particles){
+      fly.phase += dt*2;
+      fly.x += Math.sin(fly.phase) * fly.drift * dt;
+    }
+  }
+  function drawFireflies(){
+    for (const fly of firefly_particles){
+      const glow = (Math.sin(fly.phase*2)+1)/2;
+      const alpha = 70 + glow*130;
+      drawGlow(fly.x, fly.y, 8, [255,240,150], alpha, 3);
+    }
+  }
+
+  function drawNightOverlay(){
+    const result = getTimePhase(day_minutes);
+    if (!result) return;
+    const [color,alpha] = result;
+    if (alpha <= 0) return;
+    ctx.fillStyle = rgba(color, alpha/255);
+    ctx.fillRect(0,0,WIDTH,HEIGHT);
+  }
+
+  function drawInteractHighlight(rect, active, pad=6){
+    if (!active) return;
+    const pulse = (Math.sin(near_glow_phase)+1)/2;
+    const alpha = clamp((90 + pulse*90)/255, 0, 1);
+    const glowRect = rect.inflate(pad+3, pad+3);
+    ctx.save();
+    roundRectPath(glowRect.x, glowRect.y, glowRect.w, glowRect.h, 14);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = `rgba(255,245,190,${alpha})`;
+    ctx.fill();
+    ctx.restore();
+    const r2 = rect.inflate(pad,pad);
+    ctx.save();
+    roundRectPath(r2.x, r2.y, r2.w, r2.h, 10);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = rgb(GOLD);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------- 場景繪製 ----------
+  function circleFill(cx,cy,r,color){ ctx.fillStyle = rgb(color); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+
+  function drawTree(x,y){
+    drawShadow(x+27, y+66, 56, 16, 60);
+    ctx.fillStyle = 'rgb(95,160,75)';
+    ctx.beginPath(); ctx.ellipse(x+24, y+63, 29, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgb(125,78,40)'; ctx.fillRect(x+19,y+32,14,34);
+    ctx.fillStyle = 'rgb(160,100,48)'; ctx.fillRect(x+23,y+34,5,29);
+    circleFill(x+10,y+29,19,[45,115,60]);
+    circleFill(x+35,y+24,23,[45,115,60]);
+    circleFill(x+51,y+35,18,[45,115,60]);
+    circleFill(x+12,y+23,18,[75,160,78]);
+    circleFill(x+33,y+16,22,[80,175,82]);
+    circleFill(x+51,y+28,19,[75,165,78]);
+    circleFill(x+25,y+8,7,[125,205,100]);
+    circleFill(x+45,y+18,5,[125,205,100]);
+    circleFill(x+16,y+32,4,[225,75,65]);
+    circleFill(x+42,y+37,4,[225,75,65]);
+  }
+
+  function drawBackground(){
+    drawGradientRect(0,0,WIDTH,river_y,GRASS_LIGHT,GRASS_DARK);
+    for (const [tx,ty,tsize,shade] of grass_tufts){
+      ctx.fillStyle = rgb(shade);
+      ctx.beginPath(); ctx.ellipse(tx+tsize, ty+tsize/2, tsize, tsize/2, 0,0,Math.PI*2); ctx.fill();
+    }
+    for (const [fx,fy,fcolor] of flower_spots){
+      ctx.fillStyle = 'rgb(70,130,55)'; ctx.beginPath(); ctx.arc(fx,fy+2,2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = rgb(fcolor); ctx.beginPath(); ctx.arc(fx,fy,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgb(255,235,120)'; ctx.beginPath(); ctx.arc(fx,fy,1,0,Math.PI*2); ctx.fill();
+    }
+    drawGradientRect(0,river_y,WIDTH,HEIGHT-river_y,WATER,WATER_DEEP);
+    const waveOffset = (anim_clock*26) % 70;
+    ctx.strokeStyle = 'rgb(150,220,245)'; ctx.lineWidth = 2;
+    for (let x=-70; x<WIDTH+70; x+=70){
+      const wx = x + waveOffset;
+      ctx.beginPath();
+      ctx.ellipse(wx+25, river_y+15+9, 25, 9, 0, Math.PI, Math.PI*2);
+      ctx.stroke();
+    }
+    const shineOffset = (anim_clock*40) % (WIDTH+200) - 100;
+    for (let i=0;i<3;i++){
+      const sx = shineOffset + i*260;
+      const shineAlpha = Math.max(0, 70 + 40*Math.sin(anim_clock*2+i));
+      ctx.fillStyle = `rgba(200,235,250,${shineAlpha/255})`;
+      ctx.beginPath();
+      ctx.ellipse(sx+45, river_y+34+i*30+5, 45, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+    for (const [x,y] of tree_spots) drawTree(x,y);
+    drawLeaves();
+    drawFireflies();
+  }
+
+  function drawHouse(){
+    drawShadow(house.centerx, house.bottom+6, house.w+20, 22, 70);
+    drawGradientRect(house.x,house.y,house.w,house.h,[175,120,70],WOOD);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; ctx.strokeRect(house.x,house.y,house.w,house.h);
+    ctx.fillStyle = rgb(ROOF_LIGHT);
+    ctx.beginPath(); ctx.moveTo(house.x-15,house.y); ctx.lineTo(house.centerx,house.y-65); ctx.lineTo(house.right+15,house.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = rgb(ROOF);
+    ctx.beginPath(); ctx.moveTo(house.x-15,house.y); ctx.lineTo(house.centerx,house.y-65); ctx.lineTo(house.right+15,house.y); ctx.lineTo(house.centerx,house.y-20); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(95,60,35)'; ctx.fillRect(house_door.x,house_door.y,house_door.w,house_door.h);
+    ctx.strokeStyle = 'rgb(140,90,50)'; ctx.lineWidth = 2; ctx.strokeRect(house_door.x,house_door.y,house_door.w,house_door.h);
+    ctx.fillStyle = 'rgb(235,200,90)'; ctx.beginPath(); ctx.arc(house_door.right-8, house_door.centery, 2, 0, Math.PI*2); ctx.fill();
+    for (const wx of [house.x+25, house.right-60]){
+      const win = new Rect(wx, house.y+45, 35, 30);
+      const lit = isNight(day_minutes);
+      const topC = lit ? [255,235,170] : [200,230,250];
+      const botC = lit ? [250,200,110] : [150,195,225];
+      drawGradientRect(win.x,win.y,win.w,win.h,topC,botC);
+      ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 2; ctx.strokeRect(win.x,win.y,win.w,win.h);
+      ctx.beginPath(); ctx.moveTo(win.centerx,win.y); ctx.lineTo(win.centerx,win.bottom); ctx.stroke();
+    }
+    drawText("我的農舍", FONT_M, WHITE, house.x+48, house.y+8);
+    drawText("門口按 E 進入", FONT_S, BLACK, house.x+35, house.bottom+8);
+    drawInteractHighlight(house_door, scene==="outside" && isNear(house_door,22));
+  }
+
+  function drawShop(){
+    drawShadow(shop.centerx, shop.bottom+6, shop.w+16, 20, 70);
+    drawGradientRect(shop.x,shop.y,shop.w,shop.h,[250,205,115],[225,170,75]);
+    ctx.strokeStyle = 'rgb(150,100,40)'; ctx.lineWidth = 3; ctx.strokeRect(shop.x,shop.y,shop.w,shop.h);
+    ctx.fillStyle = 'rgb(200,100,75)';
+    ctx.beginPath(); ctx.moveTo(shop.x-10,shop.y); ctx.lineTo(shop.centerx,shop.y-45); ctx.lineTo(shop.right+10,shop.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(175,75,55)';
+    ctx.beginPath(); ctx.moveTo(shop.x-10,shop.y); ctx.lineTo(shop.centerx,shop.y-45); ctx.lineTo(shop.right+10,shop.y); ctx.lineTo(shop.centerx,shop.y-15); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(130,85,45)'; ctx.fillRect(shop.x+20, shop.y+52, 105, 42);
+    const boxColors = [[240,190,80],[100,170,80],[230,125,45]];
+    boxColors.forEach((bc,i)=>{
+      const bx = shop.x+30+i*31;
+      drawGradientRect(bx, shop.y+61, 18, 18, lerpColor(bc,[255,255,255],0.25), bc);
+      ctx.strokeStyle = 'rgb(90,60,30)'; ctx.lineWidth = 1; ctx.strokeRect(bx, shop.y+61, 18, 18);
+    });
+    drawText("種子商店", FONT_M, BLACK, shop.x+28, shop.y+12);
+    drawText("按 E 購買", FONT_S, BLACK, shop.x+33, shop.bottom+8);
+    drawInteractHighlight(shop, scene==="outside" && isNear(shop));
+  }
+
+  function drawShippingBin(){
+    drawShadow(shipping_bin.centerx, shipping_bin.bottom+5, shipping_bin.w+14, 18, 70);
+    drawGradientRect(shipping_bin.x,shipping_bin.y,shipping_bin.w,shipping_bin.h,[150,95,50],[110,68,32]);
+    ctx.strokeStyle = 'rgb(80,50,25)'; ctx.lineWidth = 3; ctx.strokeRect(shipping_bin.x,shipping_bin.y,shipping_bin.w,shipping_bin.h);
+    const inner = new Rect(shipping_bin.x+6, shipping_bin.y+8, 93, 52);
+    drawGradientRect(inner.x,inner.y,inner.w,inner.h,[215,150,75],[175,110,50]);
+    ctx.strokeStyle = 'rgb(100,60,30)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(shipping_bin.x+6, shipping_bin.y+32); ctx.lineTo(shipping_bin.right-6, shipping_bin.y+32); ctx.stroke();
+    drawText("出貨箱", FONT_M, WHITE, shipping_bin.x+20, shipping_bin.y+18);
+    drawText("按 E 販賣", FONT_S, BLACK, shipping_bin.x-2, shipping_bin.bottom+7);
+    drawInteractHighlight(shipping_bin, scene==="outside" && isNear(shipping_bin));
+  }
+
+  function drawFarm(){
+    for (let row=0; row<rows; row++){
+      for (let col=0; col<cols; col++){
+        const x = farm_x+col*tile_size, y = farm_y+row*tile_size;
+        const w = tile_size-3, h = tile_size-3;
+        const wet = watered[row][col];
+        const lightC = wet ? WET_DIRT_LIGHT : DIRT_LIGHT;
+        const darkC = wet ? WET_DIRT : DIRT_DARK;
+        drawGradientRect(x,y,w,h,lightC,darkC,4);
+        ctx.strokeStyle = 'rgb(105,70,40)'; ctx.lineWidth = 2;
+        roundRectPath(x,y,w,h,4); ctx.stroke();
+        const tillColor = wet ? 'rgb(75,50,30)' : 'rgb(120,82,48)';
+        ctx.strokeStyle = tillColor; ctx.lineWidth = 1;
+        for (let tx=x+7; tx<x+tile_size-8; tx+=9){
+          ctx.beginPath(); ctx.ellipse(tx+5, y+tile_size-18, 5, 4, 0, 3.4, 6.0); ctx.stroke();
+        }
+        const crop = crops[row][col];
+        if (!crop) continue;
+        const kind = crop.kind, data = crop_data[kind];
+        const stage = cropStage(crop);
+        const centerX = x + tile_size/2;
+        if (cropIsMature(crop)){
+          const pulse = (Math.sin(anim_clock*3+row+col)+1)/2;
+          drawGlow(centerX, y+tile_size/2, 20, data.color, 35+pulse*35, 3);
+        }
+        if (stage === 0){
+          circleFill(centerX, y+30, 5, data.color);
+        } else if (stage < 3){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+19, 8, 25);
+          ctx.fillStyle = 'rgb(65,155,65)';
+          ctx.beginPath(); ctx.ellipse(centerX-8, y+28, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(centerX+8, y+22, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+        } else if (kind === "carrot"){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          ctx.fillStyle = rgb(data.color);
+          ctx.beginPath(); ctx.moveTo(centerX,y+44); ctx.lineTo(centerX-11,y+29); ctx.lineTo(centerX+11,y+29); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = 'rgb(70,160,65)';
+          ctx.beginPath(); ctx.ellipse(centerX-4, y+22, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(centerX+6, y+20, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+        } else if (kind === "corn"){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          ctx.fillStyle = rgb(data.color);
+          ctx.beginPath(); ctx.ellipse(centerX, y+31, 9, 13, 0, 0, Math.PI*2); ctx.fill();
+          ctx.strokeStyle = 'rgb(60,145,65)'; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(centerX-6,y+37); ctx.lineTo(centerX-17,y+29); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX+6,y+37); ctx.lineTo(centerX+17,y+29); ctx.stroke();
+        } else {
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          circleFill(centerX, y+35, 14, data.color);
+          ctx.strokeStyle = 'rgb(180,85,25)'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(centerX,y+22); ctx.lineTo(centerX,y+48); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX-8,y+25); ctx.lineTo(centerX-8,y+45); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX+8,y+25); ctx.lineTo(centerX+8,y+45); ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function drawInside(){
+    ctx.fillStyle = 'rgb(60,48,42)'; ctx.fillRect(0,0,WIDTH,HEIGHT);
+    drawGradientRect(inside_room.x,inside_room.y,inside_room.w,inside_room.h,[240,208,152],[215,178,120]);
+    ctx.strokeStyle = 'rgb(120,82,48)'; ctx.lineWidth = 8; ctx.strokeRect(inside_room.x,inside_room.y,inside_room.w,inside_room.h);
+    ctx.strokeStyle = 'rgb(205,166,110)'; ctx.lineWidth = 2;
+    for (let x=inside_room.x+15; x<inside_room.right-15; x+=42){
+      ctx.beginPath(); ctx.moveTo(x,inside_room.y+10); ctx.lineTo(x,inside_room.bottom-10); ctx.stroke();
+    }
+    drawShadow(bed.centerx, bed.bottom+4, bed.w+10, 16, 60);
+    drawGradientRect(bed.x,bed.y,bed.w,bed.h,[170,115,68],[135,85,48],4);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; roundRectPath(bed.x,bed.y,bed.w,bed.h,4); ctx.stroke();
+    const pillow = new Rect(bed.x+15, bed.y+12, 58, 28);
+    drawGradientRect(pillow.x,pillow.y,pillow.w,pillow.h,[255,250,235],[230,220,195],6);
+    const blanket = new Rect(bed.x+10, bed.y+42, bed.w-20, 43);
+    drawGradientRect(blanket.x,blanket.y,blanket.w,blanket.h,[150,195,225],[105,150,190],6);
+    ctx.strokeStyle = 'rgb(90,135,175)'; ctx.lineWidth = 2;
+    for (let lx=blanket.x+8; lx<blanket.right-8; lx+=14){
+      ctx.beginPath(); ctx.moveTo(lx,blanket.y+4); ctx.lineTo(lx,blanket.bottom-4); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgb(95,60,35)'; ctx.fillRect(inside_door.x,inside_door.y,inside_door.w,inside_door.h);
+    ctx.strokeStyle = 'rgb(140,90,50)'; ctx.lineWidth = 2; ctx.strokeRect(inside_door.x,inside_door.y,inside_door.w,inside_door.h);
+
+    const win = new Rect(150,145,75,65);
+    const lit = isNight(day_minutes);
+    const topC = lit ? [140,150,190] : [200,230,250];
+    const botC = lit ? [60,70,110] : [150,195,225];
+    drawGradientRect(win.x,win.y,win.w,win.h,topC,botC);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; ctx.strokeRect(win.x,win.y,win.w,win.h);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(win.centerx,win.y); ctx.lineTo(win.centerx,win.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(win.x,win.centery); ctx.lineTo(win.right,win.centery); ctx.stroke();
+
+    drawGlow(470,150,46,[255,225,140],70,4);
+    circleFill(470,150,25,[245,225,140]);
+    ctx.strokeStyle = 'rgb(255,245,200)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(470,150,25,0,Math.PI*2); ctx.stroke();
+
+    drawText("溫馨農舍", FONT_B, BLACK, 425,105);
+    drawText("床邊按 SPACE 睡覺", FONT_S, BLACK, bed.x, bed.bottom+8);
+    drawText("門口按 E 回農場", FONT_S, BLACK, inside_door.x-2, inside_door.bottom+8);
+    drawInteractHighlight(bed, scene==="inside" && isNear(bed,35), 4);
+    drawInteractHighlight(inside_door, scene==="inside" && isNear(inside_door,18));
+  }
+
+  function drawPlayer(){
+    const isMoving = player.x !== target_x || player.y !== target_y;
+    const bob = isMoving ? Math.sin(anim_clock*14)*2.4 : 0;
+    const cx = player.centerx;
+    const top = player.y + bob;
+    drawShadow(cx, player.bottom+4, 26, 10, 80);
+    ctx.fillStyle = rgb(PLAYER_COLOR_DARK);
+    ctx.beginPath(); ctx.ellipse(player.x+15, top+28.5, 12, 9.5, 0, 0, Math.PI*2); ctx.fill();
+    drawGradientRect(player.x+4, top+18, 22, 18, lerpColor(PLAYER_COLOR,[255,255,255],0.2), PLAYER_COLOR, 4);
+    ctx.fillStyle = 'rgb(45,70,150)'; ctx.fillRect(player.x+2, top+6, 26, 7);
+    circleFill(cx, top+11, 10, [230,195,155]);
+    circleFill(cx, top+9, 10, [255,225,190]);
+    const eyeDx = { down:[0,3], up:[0,-3], left:[-3,0], right:[3,0] }[facing] || [0,3];
+    if (facing !== "up"){
+      ctx.fillStyle = 'rgb(35,35,35)';
+      ctx.beginPath(); ctx.arc(cx-3+eyeDx[0]*0.3, top+9+eyeDx[1]*0.5, 1, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+3+eyeDx[0]*0.3, top+9+eyeDx[1]*0.5, 1, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  function drawHelp(){
+    ctx.fillStyle = 'rgba(10,10,15,0.43)'; ctx.fillRect(0,0,WIDTH,HEIGHT);
+    const panel = new Rect(245,180,510,330);
+    roundedPanel(panel.x,panel.y,panel.w,panel.h, PANEL,PANEL_SHADE,PANEL_BORDER,14,3);
+    drawText("操作說明", FONT_B, BLACK, 435,205);
+    drawText("WASD / 方向鍵：一次慢慢走一格", FONT_M, BLACK, 280,260);
+    drawText("1、2、3：選擇種子", FONT_M, BLACK, 280,300);
+    drawText("E：種植、收成、買種子、進出農舍、販賣", FONT_M, BLACK, 280,340);
+    drawText("F：澆水", FONT_M, BLACK, 280,380);
+    drawText("SPACE：站在房間床邊睡覺", FONT_M, BLACK, 280,420);
+    drawText("H：關閉這個說明", FONT_S, [90,90,90], 420,470);
+  }
+
+  function drawCoinIcon(x,y,r=9){
+    drawGradientRect(x-r,y-r,r*2,r*2,[255,225,120],GOLD,r);
+    ctx.strokeStyle = 'rgb(170,120,30)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    drawText("$", FONT_S, [120,80,15], x-3, y-8);
+  }
+
+  function drawClockIcon(x,y,r=9){
+    drawGradientRect(x-r,y-r,r*2,r*2,[255,255,255],[215,220,230],r);
+    ctx.strokeStyle = 'rgb(90,90,95)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    const angle = (day_minutes/(24*60))*2*Math.PI - Math.PI/2;
+    const hx = x + Math.cos(angle)*(r-3), hy = y + Math.sin(angle)*(r-3);
+    ctx.strokeStyle = 'rgb(60,60,65)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(hx,hy); ctx.stroke();
+  }
+
+  function drawUI(){
+    roundedPanel(12,12,330,142,PANEL,PANEL_SHADE,PANEL_BORDER,12,3);
+    drawClockIcon(300,30);
+    drawText(`第 ${day} 天  ${formatTime()}`, FONT_B, BLACK, 25,20);
+    drawCoinIcon(300,72);
+    drawText(`金錢：$${money}`, FONT_M, BLACK, 25,63);
+    const seedColor = crop_data[selected_crop].color;
+    ctx.fillStyle = rgb(seedColor); roundRectPath(293,95,15,15,3); ctx.fill();
+    ctx.strokeStyle = 'rgb(90,60,25)'; ctx.lineWidth = 1; roundRectPath(293,95,15,15,3); ctx.stroke();
+    drawText(`目前種子：${crop_data[selected_crop].seed_name}`, FONT_M, BLACK, 25,92);
+    drawText("按 H 查看操作說明", FONT_S, [95,85,60], 25,124);
+
+    roundedPanel(680,12,308,170,PANEL,PANEL_SHADE,PANEL_BORDER,12,3);
+    drawText("背包", FONT_B, BLACK, 695,22);
+    let y = 65;
+    crop_order.forEach((kind, idx) => {
+      const data = crop_data[kind];
+      const index = idx+1;
+      const textX = 720;
+      if (kind === selected_crop){
+        ctx.save();
+        roundRectPath(690, y-4, 288, 26, 8);
+        ctx.fillStyle = 'rgba(110,190,130,0.31)';
+        ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = 'rgb(55,145,70)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(698,y+10); ctx.lineTo(703,y+15); ctx.lineTo(714,y+3); ctx.stroke();
+      }
+      ctx.fillStyle = rgb(data.color); roundRectPath(695,y+2,14,14,3); ctx.fill();
+      ctx.strokeStyle = 'rgb(90,60,25)'; ctx.lineWidth = 1; roundRectPath(695,y+2,14,14,3); ctx.stroke();
+      drawText(`${index}. ${data.name}種子：${inventory.seeds[kind]}`, FONT_S, BLACK, textX, y);
+      drawText(`收成：${inventory.produce[kind]} 個`, FONT_S, BLACK, 850, y);
+      y += 30;
+    });
+    drawText("時間會持續流動", FONT_S, [95,85,60], 695,145);
+
+    if (message_timer > 0){
+      const totalMax = 5, fadeMargin = 0.4;
+      const fadeIn = message_timer > totalMax-fadeMargin ? clamp((message_timer-(totalMax-fadeMargin))/fadeMargin,0,1) : 1;
+      const fadeOut = message_timer < 0.5 ? clamp(message_timer/0.5,0,1) : 1;
+      const boxAlpha = Math.min(fadeIn, fadeOut);
+      const msgRect = new Rect(145,650,710,35);
+      ctx.save();
+      roundRectPath(msgRect.x,msgRect.y,msgRect.w,msgRect.h,8);
+      ctx.fillStyle = `rgba(245,245,245,${boxAlpha})`;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(100,75,45,${boxAlpha})`;
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = boxAlpha;
+      drawText(message, FONT_M, BLACK, 158,656);
+      ctx.restore();
+    }
+
+    if (show_help) drawHelp();
+  }
+
+  // ---------- 輸入 ----------
+  function handleKey(key){
+    tryMove(key);
+    if (key === "h") show_help = !show_help;
+    else if (key === "1"){ selected_crop = "carrot"; setMessage("已選擇紅蘿蔔種子。"); }
+    else if (key === "2"){ selected_crop = "corn"; setMessage("已選擇玉米種子。"); }
+    else if (key === "3"){ selected_crop = "pumpkin"; setMessage("已選擇南瓜種子。"); }
+    else if (key === "e"){ plantOrHarvest(); }
+    else if (key === "f"){ waterCrop(); }
+    else if (key === " "){ sleepNextDay(); }
+  }
+
+  const capturedKeys = new Set(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","e","f","h","1","2","3"," "]);
+  window.addEventListener('keydown', (e) => {
+    if (!document.getElementById('farm').classList.contains('active')) return;
+    const key = e.key.toLowerCase();
+    if (capturedKeys.has(key)) e.preventDefault();
+    handleKey(key);
+  }, { passive:false });
+
+  // ---------- 主迴圈 ----------
+  let lastTime = performance.now();
+  const farmScreenEl = document.getElementById('farm');
+  function loop(now){
+    if (!farmScreenEl.classList.contains('active')){
+      lastTime = now;
+      requestAnimationFrame(loop);
+      return;
+    }
+    const dt = Math.min(0.05, (now-lastTime)/1000);
+    lastTime = now;
+
+    time_accumulator += dt;
+    anim_clock += dt;
+    near_glow_phase += dt*4;
+    updateLeaves(dt);
+    updateFireflies(dt);
+
+    while (time_accumulator >= seconds_per_game_minute){
+      advanceTime(1);
+      time_accumulator -= seconds_per_game_minute;
+    }
+
+    updatePlayer(dt);
+    if (message_timer > 0) message_timer = Math.max(0, message_timer-dt);
+
+    if (scene === "outside"){
+      drawBackground();
+      drawShop();
+      drawHouse();
+      drawShippingBin();
+      drawFarm();
+      drawPlayer();
+      drawNightOverlay();
+    } else {
+      drawInside();
+      drawPlayer();
+    }
+    drawUI();
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
