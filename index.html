@@ -39,6 +39,8 @@
     .header h1 { font-size: 1.25rem; }
     .header-stats { display: flex; gap: 8px; font-size: 0.8rem; font-weight: 600; }
     .stat-chip { background: rgba(255,255,255,0.28); padding: 3px 9px; border-radius: 16px; }
+    .player-chip { background: rgba(255,255,255,0.4); cursor: pointer; border: 1.5px solid rgba(255,255,255,0.5); }
+    .player-chip:hover { background: rgba(255,255,255,0.55); }
     .nav { display: flex; background: #e8f5e9; border-bottom: 2px solid #c8e6c9; }
     .nav-btn {
       flex: 1; padding: 9px 4px; border: none; background: transparent;
@@ -254,6 +256,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.15); touch-action: none;
     }
     .farm-footer { text-align: center; padding: 8px; font-size: 0.8rem; color: #555; }
+
   </style>
 </head>
 <body>
@@ -261,8 +264,9 @@
     <div class="header">
       <h1>🏝️ 波波島</h1>
       <div class="header-stats">
+        <span class="stat-chip player-chip" id="player-chip" title="點擊查看玩家資訊">🧑‍🌾 冒險者 Lv.1</span>
+        <span class="stat-chip" id="exp-display">✨ 0/30</span>
         <span class="stat-chip" id="coin-display">💰 0</span>
-        <span class="stat-chip" id="level-display">⭐ Lv.1</span>
         <span class="stat-chip" id="pet-count">🐾 0</span>
         <span class="stat-chip" id="user-display" style="display:none"></span>
         <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
@@ -370,7 +374,7 @@
         <button class="btn btn-primary" id="login-btn">登入</button>
         <button class="btn btn-explore" id="register-btn">註冊新帳號</button>
       </div>
-      <p style="margin-top:12px;font-size:0.68rem;color:#999;">＊帳號資料僅儲存在目前使用的瀏覽器中，換裝置或清除瀏覽器資料會遺失存檔。</p>
+      <p style="margin-top:12px;font-size:0.68rem;color:#999;">＊進度會雲端存檔到你的帳號，換裝置登入同一帳號即可繼續。</p>
     </div>
   </div>
 
@@ -395,36 +399,102 @@
     </div>
   </div>
 
+  <div class="overlay hidden" id="player-modal">
+    <div class="modal">
+      <div class="big" id="pl-emoji">🧑‍🌾</div>
+      <h2 id="pl-name">冒險者</h2>
+      <p id="pl-info"></p>
+      <div style="margin:10px 0;text-align:left;font-size:0.88rem;color:#555;line-height:1.6" id="pl-detail"></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+        <button class="btn btn-primary" id="pl-close">關閉</button>
+        <button class="btn btn-shop" id="pl-rename">改名</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="name-modal">
+    <div class="modal">
+      <div class="big">🏝️</div>
+      <h2>歡迎來到波波島！</h2>
+      <p>先取一個冒險者名字吧～</p>
+      <input id="name-input" maxlength="8" placeholder="輸入名字（最多8字）" style="width:90%;padding:10px 12px;border:2px solid #81c784;border-radius:12px;font-family:inherit;font-size:1rem;margin:8px 0 14px;text-align:center" />
+      <div style="margin-bottom:12px">
+        <div style="font-size:0.85rem;color:#666;margin-bottom:6px">選擇外觀</div>
+        <div id="avatar-pick" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:1.8rem"></div>
+      </div>
+      <button class="btn btn-explore" id="name-ok">開始冒險！</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="evo-modal">
+    <div class="modal">
+      <div class="big" id="evo-from">🐱</div>
+      <div style="font-size:1.5rem;margin:4px 0">⬇️ ✨</div>
+      <div class="big" id="evo-to">🐈</div>
+      <h2 id="evo-title">進化！</h2>
+      <p id="evo-msg"></p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-purple" id="evo-confirm">✨ 確認進化</button>
+        <button class="btn btn-back" id="evo-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-/* ====== Supabase 設定：請換成你自己專案的網址與 anon key ====== */
-const SUPABASE_URL = "https://ajfepkmpjphkxsccahlm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZmVwa21wanBoa3hzY2NhaGxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MjczMzgsImV4cCI6MjEwMjAwMzMzOH0.9hcNV8wYkGEECIK0ji_H-DLp8S8IONiOZaRkiLhQO5s";
+/* ====== Supabase：請換成你自己專案的網址與 anon key ====== */
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 /* ============================================================= */
 
+
 const ALL_PETS = [
-  {id:'cat',name:'小貓咪',emoji:'🐱',type:'敏捷',maxHp:95,crit:0.22,dodge:0.18,
+  // ===== 初階 =====
+  {id:'cat',name:'小貓咪',emoji:'🐱',type:'敏捷',maxHp:95,crit:0.22,dodge:0.18,evolveLv:8,evolvesTo:'cat2',
     skills:[{name:'肉球拍拍',emoji:'🐾',power:18,critB:0.05},{name:'療癒呼嚕',emoji:'😻',heal:22},{name:'閃閃衝刺',emoji:'✨',power:28,critB:0.12},{name:'毛線纏繞',emoji:'🧶',power:12,effect:'slow',hit:0.85}]},
-  {id:'dog',name:'汪汪狗',emoji:'🐶',type:'力量',maxHp:115,crit:0.15,dodge:0.10,
+  {id:'dog',name:'汪汪狗',emoji:'🐶',type:'力量',maxHp:115,crit:0.15,dodge:0.10,evolveLv:8,evolvesTo:'dog2',
     skills:[{name:'汪汪大叫',emoji:'🔊',power:20,critB:0.08},{name:'舔舔療癒',emoji:'👅',heal:26},{name:'撲倒擁抱',emoji:'🤗',power:32,critB:0.05},{name:'挖洞突擊',emoji:'🕳️',power:16,effect:'stun',hit:0.70}]},
-  {id:'bunny',name:'蹦蹦兔',emoji:'🐰',type:'平衡',maxHp:100,crit:0.18,dodge:0.15,
+  {id:'bunny',name:'蹦蹦兔',emoji:'🐰',type:'平衡',maxHp:100,crit:0.18,dodge:0.15,evolveLv:8,evolvesTo:'bunny2',
     skills:[{name:'蹦蹦跳',emoji:'⤴️',power:19,critB:0.06},{name:'胡蘿蔔力量',emoji:'🥕',heal:20},{name:'長耳巴掌',emoji:'👂',power:26,critB:0.10},{name:'超級可愛',emoji:'🥰',power:10,effect:'charm',hit:0.80}]},
-  {id:'panda',name:'圓圓熊貓',emoji:'🐼',type:'坦克',maxHp:135,crit:0.10,dodge:0.06,
+  {id:'panda',name:'圓圓熊貓',emoji:'🐼',type:'坦克',maxHp:135,crit:0.10,dodge:0.06,evolveLv:10,evolvesTo:'panda2',
     skills:[{name:'滾滾攻擊',emoji:'🌀',power:22,critB:0.04},{name:'竹子大餐',emoji:'🎋',heal:30},{name:'熊抱壓制',emoji:'🐻',power:34,critB:0.03},{name:'裝睡迷惑',emoji:'😴',power:8,effect:'confuse',hit:0.75}]},
-  {id:'fox',name:'小狐狸',emoji:'🦊',type:'技巧',maxHp:88,crit:0.25,dodge:0.20,
+  {id:'fox',name:'小狐狸',emoji:'🦊',type:'技巧',maxHp:88,crit:0.25,dodge:0.20,evolveLv:8,evolvesTo:'fox2',
     skills:[{name:'尾巴掃掃',emoji:'🦊',power:17,critB:0.08},{name:'莓果能量',emoji:'🫐',heal:18},{name:'幻影戲法',emoji:'🎭',power:27,critB:0.15},{name:'小小火焰',emoji:'🔥',power:14,effect:'burn',hit:0.78}]},
-  {id:'penguin',name:'滑滑企鵝',emoji:'🐧',type:'冰系',maxHp:108,crit:0.16,dodge:0.12,
+  {id:'penguin',name:'滑滑企鵝',emoji:'🐧',type:'冰系',maxHp:108,crit:0.16,dodge:0.12,evolveLv:9,evolvesTo:'penguin2',
     skills:[{name:'溜冰衝刺',emoji:'⛸️',power:21,critB:0.07},{name:'小魚零食',emoji:'🐟',heal:24},{name:'肚皮滑行',emoji:' freeze',power:29,critB:0.06},{name:'雪球攻擊',emoji:'❄️',power:13,effect:'freeze',hit:0.72}]},
-  {id:'owl',name:'咕咕貓頭鷹',emoji:'🦉',type:'智慧',maxHp:92,crit:0.20,dodge:0.16,
+  {id:'owl',name:'咕咕貓頭鷹',emoji:'🦉',type:'智慧',maxHp:92,crit:0.20,dodge:0.16,evolveLv:9,evolvesTo:'owl2',
     skills:[{name:'夜間突襲',emoji:'🌙',power:20,critB:0.10},{name:'羽毛療癒',emoji:'🪶',heal:21},{name:'智慧一擊',emoji:'📚',power:25,critB:0.12},{name:'催眠曲',emoji:'🎵',power:9,effect:'stun',hit:0.68}]},
-  {id:'frog',name:'跳跳蛙',emoji:'🐸',type:'水系',maxHp:98,crit:0.14,dodge:0.22,
+  {id:'frog',name:'跳跳蛙',emoji:'🐸',type:'水系',maxHp:98,crit:0.14,dodge:0.22,evolveLv:8,evolvesTo:'frog2',
     skills:[{name:'彈跳攻擊',emoji:'🔝',power:19,critB:0.06},{name:'池塘恢復',emoji:'💧',heal:23},{name:'舌頭黏黏',emoji:'👅',power:24,critB:0.08},{name:'黏液減速',emoji:'🟢',power:11,effect:'slow',hit:0.82}]},
-  {id:'chick',name:'小雞寶',emoji:'🐤',type:'火種',maxHp:85,crit:0.19,dodge:0.14,
+  {id:'chick',name:'小雞寶',emoji:'🐤',type:'火種',maxHp:85,crit:0.19,dodge:0.14,evolveLv:7,evolvesTo:'chick2',
     skills:[{name:'啄啄',emoji:'🐤',power:16,critB:0.07},{name:'暖暖羽毛',emoji:'🔥',heal:19},{name:'小雞衝刺',emoji:'💨',power:26,critB:0.11},{name:'火花四濺',emoji:'✨',power:12,effect:'burn',hit:0.76}]},
-  {id:'bear',name:'小熊熊',emoji:'🐻',type:'力量',maxHp:125,crit:0.12,dodge:0.08,
-    skills:[{name:'熊掌拍',emoji:'🐾',power:23,critB:0.05},{name:'蜂蜜罐',emoji:'🍯',heal:28},{name:'怒吼',emoji:'📢',power:33,critB:0.04},{name:'威嚇',emoji:'😤',power:10,effect:'charm',hit:0.70}]}
-];
+  {id:'bear',name:'小熊熊',emoji:'🐻',type:'力量',maxHp:125,crit:0.12,dodge:0.08,evolveLv:10,evolvesTo:'bear2',
+    skills:[{name:'熊掌拍',emoji:'🐾',power:23,critB:0.05},{name:'蜂蜜罐',emoji:'🍯',heal:28},{name:'怒吼',emoji:'📢',power:33,critB:0.04},{name:'威嚇',emoji:'😤',power:10,effect:'charm',hit:0.70}]},
+  // ===== 進化型 =====
+  {id:'cat2',name:'月光貓',emoji:'🐈',type:'敏捷',maxHp:130,crit:0.28,dodge:0.24,evolved:true,
+    skills:[{name:'星爪連擊',emoji:'✨',power:28,critB:0.10},{name:'月光療癒',emoji:'🌙',heal:32},{name:'影步突襲',emoji:'🌑',power:38,critB:0.15},{name:'銀線枷鎖',emoji:'🧵',power:18,effect:'slow',hit:0.90}]},
+  {id:'dog2',name:'守護犬',emoji:'🐕',type:'力量',maxHp:155,crit:0.20,dodge:0.14,evolved:true,
+    skills:[{name:'戰吼',emoji:'📢',power:30,critB:0.10},{name:'忠誠療癒',emoji:'💛',heal:36},{name:'衝鋒撞擊',emoji:'💥',power:44,critB:0.08},{name:'地裂',emoji:'🌍',power:22,effect:'stun',hit:0.78}]},
+  {id:'bunny2',name:'彩虹兔',emoji:'🐇',type:'平衡',maxHp:138,crit:0.24,dodge:0.20,evolved:true,
+    skills:[{name:'彩虹踢',emoji:'🌈',power:28,critB:0.10},{name:'活力胡蘿蔔',emoji:'🥕',heal:30},{name:'幻耳連拍',emoji:'💫',power:36,critB:0.14},{name:'心動光波',emoji:'💗',power:16,effect:'charm',hit:0.88}]},
+  {id:'panda2',name:'功夫熊貓',emoji:'🥋',type:'坦克',maxHp:180,crit:0.14,dodge:0.10,evolved:true,
+    skills:[{name:'旋風腿',emoji:'🌪️',power:32,critB:0.08},{name:'仙竹大餐',emoji:'🎋',heal:42},{name:'泰山壓頂',emoji:'⛰️',power:48,critB:0.06},{name:'醉拳迷惑',emoji:'🥴',power:14,effect:'confuse',hit:0.82}]},
+  {id:'fox2',name:'九尾狐',emoji:'🦊',type:'技巧',maxHp:120,crit:0.32,dodge:0.26,evolved:true,
+    skills:[{name:'焰尾橫掃',emoji:'🔥',power:26,critB:0.12},{name:'靈果能量',emoji:'🍇',heal:28},{name:'幻術千影',emoji:'🎭',power:40,critB:0.20},{name:'狐火燎原',emoji:'🧡',power:20,effect:'burn',hit:0.85}]},
+  {id:'penguin2',name:'冰皇企鵝',emoji:'👑',type:'冰系',maxHp:145,crit:0.22,dodge:0.16,evolved:true,
+    skills:[{name:'極光衝刺',emoji:'🌨️',power:30,critB:0.10},{name:'深海大餐',emoji:'🐠',heal:34},{name:'冰山滑行',emoji:'🧊',power:40,critB:0.10},{name:'絕對零度',emoji:'❄️',power:20,effect:'freeze',hit:0.80}]},
+  {id:'owl2',name:'賢者貓頭鷹',emoji:'🔮',type:'智慧',maxHp:125,crit:0.26,dodge:0.20,evolved:true,
+    skills:[{name:'星夜突襲',emoji:'🌌',power:28,critB:0.14},{name:'智慧之羽',emoji:'🪶',heal:30},{name:'真理一擊',emoji:'📖',power:36,critB:0.16},{name:'深度催眠',emoji:'💤',power:14,effect:'stun',hit:0.78}]},
+  {id:'frog2',name:'雷鳴蛙',emoji:'🐸',type:'水系',maxHp:132,crit:0.18,dodge:0.28,evolved:true,
+    skills:[{name:'雷彈跳',emoji:'⚡',power:28,critB:0.10},{name:'潮汐恢復',emoji:'🌊',heal:32},{name:'電磁長舌',emoji:'👅',power:34,critB:0.12},{name:'超導電漿',emoji:'💚',power:16,effect:'slow',hit:0.88}]},
+  {id:'chick2',name:'烈焰雞',emoji:'🐔',type:'火種',maxHp:118,crit:0.26,dodge:0.18,evolved:true,
+    skills:[{name:'火焰啄擊',emoji:'🔥',power:26,critB:0.12},{name:'浴火重生',emoji:'🧡',heal:28},{name:'爆炎衝刺',emoji:'💥',power:38,critB:0.16},{name:'煉獄火花',emoji:'☄️',power:18,effect:'burn',hit:0.84}]},
+  {id:'bear2',name:'霸王熊',emoji:'🐻‍❄️',type:'力量',maxHp:170,crit:0.16,dodge:0.12,evolved:true,
+    skills:[{name:'巨掌粉碎',emoji:'👊',power:34,critB:0.08},{name:'王者蜂蜜',emoji:'🍯',heal:40},{name:'山林怒吼',emoji:'📢',power:46,critB:0.08},{name:'威壓領域',emoji:'😤',power:16,effect:'charm',hit:0.80}]}
+]
+
 
 const ZONES = [
   {id:'plaza',  name:'中央廣場', emoji:'🏞️', desc:'島的中心，可以休息與購物。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:48, y:48},
@@ -442,20 +512,26 @@ const SHOP_ITEMS = [
   {id:'boost',name:'力量糖果',emoji:'🍬',price:40,effect:'atkUp',desc:'下次攻擊 +50%'},
   {id:'shield',name:'防護泡泡',emoji:'🫧',price:40,effect:'defUp',desc:'下次受傷減半'},
   {id:'star',name:'幸運星星',emoji:'⭐',price:50,effect:'luckUp',desc:'提升幸運'},
-  {id:'ball',name:'捕捉球',emoji:'🎾',price:25,effect:'ball',desc:'提高捕捉率'}
+  {id:'ball',name:'捕捉球',emoji:'🎾',price:25,effect:'ball',desc:'提高捕捉率'},
+  {id:'evo',name:'進化晶石',emoji:'💎',price:80,effect:'evo',desc:'可提前進化（等級-3）'}
 ];
+
+const AVATARS = ['🧑‍🌾','👧','👦','🧙','🦸','🧝','🧛','🧔','👩‍🚀','🥷'];
 
 const S = {
   coins:80, level:1, exp:0, wins:0,
+  trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
   unlocked:['plaza','meadow'],
   owned:[], team:[],
-  items:{potion:2,super:0,boost:1,shield:1,star:0,ball:3},
+  items:{potion:2,super:0,boost:1,shield:1,star:0,ball:3,evo:0},
   currentZone:null, battling:false,
   player:null, enemy:null, wild:null,
   atkBoost:false, defBoost:false, forceCrit:false,
   eEffects:{}, playerTurn:true,
   pendingCatch:null
 };
+
+function expNeeded(lv){ return lv * 30; }
 
 const $ = id => document.getElementById(id);
 const roll = c => Math.random() < c;
@@ -476,9 +552,25 @@ function addLog(boxId, text) {
   box.scrollTop = box.scrollHeight;
 }
 function updateHeader() {
+  const need = expNeeded(S.level);
+  $('player-chip').textContent = S.trainerEmoji + ' ' + (S.trainerName || '未取名') + ' Lv.' + S.level;
+  $('exp-display').textContent = '✨ ' + S.exp + '/' + need;
   $('coin-display').textContent = '💰 '+S.coins;
-  $('level-display').textContent = '⭐ Lv.'+S.level;
   $('pet-count').textContent = '🐾 '+S.owned.length;
+}
+
+function showPlayerProfile() {
+  $('pl-emoji').textContent = S.trainerEmoji;
+  $('pl-name').textContent = S.trainerName || '未取名';
+  const need = expNeeded(S.level);
+  $('pl-info').textContent = '玩家等級 Lv.' + S.level + '　經驗 ' + S.exp + '/' + need;
+  $('pl-detail').innerHTML =
+    '🏆 勝場：' + S.wins + '<br>' +
+    '🐾 寵物：' + S.owned.length + ' 隻<br>' +
+    '🔓 解鎖區域：' + S.unlocked.length + ' / ' + ZONES.length + '<br>' +
+    '💰 金錢：' + S.coins + '<br>' +
+    '<br><span style="color:#888;font-size:0.8rem">升級會獲得金錢獎勵，並讓野生寵物等級範圍提升。</span>';
+  $('player-modal').classList.remove('hidden');
 }
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -490,68 +582,58 @@ function showScreen(id) {
   if(id==='codex') renderCodex();
 }
 
-function attachStaticHandlers() {
-  document.querySelectorAll('.nav-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
-  });
-  $('cap-fight').onclick = ()=> startWildBattle();
-  $('cap-catch').onclick = ()=> tryCatch();
-  $('cap-run').onclick = ()=>{ $('capture-modal').classList.add('hidden'); addLog('zone-log','你決定先離開…'); };
-}
 
-function startNewGame() {
-  S.owned.push(clonePet(getBase('cat')));
-  S.team = [0];
-  updateHeader();
-  renderIsland();
-  addLog('map-log','🏝️ 歡迎來到波波島！你獲得了「小貓咪」！');
-  addLog('map-log','點擊島上的 🌻陽光草地 開始探索吧～');
-}
-
-/* ---------------- 登入 / 帳號存檔系統（Supabase 版）---------------- */
-let currentUser = null;   // 顯示用玩家名稱
-let currentUserId = null; // Supabase auth 使用者 id
+/* ---------------- Supabase 登入 / 雲端存檔 ---------------- */
+let currentUser = null;
+let currentUserId = null;
 let autosaveTimer = null;
 let authBusy = false;
 
-// Supabase Auth 需要 email 格式，這裡把「玩家名稱」轉成一個內部用的假 email，
-// 讓使用者體驗上仍然只需要輸入「玩家名稱」+「密碼」。
 function usernameToEmail(username) {
   const safe = username.toLowerCase().trim().replace(/[^a-z0-9_.-]/g, '');
   return safe + '@boboisland.local';
 }
-
 function showLoginError(msg) {
   const el = $('login-error');
   el.textContent = msg;
   el.style.display = msg ? 'block' : 'none';
 }
-
 function setLoginButtonsBusy(busy) {
   authBusy = busy;
   $('login-btn').disabled = busy;
   $('register-btn').disabled = busy;
 }
-
 function getSaveData() {
   return {
     island: {
       coins: S.coins, level: S.level, exp: S.exp, wins: S.wins,
+      trainerName: S.trainerName, trainerEmoji: S.trainerEmoji, nameSet: !!S.nameSet,
       unlocked: S.unlocked, owned: S.owned, team: S.team, items: S.items
     },
     farm: (window.FarmGame ? window.FarmGame.getState() : null)
   };
 }
-
 function loadGameData(saved) {
-  if (saved && saved.island) Object.assign(S, saved.island);
+  if (saved && saved.island) {
+    const d = saved.island;
+    S.coins = d.coins ?? 80;
+    S.level = d.level ?? 1;
+    S.exp = d.exp ?? 0;
+    S.wins = d.wins ?? 0;
+    S.trainerName = d.trainerName || '';
+    S.trainerEmoji = d.trainerEmoji || '🧑‍🌾';
+    S.nameSet = !!(d.nameSet && d.trainerName);
+    S.unlocked = d.unlocked || ['plaza','meadow'];
+    S.owned = d.owned || [];
+    S.team = Array.isArray(d.team) ? d.team.filter(i => i >= 0 && i < S.owned.length) : [];
+    if (S.owned.length && S.team.length === 0) S.team = [0];
+    S.items = d.items || {potion:2,super:0,boost:1,shield:1,star:0,ball:3,evo:0};
+    if (S.items.evo == null) S.items.evo = 0;
+  }
   updateHeader();
   renderIsland();
-  addLog('map-log','👋 歡迎回來，'+currentUser+'！');
   if (saved && saved.farm && window.FarmGame) window.FarmGame.loadState(saved.farm);
 }
-
-// 把目前進度寫回 Supabase 的 saves 資料表（需要先在 Supabase 建好資料表與 RLS，見說明文件）
 async function persistCurrentUser() {
   if (!currentUserId) return;
   const { error } = await sb.from('saves').upsert({
@@ -562,7 +644,10 @@ async function persistCurrentUser() {
   });
   if (error) console.error('存檔失敗：', error.message);
 }
-
+function saveGame() {
+  // 相容新版呼叫點：改為寫入 Supabase
+  persistCurrentUser();
+}
 async function enterGame(username, userId, savedData) {
   currentUser = username;
   currentUserId = userId;
@@ -572,19 +657,36 @@ async function enterGame(username, userId, savedData) {
   $('user-display').style.display = 'inline-block';
   $('logout-btn').style.display = 'inline-block';
 
-  if (savedData) loadGameData(savedData);
-  else startNewGame();
+  if (savedData && savedData.island && Array.isArray(savedData.island.owned) && savedData.island.owned.length) {
+    loadGameData(savedData);
+    addLog('map-log','👋 歡迎回來，'+currentUser+'！');
+    addLog('map-log','目前：Lv.' + S.level + '　勝場 ' + S.wins + '　寵物 ' + S.owned.length + ' 隻');
+  } else {
+    S.owned = [clonePet(getBase('cat'))];
+    S.team = [0];
+    updateHeader();
+    renderIsland();
+    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了「小貓咪」！');
+    addLog('map-log','點擊島上的 🌻陽光草地 開始探索吧～');
+  }
+
+  // 綁定 UI（只綁一次）
+  bindGameHandlers();
+
+  if (!S.nameSet || !S.trainerName) {
+    openNameModal(false);
+  } else {
+    addLog('map-log','歡迎回來，' + S.trainerEmoji + S.trainerName + '！');
+  }
 
   if (autosaveTimer) clearInterval(autosaveTimer);
   autosaveTimer = setInterval(persistCurrentUser, 8000);
 }
-
 async function doLogin() {
   if (authBusy) return;
   const username = $('login-username').value.trim();
   const password = $('login-password').value;
   if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
-
   setLoginButtonsBusy(true);
   const email = usernameToEmail(username);
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -593,19 +695,12 @@ async function doLogin() {
     setLoginButtonsBusy(false);
     return;
   }
-
   const userId = data.user.id;
-  const { data: row, error: readErr } = await sb
-    .from('saves')
-    .select('data')
-    .eq('user_id', userId)
-    .maybeSingle();
+  const { data: row, error: readErr } = await sb.from('saves').select('data').eq('user_id', userId).maybeSingle();
   if (readErr) console.error('讀取存檔失敗：', readErr.message);
-
   setLoginButtonsBusy(false);
   enterGame(username, userId, row ? row.data : null);
 }
-
 async function doRegister() {
   if (authBusy) return;
   const username = $('login-username').value.trim();
@@ -613,7 +708,6 @@ async function doRegister() {
   if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
   if (username.length < 2 || username.length > 12) { showLoginError('名稱請輸入 2-12 個字'); return; }
   if (password.length < 6) { showLoginError('密碼至少需要 6 個字元'); return; }
-
   setLoginButtonsBusy(true);
   const email = usernameToEmail(username);
   const { data, error } = await sb.auth.signUp({
@@ -626,25 +720,20 @@ async function doRegister() {
     return;
   }
   if (!data.session) {
-    // 若 Supabase 專案開啟了「Confirm email」，這裡會拿不到 session。
-    // 建議在 Authentication → Providers → Email 把 Confirm email 關掉，方便這種假 email 的用法。
     showLoginError('註冊成功，但需要 Email 驗證，請到 Supabase 專案關閉 Confirm email 後再試一次。');
     setLoginButtonsBusy(false);
     return;
   }
-
   const userId = data.user.id;
   await sb.from('saves').upsert({ user_id: userId, username, data: null });
   setLoginButtonsBusy(false);
   enterGame(username, userId, null);
 }
-
 async function doLogout() {
   if (currentUserId) await persistCurrentUser();
   await sb.auth.signOut();
   location.reload();
 }
-
 function attachLoginHandlers() {
   $('login-btn').addEventListener('click', doLogin);
   $('register-btn').addEventListener('click', doRegister);
@@ -653,6 +742,85 @@ function attachLoginHandlers() {
   $('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-password').focus(); });
 }
 window.addEventListener('beforeunload', () => { if (currentUserId) persistCurrentUser(); });
+
+let _handlersBound = false;
+function bindGameHandlers() {
+  if (_handlersBound) return;
+  _handlersBound = true;
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
+  });
+  $('cap-fight').onclick = ()=> startWildBattle();
+  $('cap-catch').onclick = ()=> tryCatch();
+  $('cap-run').onclick = ()=>{ $('capture-modal').classList.add('hidden'); addLog('zone-log','你決定先離開…'); };
+  $('player-chip').onclick = ()=> showPlayerProfile();
+  $('pl-close').onclick = ()=> $('player-modal').classList.add('hidden');
+  $('pl-rename').onclick = ()=> {
+    $('player-modal').classList.add('hidden');
+    openNameModal(true);
+  };
+  $('evo-confirm').onclick = ()=> confirmEvolve();
+  $('evo-cancel').onclick = ()=> { $('evo-modal').classList.add('hidden'); _evoIdx=null; };
+
+  // 手動存檔按鈕
+  const header = document.querySelector('.header-stats');
+  if (header && !document.getElementById('save-btn')) {
+    const saveBtn = document.createElement('span');
+    saveBtn.id = 'save-btn';
+    saveBtn.className = 'stat-chip';
+    saveBtn.style.cursor = 'pointer';
+    saveBtn.textContent = '💾';
+    saveBtn.title = '手動存檔';
+    saveBtn.onclick = () => { saveGame(); alert('已存檔到雲端！'); };
+    header.appendChild(saveBtn);
+  }
+
+  // 頭像選擇
+  let pickedAvatar = S.trainerEmoji || '🧑‍🌾';
+  window._pickedAvatar = pickedAvatar;
+  const avBox = $('avatar-pick');
+  if (avBox) {
+    avBox.innerHTML = '';
+    AVATARS.forEach(a => {
+      const s = document.createElement('span');
+      s.textContent = a;
+      s.style.cssText = 'cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent';
+      if (a === pickedAvatar) s.style.borderColor = '#66bb6a';
+      s.onclick = () => {
+        window._pickedAvatar = a;
+        avBox.querySelectorAll('span').forEach(x => x.style.borderColor = 'transparent');
+        s.style.borderColor = '#66bb6a';
+      };
+      avBox.appendChild(s);
+    });
+  }
+  $('name-ok').onclick = () => {
+    const n = ($('name-input').value || '').trim().slice(0, 8);
+    if (!n) { alert('請輸入名字！'); return; }
+    S.trainerName = n;
+    S.trainerEmoji = window._pickedAvatar || '🧑‍🌾';
+    S.nameSet = true;
+    $('name-modal').classList.add('hidden');
+    updateHeader();
+    saveGame();
+    addLog('map-log','🏝️ 歡迎 ' + S.trainerEmoji + S.trainerName + ' 來到波波島！');
+  };
+}
+
+function openNameModal(isRename) {
+  $('name-input').value = isRename ? S.trainerName : '';
+  $('name-modal').querySelector('h2').textContent = isRename ? '更改名字' : '歡迎來到波波島！';
+  $('name-modal').querySelector('p').textContent = isRename ? '輸入新的冒險者名字' : '先取一個冒險者名字吧～';
+  $('name-ok').textContent = isRename ? '確認' : '開始冒險！';
+  window._pickedAvatar = S.trainerEmoji || '🧑‍🌾';
+  const avBox = $('avatar-pick');
+  if (avBox) {
+    avBox.querySelectorAll('span').forEach(s => {
+      s.style.borderColor = s.textContent === window._pickedAvatar ? '#66bb6a' : 'transparent';
+    });
+  }
+  $('name-modal').classList.remove('hidden');
+}
 
 function renderIsland() {
   document.querySelectorAll('.spot').forEach(s=>s.remove());
@@ -679,7 +847,7 @@ function openZone(z) {
   actions.innerHTML = '';
   if(z.rest){
     const b=document.createElement('button'); b.className='btn btn-explore'; b.textContent='😴 休息回復';
-    b.onclick=()=>{ S.owned.forEach(p=>p.hp=p.maxHp); addLog('zone-log','所有寵物恢復精神了！❤️'); };
+    b.onclick=()=>{ S.owned.forEach(p=>p.hp=p.maxHp); saveGame(); addLog('zone-log','所有寵物恢復精神了！❤️'); };
     actions.appendChild(b);
   }
   if(z.shop){
@@ -716,7 +884,7 @@ function explore() {
       const found=SHOP_ITEMS[rand(0,SHOP_ITEMS.length-1)];
       S.items[found.id]=(S.items[found.id]||0)+1;
       addLog('zone-log','🎁 發現了 '+found.emoji+found.name+'！');
-      updateHeader();
+      updateHeader(); saveGame();
     } else {
       addLog('zone-log','什麼都沒發現…再試試看。');
     }
@@ -732,7 +900,7 @@ function tryCatch() {
     S.owned.push(S.wild);
     addLog('zone-log','🎉 成功捕捉了 '+S.wild.emoji+S.wild.name+'！');
     $('capture-modal').classList.add('hidden');
-    checkUnlocks(); updateHeader(); S.wild=null;
+    checkUnlocks(); updateHeader(); saveGame(); S.wild=null;
   } else {
     addLog('zone-log',S.wild.name+' 掙脫了！');
     $('cap-msg').textContent=S.wild.name+' 掙脫了！還要繼續嗎？\n❤️ '+S.wild.hp+'/'+S.wild.maxHp;
@@ -914,7 +1082,12 @@ function endBattle(win){
     const coins=15+rand(5,25)+(S.currentZone?S.currentZone.danger*8:0);
     const expG=12+rand(5,15);
     S.coins+=coins; S.exp+=expG;
-    while(S.exp>=S.level*30){ S.exp-=S.level*30; S.level++; }
+    let leveled=false; let levelsGained=0;
+    while(S.exp>=expNeeded(S.level)){ S.exp-=expNeeded(S.level); S.level++; levelsGained++; leveled=true; }
+    if(leveled){
+      const bonus = levelsGained * 20;
+      S.coins += bonus;
+    }
     if(S.owned[idx]){
       S.owned[idx].exp=(S.owned[idx].exp||0)+expG;
       if(S.owned[idx].exp>=S.owned[idx].level*25){
@@ -923,10 +1096,12 @@ function endBattle(win){
         S.owned[idx].hp=S.owned[idx].maxHp;
       }
     }
-    checkUnlocks(); updateHeader();
+    checkUnlocks(); updateHeader(); saveGame();
     $('res-emoji').textContent='🎉';
     $('res-title').textContent='勝利！';
-    $('res-msg').textContent='獲得 💰'+coins+'　經驗 +'+expG+'\n目前勝場：'+S.wins;
+    let winMsg='獲得 💰'+coins+'　經驗 +'+expG+'\n目前勝場：'+S.wins+'\n玩家等級：Lv.'+S.level;
+    if(leveled) winMsg+='\n🎊 升級了！+'+(levelsGained*20)+' 金錢獎勵';
+    $('res-msg').textContent=winMsg;
 
     // 可以收服對手
     if(S.wild){
@@ -941,7 +1116,7 @@ function endBattle(win){
         rate = Math.min(0.95, rate);
         if(roll(rate)){
           S.owned.push(S.pendingCatch);
-          updateHeader();
+          updateHeader(); saveGame();
           $('res-msg').textContent += '\n🎉 成功收服了 '+S.pendingCatch.emoji+S.pendingCatch.name+'！';
           catchBtn.disabled = true;
           catchBtn.textContent = '已收服 ✓';
@@ -1002,10 +1177,76 @@ function openShop(){
     const card=document.createElement('div'); card.className='shop-item';
     card.innerHTML='<div class="emoji">'+it.emoji+'</div><div class="name">'+it.name+'</div><div class="price">💰 '+it.price+'</div><div class="desc">'+it.desc+'</div>';
     const btn=document.createElement('button'); btn.className='btn btn-shop'; btn.style.padding='5px 12px'; btn.style.fontSize='0.8rem'; btn.textContent='購買';
-    btn.onclick=()=>{ if(S.coins<it.price){ addLog('zone-log','金錢不足！'); return; } S.coins-=it.price; S.items[it.id]=(S.items[it.id]||0)+1; updateHeader(); addLog('zone-log','買下了 '+it.emoji+it.name+'！'); };
+    btn.onclick=()=>{ if(S.coins<it.price){ addLog('zone-log','金錢不足！'); return; } S.coins-=it.price; S.items[it.id]=(S.items[it.id]||0)+1; updateHeader(); saveGame(); addLog('zone-log','買下了 '+it.emoji+it.name+'！'); };
     card.appendChild(btn); grid.appendChild(card);
   });
   $('zone-log').appendChild(grid);
+}
+
+function canEvolve(p) {
+  const base = getBase(p.id);
+  if (!base || !base.evolvesTo) return false;
+  const need = base.evolveLv || 8;
+  if (p.level >= need) return true;
+  // 有進化晶石可提前 3 級
+  if ((S.items.evo || 0) > 0 && p.level >= Math.max(1, need - 3)) return true;
+  return false;
+}
+
+function evolveNeedText(p) {
+  const base = getBase(p.id);
+  if (!base || !base.evolvesTo) return '';
+  const need = base.evolveLv || 8;
+  if (p.level >= need) return '可進化！';
+  if ((S.items.evo || 0) > 0 && p.level >= need - 3) return '可用💎進化（需 Lv.' + (need-3) + '+）';
+  return '進化需 Lv.' + need;
+}
+
+let _evoIdx = null;
+function openEvolve(idx) {
+  const p = S.owned[idx];
+  if (!p || !canEvolve(p)) return;
+  const base = getBase(p.id);
+  const next = getBase(base.evolvesTo);
+  if (!next) return;
+  _evoIdx = idx;
+  $('evo-from').textContent = p.emoji;
+  $('evo-to').textContent = next.emoji;
+  $('evo-title').textContent = p.name + ' → ' + next.name;
+  const need = base.evolveLv || 8;
+  let costNote = p.level >= need ? '達到等級，可免費進化！' : '將消耗 1 顆 💎進化晶石';
+  $('evo-msg').textContent = costNote + '\n\n❤️ ' + p.maxHp + ' → ' + Math.floor(next.maxHp * (1 + (p.level-1)*0.08)) + ' HP\n💥 暴擊 ' + (base.crit*100).toFixed(0) + '% → ' + (next.crit*100).toFixed(0) + '%\n💨 閃避 ' + (base.dodge*100).toFixed(0) + '% → ' + (next.dodge*100).toFixed(0) + '%';
+  $('evo-modal').classList.remove('hidden');
+}
+
+function confirmEvolve() {
+  if (_evoIdx == null) return;
+  const p = S.owned[_evoIdx];
+  const base = getBase(p.id);
+  const next = getBase(base.evolvesTo);
+  if (!p || !next) return;
+  const need = base.evolveLv || 8;
+  if (p.level < need) {
+    if ((S.items.evo || 0) <= 0) { alert('需要進化晶石！'); return; }
+    S.items.evo--;
+  }
+  // 進化：換成新型態，保留等級，血量全滿，能力重算
+  const newMax = Math.floor(next.maxHp * (1 + (p.level - 1) * 0.08));
+  p.id = next.id;
+  p.name = next.name;
+  p.emoji = next.emoji;
+  p.type = next.type;
+  p.maxHp = newMax;
+  p.hp = newMax;
+  p.crit = next.crit;
+  p.dodge = next.dodge;
+  // exp 保留
+  $('evo-modal').classList.add('hidden');
+  alert('✨ ' + base.name + ' 進化成了 ' + next.emoji + next.name + '！');
+  saveGame();
+  renderTeam();
+  updateHeader();
+  _evoIdx = null;
 }
 
 function renderTeam(){
@@ -1016,11 +1257,23 @@ function renderTeam(){
   S.owned.forEach((p,idx)=>{ const card=makePetCard(p,idx,S.team.includes(idx)); card.onclick=()=>toggleTeam(idx); ownedBox.appendChild(card); });
 }
 function makePetCard(p,idx,inTeam){
-  const base=getBase(p.id);
+  const base=getBase(p.id) || {type:'?'};
   const div=document.createElement('div');
   div.className='pet-card'+(inTeam?' active-team':'');
   const pct=Math.max(0,p.hp/p.maxHp*100);
-  div.innerHTML=(inTeam?'<span class="team-label">出戰</span>':'')+'<div class="emoji">'+p.emoji+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+base.type+'<br>❤️ '+p.hp+'/'+p.maxHp+'</div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>';
+  const evoBadge = base.evolved ? '<span class="team-label" style="background:#ab47bc;left:auto;right:3px">進化</span>' : '';
+  let evoBtn = '';
+  if (canEvolve(p)) {
+    evoBtn = '<button class="btn btn-purple" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-evo="'+idx+'">✨ 進化</button>';
+  } else if (base.evolvesTo) {
+    evoBtn = '<div style="font-size:0.68rem;color:#888;margin-top:4px">'+evolveNeedText(p)+'</div>';
+  }
+  div.innerHTML=(inTeam?'<span class="team-label">出戰</span>':'')+evoBadge+'<div class="emoji">'+p.emoji+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+(base.type||'')+'<br>❤️ '+p.hp+'/'+p.maxHp+'</div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>'+evoBtn;
+  // 進化按鈕不要觸發組隊
+  const btn = div.querySelector('[data-evo]');
+  if (btn) {
+    btn.onclick = (e) => { e.stopPropagation(); openEvolve(idx); };
+  }
   return div;
 }
 function toggleTeam(idx){
@@ -1028,6 +1281,7 @@ function toggleTeam(idx){
   if(pos>=0) S.team.splice(pos,1);
   else { if(S.team.length>=3){ alert('最多 3 隻！'); return; } S.team.push(idx); }
   renderTeam();
+  saveGame();
 }
 function renderBag(){
   const box=$('item-list'); box.innerHTML=''; let has=false;
@@ -1042,17 +1296,30 @@ function renderBag(){
 function renderCodex(){
   const box=$('codex-list'); box.innerHTML='';
   ALL_PETS.forEach(p=>{
+    // 進化型：只有擁有過才顯示在圖鑑（或對應初階已擁有可半透明）
     const owned=S.owned.some(o=>o.id===p.id);
-    const d=document.createElement('div'); d.className='pet-card'; d.style.opacity=owned?1:0.4;
-    d.innerHTML='<div class="emoji">'+(owned?p.emoji:'❓')+'</div><div class="name">'+(owned?p.name:'？？？')+'</div><div class="meta">'+(owned?p.type+'　❤️'+p.maxHp+'<br>💥'+(p.crit*100).toFixed(0)+'% 💨'+(p.dodge*100).toFixed(0)+'%':'尚未發現')+'</div>';
+    const baseOwned = p.evolved ? false : owned;
+    const show = owned || !p.evolved;
+    if (!show && !owned) return; // 進化型未擁有就不佔格子太多 — 改為仍顯示但問號
+    const d=document.createElement('div'); d.className='pet-card'; d.style.opacity=owned?1:(p.evolved?0.25:0.4);
+    let meta = '尚未發現';
+    if (owned) {
+      meta = p.type+'　❤️'+p.maxHp+'<br>💥'+(p.crit*100).toFixed(0)+'% 💨'+(p.dodge*100).toFixed(0)+'%';
+      if (p.evolved) meta = '✨進化型<br>' + meta;
+      if (p.evolvesTo) meta += '<br>可進化→'+ (getBase(p.evolvesTo)||{}).name;
+    } else if (p.evolvesTo) {
+      meta = '進化需 Lv.'+(p.evolveLv||8);
+    } else if (p.evolved) {
+      meta = '進化型（未擁有）';
+    }
+    d.innerHTML='<div class="emoji">'+(owned?p.emoji:'❓')+'</div><div class="name">'+(owned?p.name:'？？？')+'</div><div class="meta">'+meta+'</div>';
     box.appendChild(d);
   });
 }
 
-attachStaticHandlers();
 attachLoginHandlers();
-</script>
 
+</script>
 <script>
 (() => {
   const canvas = document.getElementById('farm-game');
