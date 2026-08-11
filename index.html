@@ -444,66 +444,32 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 /* ====== Supabase：請換成你自己專案的網址與 anon key ====== */
-const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
+const SUPABASE_URL = "https://ajfepkmpjphkxsccahlm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZmVwa21wanBoa3hzY2NhaGxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MjczMzgsImV4cCI6MjEwMjAwMzMzOH0.9hcNV8wYkGEECIK0ji_H-DLp8S8IONiOZaRkiLhQO5s";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 /* ============================================================= */
 
 
 const ALL_PETS = [
-  // ===== 初階 =====
-  {id:'cat',name:'小貓咪',emoji:'🐱',type:'敏捷',maxHp:95,crit:0.22,dodge:0.18,evolveLv:8,evolvesTo:'cat2',
-    skills:[{name:'肉球拍拍',emoji:'🐾',power:18,critB:0.05},{name:'療癒呼嚕',emoji:'😻',heal:22},{name:'閃閃衝刺',emoji:'✨',power:28,critB:0.12},{name:'毛線纏繞',emoji:'🧶',power:12,effect:'slow',hit:0.85}]},
-  {id:'dog',name:'汪汪狗',emoji:'🐶',type:'力量',maxHp:115,crit:0.15,dodge:0.10,evolveLv:8,evolvesTo:'dog2',
-    skills:[{name:'汪汪大叫',emoji:'🔊',power:20,critB:0.08},{name:'舔舔療癒',emoji:'👅',heal:26},{name:'撲倒擁抱',emoji:'🤗',power:32,critB:0.05},{name:'挖洞突擊',emoji:'🕳️',power:16,effect:'stun',hit:0.70}]},
-  {id:'bunny',name:'蹦蹦兔',emoji:'🐰',type:'平衡',maxHp:100,crit:0.18,dodge:0.15,evolveLv:8,evolvesTo:'bunny2',
-    skills:[{name:'蹦蹦跳',emoji:'⤴️',power:19,critB:0.06},{name:'胡蘿蔔力量',emoji:'🥕',heal:20},{name:'長耳巴掌',emoji:'👂',power:26,critB:0.10},{name:'超級可愛',emoji:'🥰',power:10,effect:'charm',hit:0.80}]},
-  {id:'panda',name:'圓圓熊貓',emoji:'🐼',type:'坦克',maxHp:135,crit:0.10,dodge:0.06,evolveLv:10,evolvesTo:'panda2',
-    skills:[{name:'滾滾攻擊',emoji:'🌀',power:22,critB:0.04},{name:'竹子大餐',emoji:'🎋',heal:30},{name:'熊抱壓制',emoji:'🐻',power:34,critB:0.03},{name:'裝睡迷惑',emoji:'😴',power:8,effect:'confuse',hit:0.75}]},
-  {id:'fox',name:'小狐狸',emoji:'🦊',type:'技巧',maxHp:88,crit:0.25,dodge:0.20,evolveLv:8,evolvesTo:'fox2',
-    skills:[{name:'尾巴掃掃',emoji:'🦊',power:17,critB:0.08},{name:'莓果能量',emoji:'🫐',heal:18},{name:'幻影戲法',emoji:'🎭',power:27,critB:0.15},{name:'小小火焰',emoji:'🔥',power:14,effect:'burn',hit:0.78}]},
-  {id:'penguin',name:'滑滑企鵝',emoji:'🐧',type:'冰系',maxHp:108,crit:0.16,dodge:0.12,evolveLv:9,evolvesTo:'penguin2',
-    skills:[{name:'溜冰衝刺',emoji:'⛸️',power:21,critB:0.07},{name:'小魚零食',emoji:'🐟',heal:24},{name:'肚皮滑行',emoji:' freeze',power:29,critB:0.06},{name:'雪球攻擊',emoji:'❄️',power:13,effect:'freeze',hit:0.72}]},
-  {id:'owl',name:'咕咕貓頭鷹',emoji:'🦉',type:'智慧',maxHp:92,crit:0.20,dodge:0.16,evolveLv:9,evolvesTo:'owl2',
-    skills:[{name:'夜間突襲',emoji:'🌙',power:20,critB:0.10},{name:'羽毛療癒',emoji:'🪶',heal:21},{name:'智慧一擊',emoji:'📚',power:25,critB:0.12},{name:'催眠曲',emoji:'🎵',power:9,effect:'stun',hit:0.68}]},
-  {id:'frog',name:'跳跳蛙',emoji:'🐸',type:'水系',maxHp:98,crit:0.14,dodge:0.22,evolveLv:8,evolvesTo:'frog2',
-    skills:[{name:'彈跳攻擊',emoji:'🔝',power:19,critB:0.06},{name:'池塘恢復',emoji:'💧',heal:23},{name:'舌頭黏黏',emoji:'👅',power:24,critB:0.08},{name:'黏液減速',emoji:'🟢',power:11,effect:'slow',hit:0.82}]},
-  {id:'chick',name:'小雞寶',emoji:'🐤',type:'火種',maxHp:85,crit:0.19,dodge:0.14,evolveLv:7,evolvesTo:'chick2',
-    skills:[{name:'啄啄',emoji:'🐤',power:16,critB:0.07},{name:'暖暖羽毛',emoji:'🔥',heal:19},{name:'小雞衝刺',emoji:'💨',power:26,critB:0.11},{name:'火花四濺',emoji:'✨',power:12,effect:'burn',hit:0.76}]},
-  {id:'bear',name:'小熊熊',emoji:'🐻',type:'力量',maxHp:125,crit:0.12,dodge:0.08,evolveLv:10,evolvesTo:'bear2',
-    skills:[{name:'熊掌拍',emoji:'🐾',power:23,critB:0.05},{name:'蜂蜜罐',emoji:'🍯',heal:28},{name:'怒吼',emoji:'📢',power:33,critB:0.04},{name:'威嚇',emoji:'😤',power:10,effect:'charm',hit:0.70}]},
-  // ===== 進化型 =====
-  {id:'cat2',name:'月光貓',emoji:'🐈',type:'敏捷',maxHp:130,crit:0.28,dodge:0.24,evolved:true,
-    skills:[{name:'星爪連擊',emoji:'✨',power:28,critB:0.10},{name:'月光療癒',emoji:'🌙',heal:32},{name:'影步突襲',emoji:'🌑',power:38,critB:0.15},{name:'銀線枷鎖',emoji:'🧵',power:18,effect:'slow',hit:0.90}]},
-  {id:'dog2',name:'守護犬',emoji:'🐕',type:'力量',maxHp:155,crit:0.20,dodge:0.14,evolved:true,
-    skills:[{name:'戰吼',emoji:'📢',power:30,critB:0.10},{name:'忠誠療癒',emoji:'💛',heal:36},{name:'衝鋒撞擊',emoji:'💥',power:44,critB:0.08},{name:'地裂',emoji:'🌍',power:22,effect:'stun',hit:0.78}]},
-  {id:'bunny2',name:'彩虹兔',emoji:'🐇',type:'平衡',maxHp:138,crit:0.24,dodge:0.20,evolved:true,
-    skills:[{name:'彩虹踢',emoji:'🌈',power:28,critB:0.10},{name:'活力胡蘿蔔',emoji:'🥕',heal:30},{name:'幻耳連拍',emoji:'💫',power:36,critB:0.14},{name:'心動光波',emoji:'💗',power:16,effect:'charm',hit:0.88}]},
-  {id:'panda2',name:'功夫熊貓',emoji:'🥋',type:'坦克',maxHp:180,crit:0.14,dodge:0.10,evolved:true,
-    skills:[{name:'旋風腿',emoji:'🌪️',power:32,critB:0.08},{name:'仙竹大餐',emoji:'🎋',heal:42},{name:'泰山壓頂',emoji:'⛰️',power:48,critB:0.06},{name:'醉拳迷惑',emoji:'🥴',power:14,effect:'confuse',hit:0.82}]},
-  {id:'fox2',name:'九尾狐',emoji:'🦊',type:'技巧',maxHp:120,crit:0.32,dodge:0.26,evolved:true,
-    skills:[{name:'焰尾橫掃',emoji:'🔥',power:26,critB:0.12},{name:'靈果能量',emoji:'🍇',heal:28},{name:'幻術千影',emoji:'🎭',power:40,critB:0.20},{name:'狐火燎原',emoji:'🧡',power:20,effect:'burn',hit:0.85}]},
-  {id:'penguin2',name:'冰皇企鵝',emoji:'👑',type:'冰系',maxHp:145,crit:0.22,dodge:0.16,evolved:true,
-    skills:[{name:'極光衝刺',emoji:'🌨️',power:30,critB:0.10},{name:'深海大餐',emoji:'🐠',heal:34},{name:'冰山滑行',emoji:'🧊',power:40,critB:0.10},{name:'絕對零度',emoji:'❄️',power:20,effect:'freeze',hit:0.80}]},
-  {id:'owl2',name:'賢者貓頭鷹',emoji:'🔮',type:'智慧',maxHp:125,crit:0.26,dodge:0.20,evolved:true,
-    skills:[{name:'星夜突襲',emoji:'🌌',power:28,critB:0.14},{name:'智慧之羽',emoji:'🪶',heal:30},{name:'真理一擊',emoji:'📖',power:36,critB:0.16},{name:'深度催眠',emoji:'💤',power:14,effect:'stun',hit:0.78}]},
-  {id:'frog2',name:'雷鳴蛙',emoji:'🐸',type:'水系',maxHp:132,crit:0.18,dodge:0.28,evolved:true,
-    skills:[{name:'雷彈跳',emoji:'⚡',power:28,critB:0.10},{name:'潮汐恢復',emoji:'🌊',heal:32},{name:'電磁長舌',emoji:'👅',power:34,critB:0.12},{name:'超導電漿',emoji:'💚',power:16,effect:'slow',hit:0.88}]},
-  {id:'chick2',name:'烈焰雞',emoji:'🐔',type:'火種',maxHp:118,crit:0.26,dodge:0.18,evolved:true,
-    skills:[{name:'火焰啄擊',emoji:'🔥',power:26,critB:0.12},{name:'浴火重生',emoji:'🧡',heal:28},{name:'爆炎衝刺',emoji:'💥',power:38,critB:0.16},{name:'煉獄火花',emoji:'☄️',power:18,effect:'burn',hit:0.84}]},
-  {id:'bear2',name:'霸王熊',emoji:'🐻‍❄️',type:'力量',maxHp:170,crit:0.16,dodge:0.12,evolved:true,
-    skills:[{name:'巨掌粉碎',emoji:'👊',power:34,critB:0.08},{name:'王者蜂蜜',emoji:'🍯',heal:40},{name:'山林怒吼',emoji:'📢',power:46,critB:0.08},{name:'威壓領域',emoji:'😤',power:16,effect:'charm',hit:0.80}]}
-]
-
+  // 目前已清空預設寵物。請在此加入你自己畫的寵物，格式範例：
+  // {id:'mypet', name:'波波獸', emoji:'⭐', img:'images/mypet.png', type:'神秘',
+  //   maxHp:100, crit:0.20, dodge:0.15, evolveLv:8, evolvesTo:'mypet2',
+  //   skills:[
+  //     {name:'普通攻擊', emoji:'👊', power:18, critB:0.05},
+  //     {name:'回復', emoji:'💚', heal:22},
+  //     {name:'強擊', emoji:'💥', power:28, critB:0.12},
+  //     {name:'狀態技', emoji:'✨', power:12, effect:'slow', hit:0.85}
+  //   ]},
+];
 
 const ZONES = [
   {id:'plaza',  name:'中央廣場', emoji:'🏞️', desc:'島的中心，可以休息與購物。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:48, y:48},
-  {id:'meadow', name:'陽光草地', emoji:'🌻', desc:'開滿花的溫柔草地，適合新手。', unlock:0, danger:1, pets:['cat','bunny','chick'], x:55, y:28},
-  {id:'forest', name:'神秘森林', emoji:'🌳', desc:'樹影幢幢，敏捷小動物的家。', unlock:2, danger:2, pets:['fox','owl','frog'], x:22, y:32},
-  {id:'beach',  name:'波波海灘', emoji:'🏖️', desc:'陽光沙灘，冰系寵物常出沒。', unlock:4, danger:2, pets:['penguin','frog','dog'], x:65, y:72},
-  {id:'cave',   name:'咕咕洞窟', emoji:'🕳️', desc:'陰涼洞穴，坦克型寵物棲息地。', unlock:6, danger:3, pets:['panda','bear','owl'], x:18, y:62},
-  {id:'volcano',name:'小火山',   emoji:'🌋', desc:'熱氣騰騰的力量試煉場。', unlock:9, danger:3, pets:['dog','bear','chick'], x:78, y:38},
-  {id:'rainbow',name:'彩虹山頂', emoji:'🌈', desc:'傳說稀有寵物會出現的地方！', unlock:12, danger:4, pets:['fox','bunny','owl','chick'], x:42, y:12}
+  {id:'meadow', name:'陽光草地', emoji:'🌻', desc:'開滿花的溫柔草地，適合新手。', unlock:0, danger:1, pets:[], x:55, y:28},
+  {id:'forest', name:'神秘森林', emoji:'🌳', desc:'樹影幢幢，敏捷小動物的家。', unlock:2, danger:2, pets:[], x:22, y:32},
+  {id:'beach',  name:'波波海灘', emoji:'🏖️', desc:'陽光沙灘，冰系寵物常出沒。', unlock:4, danger:2, pets:[], x:65, y:72},
+  {id:'cave',   name:'咕咕洞窟', emoji:'🕳️', desc:'陰涼洞穴，坦克型寵物棲息地。', unlock:6, danger:3, pets:[], x:18, y:62},
+  {id:'volcano',name:'小火山',   emoji:'🌋', desc:'熱氣騰騰的力量試煉場。', unlock:9, danger:3, pets:[], x:78, y:38},
+  {id:'rainbow',name:'彩虹山頂', emoji:'🌈', desc:'傳說稀有寵物會出現的地方！', unlock:12, danger:4, pets:[], x:42, y:12}
 ];
 
 const SHOP_ITEMS = [
@@ -662,12 +628,14 @@ async function enterGame(username, userId, savedData) {
     addLog('map-log','👋 歡迎回來，'+currentUser+'！');
     addLog('map-log','目前：Lv.' + S.level + '　勝場 ' + S.wins + '　寵物 ' + S.owned.length + ' 隻');
   } else {
-    S.owned = [clonePet(getBase('cat'))];
-    S.team = [0];
+    S.owned = [];
+    S.team = [];
+    // 預設寵物已清空：請在 ALL_PETS 加入至少一隻，並把下面改成 clonePet(getBase('你的寵物id'))
+    // 範例：S.owned = [clonePet(getBase('mypet'))]; S.team = [0];
     updateHeader();
     renderIsland();
-    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了「小貓咪」！');
-    addLog('map-log','點擊島上的 🌻陽光草地 開始探索吧～');
+    addLog('map-log','🏝️ 歡迎來到波波島！目前圖鑑是空的，請先在程式中加入你的自訂寵物！');
+    addLog('map-log','加入寵物並設定新手區後，再開始探索吧～');
   }
 
   // 綁定 UI（只綁一次）
