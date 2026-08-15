@@ -2281,6 +2281,23 @@ const clonePet = (base,lv=1) => {
   return p;
 };
 
+/** 開局贈寵：4等白二星水波豹 + 4等白一星火爆熊 */
+function createStarterPets() {
+  const water = clonePet(getBase('shuibo_bao'), 4);
+  water.starLevel = 1; // 白2★
+  water.exp = 0;
+  if (typeof syncPetEvoStage === 'function') syncPetEvoStage(water);
+  recalculatePetStats(water, { restoreFullHp: true });
+
+  const fire = clonePet(getBase('huobao_xiong'), 4);
+  fire.starLevel = 0; // 白1★
+  fire.exp = 0;
+  if (typeof syncPetEvoStage === 'function') syncPetEvoStage(fire);
+  recalculatePetStats(fire, { restoreFullHp: true });
+
+  return [water, fire];
+}
+
 function addLog(boxId, text) {
   const box = $(boxId);
   const d = document.createElement('div');
@@ -2437,12 +2454,12 @@ async function enterGame(username, userId, savedData) {
     addLog('map-log','👋 歡迎回來，'+currentUser+'！');
     addLog('map-log','目前：Lv.' + S.level + '　勝場 ' + S.wins + '　寵物 ' + S.owned.length + ' 隻');
   } else {
-    S.owned = [clonePet(getBase('shuibo_bao'))];
-    S.team = [0];
+    S.owned = createStarterPets();
+    S.team = [0, 1];
     updateHeader();
     renderIsland();
-    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了「水波豹」！');
-    addLog('map-log','點擊島上的 🌻陽光草地 開始探索吧～');
+    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了 Lv.4 白2★ 水波豹 與 Lv.4 白1★ 火爆熊！');
+    addLog('map-log','點擊島上的地點開始探索吧～');
   }
 
   // 綁定 UI（只綁一次）
@@ -2537,14 +2554,14 @@ function enterAsGuest() {
   } catch (e) {}
 
   if (!loaded) {
-    S.owned = [clonePet(getBase('shuibo_bao'))];
-    S.team = [0];
+    S.owned = createStarterPets();
+    S.team = [0, 1];
     S.trainerName = '';
     S.trainerEmoji = '🧑‍🌾';
     S.nameSet = false;
     updateHeader();
     renderIsland();
-    addLog('map-log','👤 訪客模式：你獲得了「水波豹」！（進度僅存本機）');
+    addLog('map-log','👤 訪客模式：你獲得了 Lv.4 白2★ 水波豹 與 Lv.4 白1★ 火爆熊！（進度僅存本機）');
   }
 
   bindGameHandlers();
@@ -3792,6 +3809,20 @@ function showPop(target,text,type){
   el.appendChild(p);
   setTimeout(() => { p.remove(); }, 900);
 }
+/** 屬性克制：攻擊方屬性 → 防守方屬性 → 倍率 */
+const TYPE_EFFECT = {
+  '水': { '火': 1.5, '電': 0.75 },
+  '火': { '水': 0.75, '電': 1.0 },
+  '電': { '水': 1.5, '火': 1.0 },
+  '神': { '火': 1.1, '水': 1.1, '電': 1.1 }
+};
+function getTypeMul(atkType, defType) {
+  if (!atkType || !defType) return 1;
+  const row = TYPE_EFFECT[atkType];
+  if (!row) return 1;
+  const m = row[defType];
+  return (m != null) ? m : 1;
+}
 function calcAtk(atk,def,sk,isP){
   // 規則：技能一定命中、一定不會被閃避（不判定 miss / dodge）
   const atkStat = Math.max(1, Number(atk.attack) || Number(atk.baseAtk) || 30);
@@ -3825,6 +3856,12 @@ function calcAtk(atk,def,sk,isP){
   }
   dmg = Math.max(1, Math.floor(dmg + rand(-3, 5)));
 
+  // 屬性克制（水克火 1.5 倍；火打水 0.75 倍等）
+  const aType = atk.type || (typeof getBase === 'function' && getBase(atk.id) && getBase(atk.id).type) || '';
+  const dType = def.type || (typeof getBase === 'function' && getBase(def.id) && getBase(def.id).type) || '';
+  const typeMul = getTypeMul(aType, dType);
+  if (typeMul !== 1) dmg = Math.max(1, Math.floor(dmg * typeMul));
+
   let critRate = (atk.crit != null ? atk.crit : 0.08) + (sk.critB || 0);
   if (isP && S.pEffects && S.pEffects.critSet != null) critRate = S.pEffects.critSet;
   if (isP && S.pEffects && S.pEffects.critBonus) critRate += S.pEffects.critBonus;
@@ -3843,7 +3880,7 @@ function calcAtk(atk,def,sk,isP){
   if (isP && S.eEffects && S.eEffects.slow) dmg = Math.floor(dmg * 1.2);
   if (isP && S.eEffects && S.eEffects.charm) dmg = Math.floor(dmg * 0.7);
   if (!isP && S.defBoost) { dmg = Math.floor(dmg * 0.5); S.defBoost = false; }
-  return { type: crit ? 'crit' : 'hit', dmg: Math.max(1, dmg) };
+  return { type: crit ? 'crit' : 'hit', dmg: Math.max(1, dmg), typeMul: typeMul };
 }
 
 
@@ -4212,6 +4249,16 @@ function executeSkill(pl, sk, onDone, isEnemy){
       }
       defender.hp = Math.max(0, defender.hp - realDmg);
       const side = isEnemy ? 'en' : 'p';
+      // 屬性相剋提示（每段攻擊只在第一下顯示一次）
+      if (h === 0 && r.typeMul != null && r.typeMul > 1) {
+        const aType = pl.type || '';
+        const dType = defender.type || '';
+        addBLog('✨ 發現屬性相剋！（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'lucky');
+      } else if (h === 0 && r.typeMul != null && r.typeMul < 1) {
+        const aType = pl.type || '';
+        const dType = defender.type || '';
+        addBLog('💧 屬性不佳…（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'sys');
+      }
       if (r.type === 'crit') {
         addBLog('💥 CRITICAL HIT！對 ' + defender.name + ' 第' + (h+1) + '下 ' + r.dmg + ' 傷害！', 'crit');
         showCritPop(isEnemy ? 'p' : 'e', r.dmg);
