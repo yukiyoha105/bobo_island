@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#4caf50">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <title>波波島 🏝️</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -684,91 +682,51 @@
     .btn .red-dot { top: 2px; right: 2px; }
 
 
-    /* ===== 手機版（≤560；電腦維持原樣）===== */
+    /* 手機版 ≤560；電腦版不變 */
     @media (max-width: 560px) {
-      html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
-      body { padding: 0; align-items: stretch; background: #6bb8d6; }
-      .game {
-        max-width: 100%; width: 100%; min-height: 100vh; min-height: 100dvh;
-        border-radius: 0; border-width: 0; box-shadow: none;
-        display: flex; flex-direction: column;
-      }
-      .header { padding: 8px 10px; padding-top: max(8px, env(safe-area-inset-top, 8px)); gap: 4px; flex-shrink: 0; }
+      body { padding: 0; align-items: stretch; }
+      .game { max-width: 100%; border-radius: 0; border-width: 0; min-height: 100dvh; display: flex; flex-direction: column; }
+      .header { padding: 8px 10px; flex-shrink: 0; }
       .header h1 { font-size: 1.05rem; }
       .header-stats { width: 100%; flex-wrap: wrap; gap: 4px; font-size: 0.72rem; }
-      .stat-chip { padding: 4px 8px; font-size: 0.72rem; }
-      .nav { flex-shrink: 0; position: sticky; top: 0; z-index: 40; }
-      .nav-btn { padding: 12px 2px; font-size: 0.78rem; min-height: 44px; }
-      .screen { padding: 8px; min-height: 0; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-      .island-wrap { max-width: 100%; aspect-ratio: 1/1; border-radius: 12px; }
-      .spot-icon { font-size: 1.45rem; }
-      .spot-label { font-size: 0.55rem; }
-      .btn { padding: 12px 16px; min-height: 44px; }
+      .nav-btn { padding: 12px 2px; min-height: 44px; font-size: 0.78rem; }
+      .screen { padding: 8px; flex: 1; overflow-y: auto; min-height: 0; }
+      .island-wrap { aspect-ratio: 1/1; max-width: 100%; }
       .pet-list, .item-list, .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .battle-row-allies, .battle-row-enemies { grid-template-columns: repeat(3, 1fr); gap: 4px; }
-      .bcard { min-height: 0; padding: 4px 3px; font-size: 0.62rem; }
+      .bcard { padding: 4px 3px; font-size: 0.62rem; }
       .bcard .bc-face { font-size: 1.35rem; }
-      .bcard .bc-sk { font-size: 0.55rem; min-height: 28px; padding: 4px 1px; }
-      .battle-bottom-bar { flex-direction: column; align-items: stretch; }
-      .battle-bottom-bar .btn { width: 100%; }
+      .bcard .bc-sk { font-size: 0.55rem; min-height: 28px; }
+      .btn { min-height: 44px; padding: 12px 16px; }
       .pet-info-grid { grid-template-columns: 1fr; }
-      .modal { max-width: 94vw; }
       #res-actions { display: flex; flex-direction: column; gap: 6px; }
       #res-actions .btn { width: 100%; }
-      input, button, .btn, .nav-btn, .act-btn, .bc-sk { touch-action: manipulation; }
+      input, button, .btn, .nav-btn, .act-btn { touch-action: manipulation; }
     }
-    /* 寵物資訊：內容可捲、底部按鈕列永遠固定（不依賴 sticky） */
     .pet-info-modal {
-      max-width: 680px !important;
-      max-height: 88vh;
-      display: flex !important;
-      flex-direction: column;
-      padding: 16px 14px 0 !important;
-      overflow: hidden !important;
+      max-width: 680px !important; max-height: 88vh;
+      display: flex !important; flex-direction: column;
+      padding: 16px 14px 0 !important; overflow: hidden !important;
     }
     .pet-info-scroll {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      padding-bottom: 8px;
-      min-height: 0;
+      flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain; min-height: 0; padding-bottom: 8px;
     }
     .pet-info-actions {
-      flex: 0 0 auto;
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
+      flex: 0 0 auto; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
       padding: 10px 4px max(12px, env(safe-area-inset-bottom, 12px));
-      border-top: 1px solid #e0e0e0;
-      background: #fff;
-      box-shadow: 0 -4px 14px rgba(0,0,0,0.06);
-      z-index: 10;
+      border-top: 1px solid #e0e0e0; background: #fff;
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.06); z-index: 10;
     }
-    .pet-info-actions .btn {
-      min-height: 48px;
-      min-width: 70px;
-      flex: 1 1 30%;
-      max-width: 160px;
-      font-size: 0.9rem;
-      touch-action: manipulation;
-      position: relative;
-      z-index: 11;
-    }
+    .pet-info-actions .btn { min-height: 48px; flex: 1 1 30%; max-width: 160px; }
     @media (max-width: 560px) {
-      .overlay#pet-info-modal {
-        align-items: flex-end !important;
-        padding: 0 !important;
-      }
+      .overlay#pet-info-modal { align-items: flex-end !important; padding: 0 !important; }
       .overlay#pet-info-modal .pet-info-modal {
-        max-width: 100% !important;
-        width: 100% !important;
+        max-width: 100% !important; width: 100% !important;
         max-height: min(94vh, 100dvh) !important;
-        border-radius: 18px 18px 0 0 !important;
-        margin: 0 !important;
+        border-radius: 18px 18px 0 0 !important; margin: 0 !important;
       }
-      .pet-info-actions .btn { max-width: none; flex: 1 1 40%; }
+      .pet-info-actions .btn { max-width: none; }
     }
 
   </style>
@@ -950,7 +908,6 @@
     </div>
   </div>
 
-
   <div class="overlay hidden" id="app-confirm-modal" style="z-index:400">
     <div class="modal" style="max-width:340px">
       <div class="big" id="app-confirm-emoji">❓</div>
@@ -983,7 +940,17 @@
 /* ====== Supabase：請換成你自己專案的網址與 anon key ====== */
 const SUPABASE_URL = "https://ajfepkmpjphkxsccahlm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZmVwa21wanBoa3hzY2NhaGxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MjczMzgsImV4cCI6MjEwMjAwMzMzOH0.9hcNV8wYkGEECIK0ji_H-DLp8S8IONiOZaRkiLhQO5s";
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let sb = null;
+try {
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else {
+    console.warn('Supabase SDK 未載入，改用本機存檔模式');
+  }
+} catch (e) {
+  console.warn('Supabase 初始化失敗', e);
+  sb = null;
+}
 /* ============================================================= */
 
 
@@ -1789,32 +1756,30 @@ function calcDismantleFragments(p) {
   return Math.max(1, 1 + Math.floor(lv / 5) + star + stage);
 }
 
-/** 遊戲內確認（取代原生 confirm，手機較穩定） */
 function appConfirm(opts) {
   opts = opts || {};
-  return new Promise((resolve) => {
-    const ov = document.getElementById('app-confirm-modal');
+  return new Promise(function(resolve) {
+    var ov = document.getElementById('app-confirm-modal');
     if (!ov) { resolve(window.confirm(opts.message || '確定？')); return; }
-    const em = document.getElementById('app-confirm-emoji');
-    const title = document.getElementById('app-confirm-title');
-    const msg = document.getElementById('app-confirm-msg');
-    const okBtn = document.getElementById('app-confirm-ok');
-    const cancelBtn = document.getElementById('app-confirm-cancel');
+    var em = document.getElementById('app-confirm-emoji');
+    var title = document.getElementById('app-confirm-title');
+    var msg = document.getElementById('app-confirm-msg');
+    var okBtn = document.getElementById('app-confirm-ok');
+    var cancelBtn = document.getElementById('app-confirm-cancel');
     if (em) em.textContent = opts.emoji || '❓';
     if (title) title.textContent = opts.title || '請確認';
     if (msg) msg.textContent = opts.message || '確定要執行嗎？';
     if (okBtn) okBtn.textContent = opts.okText || '確定';
     if (cancelBtn) cancelBtn.textContent = opts.cancelText || '取消';
-    const cleanup = () => {
+    function cleanup() {
       ov.classList.add('hidden');
       okBtn.onclick = null;
       cancelBtn.onclick = null;
       ov.onclick = null;
-    };
-    okBtn.onclick = (e) => { if (e) e.stopPropagation(); cleanup(); resolve(true); };
-    cancelBtn.onclick = (e) => { if (e) e.stopPropagation(); cleanup(); resolve(false); };
-    // 點遮罩 = 取消
-    ov.onclick = (e) => { if (e.target === ov) { cleanup(); resolve(false); } };
+    }
+    okBtn.onclick = function(e) { if (e) e.stopPropagation(); cleanup(); resolve(true); };
+    cancelBtn.onclick = function(e) { if (e) e.stopPropagation(); cleanup(); resolve(false); };
+    ov.onclick = function(e) { if (e.target === ov) { cleanup(); resolve(false); } };
     ov.classList.remove('hidden');
   });
 }
@@ -1835,28 +1800,88 @@ function tryDismantlePet(idx) {
     '（分解後無法復原）';
   appConfirm({ emoji: '♻️', title: '分解寵物', message: msg, okText: '確定分解', cancelText: '取消' }).then(function(ok) {
     if (!ok) return;
-    // 索引可能已變，用 id+引用再找一次
-    let i = idx;
-    if (!S.owned[i] || S.owned[i] !== p) {
-      i = S.owned.indexOf(p);
-      if (i < 0) { alert('找不到該寵物'); return; }
-    }
-    addFragments(p.id, gain);
-    const name = p.name;
-    const emoji = p.emoji || '';
-    S.team = (S.team || []).filter(ti => ti !== i).map(ti => (ti > i ? ti - 1 : ti));
-    S.owned.splice(i, 1);
-    if (S.team.length === 0 && S.owned.length > 0) S.team = [0];
-    $('pet-info-modal').classList.add('hidden');
-    window._petInfoIdx = null;
-    updateHeader();
-    if (typeof renderTeam === 'function') renderTeam();
-    saveGame();
-    alert('♻️ 已分解 ' + emoji + name + '\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
+    doDismantlePetConfirmed(idx, p, gain);
   });
   return true;
 }
+function doDismantlePetConfirmed(idx, p, gain) {
+  addFragments(p.id, gain);
+  const name = p.name;
+  const emoji = p.emoji || '';
 
+  // 從隊伍移除，並修正索引
+  S.team = (S.team || []).filter(i => i !== idx).map(i => (i > idx ? i - 1 : i));
+  S.owned.splice(idx, 1);
+  // 若隊伍空了但還有寵物，自動放入第一隻
+  if (S.team.length === 0 && S.owned.length > 0) S.team = [0];
+
+  $('pet-info-modal').classList.add('hidden');
+  window._petInfoIdx = null;
+  updateHeader();
+  if (typeof renderTeam === 'function') renderTeam();
+  saveGame();
+  alert('♻️ 已分解 ' + emoji + name + '\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
+  return true;
+}
+
+
+
+
+const S = {
+  coins:80, level:1, exp:0, wins:0,
+  fragments:{},
+  treasures:{},
+  treasureFrags:{},
+  trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
+  unlocked:['plaza','meadow','beach','coral_forge'],
+  owned:[], team:[],
+  items:{hua_mi:0},
+  currentZone:null, battling:false,
+  player:null, enemy:null, wild:null,
+  atkBoost:false, defBoost:false, forceCrit:false,
+  eEffects:{}, playerTurn:true,
+  pendingCatch:null
+};
+
+function expNeeded(lv){ return lv * 30; }
+
+const $ = id => document.getElementById(id);
+const roll = c => Math.random() < c;
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const getBase = id => ALL_PETS.find(p=>p.id===id);
+
+const EVO_STAGE_NAMES = ['基礎','初始進化','中階進化','進階進化','終極進化','完美進化'];
+/** 依等級對應進化階段：0~12基 / 13~18初 / 19~28中 / 29~36進 / 37~48終 / 49+完 */
+function evoStageFromLevel(level) {
+  const lv = Math.max(0, Math.floor(Number(level) || 0));
+  if (lv >= 49) return 5;
+  if (lv >= 37) return 4;
+  if (lv >= 29) return 3;
+  if (lv >= 19) return 2;
+  if (lv >= 13) return 1;
+  return 0;
+}
+/** 目前等級「最高可進化到」的階段（不自動升，需按進化按鈕） */
+function maxEvoStageForPet(p) {
+  return evoStageFromLevel(p && p.level != null ? p.level : 1);
+}
+/** 是否可手動進化到下一階段 */
+function canStageEvolve(p) {
+  if (!p) return false;
+  const cur = Math.max(0, Number(p.evoStage) || 0);
+  const max = maxEvoStageForPet(p);
+  return max > cur && cur < 5;
+}
+/** 讀檔時：不自動升階；僅修正非法過高階段 */
+function syncPetEvoStage(p, { allowDowngrade = false } = {}) {
+  if (!p) return 0;
+  const max = maxEvoStageForPet(p);
+  let cur = Math.max(0, Number(p.evoStage) || 0);
+  if (cur > max) cur = max; // 等級不夠時壓回
+  if (allowDowngrade) cur = Math.min(cur, max);
+  p.evoStage = cur;
+  return p.evoStage;
+}
 function doStageEvolve(idx) {
   const p = S.owned[idx];
   if (!p || !canStageEvolve(p)) {
@@ -1870,35 +1895,34 @@ function doStageEvolve(idx) {
   const msg = '確定讓「' + (p.emoji||'') + p.name + '」進化？\n' + fromName + ' → ' + toName;
   appConfirm({ emoji: '✨', title: '進化確認', message: msg, okText: '確認進化', cancelText: '取消' }).then(function(ok) {
     if (!ok) return;
-    let i = idx;
-    if (!S.owned[i] || S.owned[i] !== p) {
-      i = S.owned.indexOf(p);
-      if (i < 0) { alert('找不到該寵物'); return; }
-    }
-    const before = snapshotPetCombatStats(p);
-    if (p._lastPower == null) syncPetPowerBaseline(p);
-    p.evoStage = to;
-    recalculatePetStats(p, { restoreFullHp: true });
-    notifyIfPowerUp(p, '進化');
-    saveGame();
-    const after = snapshotPetCombatStats(p);
-    const statLines = buildPetStatDeltaLines(before, after);
-    if (typeof renderTeam === 'function') renderTeam();
-    updateHeader();
-    if (typeof updateRedDots === 'function') updateRedDots();
-    window._reopenPetInfoIdx = i;
-    showLevelUpScreen({
-      kind: 'evo',
-      name: p.name,
-      emoji: p.emoji || '✨',
-      fromLabel: fromName,
-      toLabel: toName,
-      statLines: statLines
-    });
+    doStageEvolveConfirmed(idx, p, fromName, toName);
   });
   return true;
 }
-
+function doStageEvolveConfirmed(idx, p, fromName, toName) {
+  const to = Math.max(0, Number(p.evoStage) || 0) + 1;
+  const before = snapshotPetCombatStats(p);
+  if (p._lastPower == null) syncPetPowerBaseline(p);
+  p.evoStage = to;
+  recalculatePetStats(p, { restoreFullHp: true });
+  notifyIfPowerUp(p, '進化');
+  saveGame();
+  const after = snapshotPetCombatStats(p);
+  const statLines = buildPetStatDeltaLines(before, after);
+  if (typeof renderTeam === 'function') renderTeam();
+  updateHeader();
+  if (typeof updateRedDots === 'function') updateRedDots();
+  window._reopenPetInfoIdx = idx;
+  showLevelUpScreen({
+    kind: 'evo',
+    name: p.name,
+    emoji: p.emoji || '✨',
+    fromLabel: fromName,
+    toLabel: toName,
+    statLines: statLines
+  });
+  return true;
+}
 /** 戰力（僅供排序／寵物資訊內顯示，不進公式展開） */
 function calcCombatPower(p) {
   if (!p) return 0;
@@ -2381,7 +2405,7 @@ function loadGameData(saved) {
   if (saved && saved.farm && window.FarmGame) window.FarmGame.loadState(saved.farm);
 }
 async function persistCurrentUser() {
-  if (!currentUserId) return;
+  if (!currentUserId || !sb) return;
   const { error } = await sb.from('saves').upsert({
     user_id: currentUserId,
     username: currentUser,
@@ -2435,6 +2459,7 @@ async function enterGame(username, userId, savedData) {
 }
 async function doLogin() {
   if (authBusy) return;
+  if (!sb) { showLoginError('雲端服務未連線，請改用「訪客模式」'); return; }
   const username = $('login-username').value.trim();
   const password = $('login-password').value;
   if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
@@ -2454,6 +2479,7 @@ async function doLogin() {
 }
 async function doRegister() {
   if (authBusy) return;
+  if (!sb) { showLoginError('雲端服務未連線，請改用「訪客模式」'); return; }
   const username = $('login-username').value.trim();
   const password = $('login-password').value;
   if (!username || !password) { showLoginError('請輸入玩家名稱與密碼'); return; }
@@ -2482,7 +2508,7 @@ async function doRegister() {
 }
 async function doLogout() {
   if (currentUserId) await persistCurrentUser();
-  await sb.auth.signOut();
+  if (sb) await sb.auth.signOut();
   location.reload();
 }
 
@@ -2584,27 +2610,20 @@ function bindGameHandlers() {
       cb();
     }
   };
-  function bindPetInfoAction(btn, fn) {
-    if (!btn) return;
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const idx = window._petInfoIdx;
-      if (idx == null || idx < 0 || !S.owned || !S.owned[idx]) {
-        alert('請重新點開寵物資訊後再試');
-        return;
-      }
-      try { fn(idx); } catch (err) { console.error(err); alert('操作失敗：' + (err && err.message ? err.message : err)); }
-    }, { passive: false });
-  }
-  bindPetInfoAction($('pet-info-star'), function(idx){ tryUpgradeStar(idx); });
-  bindPetInfoAction($('pet-info-evo'), function(idx){ doStageEvolve(idx); });
-  bindPetInfoAction($('pet-info-dismantle'), function(idx){ tryDismantlePet(idx); });
-  // 關閉鈕也加大可靠性
-  const petCloseBtn = $('pet-info-close');
-  if (petCloseBtn) petCloseBtn.onclick = function(e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    $('pet-info-modal').classList.add('hidden');
+  const petStarBtn = $('pet-info-star');
+  if (petStarBtn) petStarBtn.onclick = () => {
+    if (window._petInfoIdx == null) return;
+    tryUpgradeStar(window._petInfoIdx);
+  };
+  const petEvoBtn = $('pet-info-evo');
+  if (petEvoBtn) petEvoBtn.onclick = () => {
+    if (window._petInfoIdx == null) return;
+    doStageEvolve(window._petInfoIdx);
+  };
+  const petDisBtn = $('pet-info-dismantle');
+  if (petDisBtn) petDisBtn.onclick = () => {
+    if (window._petInfoIdx == null) return;
+    tryDismantlePet(window._petInfoIdx);
   };
   const confAct = $('confirm-actions-btn');
   if (confAct) confAct.onclick = () => resolvePlayerActions();
@@ -2911,28 +2930,24 @@ function startWildBattle() {
   // 敵方最多 3 隻（目前野生先 1 隻，之後可擴充）
   const ebase = getBase(S.wild.id) || {};
   function randomEnemyStar(level) {
+    // 野生星級隨機：多數偏低，等級越高越可能較高星
     const lv = Math.max(1, level || 1);
     const roll = Math.random();
     let star = 0;
-    if (roll < 0.38) star = 0;
-    else if (roll < 0.58) star = rand(1, 3);
-    else if (roll < 0.74) star = rand(4, 8);
-    else if (roll < 0.86) star = rand(9, 14);
-    else if (roll < 0.93) star = rand(15, 22);
-    else if (roll < 0.97) star = rand(23, 29);
-    else if (roll < 0.99) star = rand(30, 34);
-    else star = rand(35, 39);
+    if (roll < 0.40) star = 0;            // 40% 無星
+    else if (roll < 0.65) star = rand(1, 2);
+    else if (roll < 0.82) star = rand(3, 5);
+    else if (roll < 0.94) star = rand(6, 10);
+    else star = rand(11, Math.min(20, 8 + Math.floor(lv / 3)));
+    // 低等野生上限再壓一點
     if (lv < 8) star = Math.min(star, 3);
     else if (lv < 15) star = Math.min(star, 8);
     else if (lv < 25) star = Math.min(star, 15);
-    else if (lv < 35) star = Math.min(star, 24);
-    else if (lv < 45) star = Math.min(star, 29);
-    else if (lv < 55) star = Math.min(star, 34);
-    else star = Math.min(star, 39);
     return star;
   }
   function makeEnemy(wildLike, lv) {
     const w = wildLike;
+    // 每隻敵人獨立隨機星級（若尚未指定）
     if (w.starLevel == null || w._starRandomized !== true) {
       w.starLevel = randomEnemyStar(w.level || lv || 1);
       w._starRandomized = true;
@@ -2947,43 +2962,21 @@ function startWildBattle() {
       dodge: w.dodge != null ? w.dodge : (eb.baseDodge || 0.09),
       hit: w.hit != null ? w.hit : (eb.baseHit || 0.85),
       attack: w.attack, defense: w.defense, speed: w.speed,
-      mp: maxMpE, maxMp: maxMpE,
-      catchable: w.catchable !== false
+      mp: maxMpE, maxMp: maxMpE
     });
   }
   S.battleEnemies = [makeEnemy(S.wild, S.wild.level)];
-  function pickExtraEnemyId(excludeIds) {
-    const zone = S.currentZone;
-    const used = excludeIds || [];
-    let pool = [];
-    if (zone && Array.isArray(zone.pets)) pool = zone.pets.filter(id => getBase(id));
-    if (zone && (zone.timeSpawns || zone.id === 'meadow') && typeof getZoneSpawnTable === 'function') {
-      (getZoneSpawnTable(zone) || []).forEach(row => {
-        if (row && row.id && getBase(row.id) && pool.indexOf(row.id) < 0) pool.push(row.id);
-      });
-    }
-    if (!pool.length) pool = [S.wild.id];
-    const fresh = pool.filter(id => used.indexOf(id) < 0);
-    const candidates = fresh.length ? fresh : pool;
-    return candidates[rand(0, candidates.length - 1)] || S.wild.id;
-  }
-  function addExtraEnemy(levelOffset) {
-    const usedIds = S.battleEnemies.filter(Boolean).map(e => e.id);
-    const pid = pickExtraEnemyId(usedIds);
-    const base = getBase(pid) || getBase(S.wild.id);
-    if (!base) return;
-    let lv = Math.max(1, (S.wild.level || 1) + (levelOffset || 0));
-    if (base.minWildLevel) lv = Math.max(lv, base.minWildLevel);
-    const extra = clonePet(base, lv);
-    if (base.evoStage != null && base.evoStage > 0) {
-      extra.evoStage = base.evoStage;
-      recalculatePetStats(extra, { restoreFullHp: true });
-    }
-    extra.catchable = base.catchable !== false;
+  // 預留擴成 3：同種較低機率加援
+  if (Math.random() < 0.35) {
+    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) + rand(-1, 0)));
+    extra.catchable = false; // 援敵不可收服
     S.battleEnemies.push(makeEnemy(extra));
   }
-  if (Math.random() < 0.40) addExtraEnemy(rand(-1, 0));
-  if (Math.random() < 0.18 && S.battleEnemies.length < 3) addExtraEnemy(-1);
+  if (Math.random() < 0.15 && S.battleEnemies.length < 3) {
+    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) - 1));
+    extra.catchable = false;
+    S.battleEnemies.push(makeEnemy(extra));
+  }
   while (S.battleEnemies.length < 3) S.battleEnemies.push(null);
   S.enemy = S.battleEnemies.find(e => e && e.hp > 0) || S.battleEnemies[0];
 
@@ -4846,64 +4839,64 @@ function endBattle(win){
     }
     petLevelUpQueue.forEach(q => S._pendingLevelUpQueue.push(q));
     S._pendingLevelUp = null;
-        const catchCandidates = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
-    if (catchCandidates.length) winMsg += '\n🎾 可選擇收服 1 隻（各別機率）';
+    if(S.wild && S.wild.catchable !== false) winMsg+='\n🎾 獲得一次捕捉機會';
     if(drops.lines.length) winMsg+='\n'+drops.lines.join('\n');
     $('res-msg').textContent=winMsg;
-    S._postBattleCatchUsed = false;
-    S.pendingCatch = null;
-    S._catchCandidates = catchCandidates.map(e => ({
-      id: e.id, name: e.name, emoji: e.emoji, level: e.level || 1,
-      starLevel: Math.max(0, Number(e.starLevel) || 0),
-      evoStage: Math.max(0, Number(e.evoStage) || 0)
-    }));
-    function calcPostBattleCatchRate(snap) {
-      const base = getBase(snap.id) || {};
-      let rate = (base.captureRate != null) ? Number(base.captureRate) : 0.55;
-      return Math.max(0.05, Math.min(0.95, rate + 0.20));
-    }
-    S._catchCandidates.forEach((snap, idx) => {
-      const pct = Math.round(calcPostBattleCatchRate(snap) * 100);
-      const starLabel = (typeof getStarMeta === 'function') ? getStarMeta(snap.starLevel || 0).label : '';
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-purple';
-      btn.dataset.catchIdx = String(idx);
-      btn.textContent = '🎾 ' + (snap.emoji||'') + snap.name + ' Lv.' + snap.level + (starLabel ? ' '+starLabel : '') + '（' + pct + '%）';
-      btn.onclick = () => {
-        if (S._postBattleCatchUsed) return;
+
+    // 戰鬥勝利後：可收服對象有「一次」捕捉機會
+    if (S.wild && S.wild.catchable !== false) {
+      const wildSnap = {
+        id: S.wild.id,
+        name: S.wild.name,
+        emoji: S.wild.emoji,
+        level: S.wild.level || 1,
+        catchable: true
+      };
+      S.pendingCatch = wildSnap;
+      S._postBattleCatchUsed = false;
+      const catchBtn = document.createElement('button');
+      catchBtn.className = 'btn btn-purple';
+      catchBtn.textContent = '🎾 捕捉 ' + (wildSnap.emoji || '') + wildSnap.name + '（僅一次）';
+      catchBtn.onclick = () => {
+        if (S._postBattleCatchUsed || !S.pendingCatch) return;
         S._postBattleCatchUsed = true;
-        actions.querySelectorAll('[data-catch-idx]').forEach(b => b.disabled = true);
-        if (roll(calcPostBattleCatchRate(snap))) {
-          const base = getBase(snap.id) || snap;
-          const caught = clonePet(base, snap.level || 1);
-          caught.level = snap.level || 1;
-          caught.starLevel = Math.max(0, Number(snap.starLevel) || 0);
-          if (snap.evoStage != null) caught.evoStage = Math.max(0, Number(snap.evoStage) || 0);
+        let rate = 0.55;
+        if ((S.items.ball || 0) > 0) { rate += 0.25; S.items.ball--; }
+        rate = Math.min(0.95, rate);
+        if (roll(rate)) {
+          const base = getBase(S.pendingCatch.id) || S.pendingCatch;
+          const caught = clonePet(base, S.pendingCatch.level || 1);
+          caught.level = S.pendingCatch.level || 1;
           recalculatePetStats(caught, { restoreFullHp: true });
           S.owned.push(caught);
           onPetCaught(caught);
-          updateHeader(); saveGame();
+          updateHeader();
+          saveGame();
           if (typeof updateRedDots === 'function') updateRedDots();
-          const keepStar = (typeof getStarMeta === 'function') ? getStarMeta(caught.starLevel || 0).label : '';
-          $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji||'') + caught.name + (keepStar ? '（'+keepStar+'）' : '') + '！';
-          btn.textContent = '已捕捉 ✓';
+          $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name + '！';
+          catchBtn.disabled = true;
+          catchBtn.textContent = '已捕捉 ✓';
         } else {
-          $('res-msg').textContent += '\n💨 ' + snap.name + ' 逃走了…（本場捕捉機會已用完）';
-          btn.textContent = '捕捉失敗';
+          $('res-msg').textContent += '\n💨 ' + S.pendingCatch.name + ' 逃走了…（機會已用完）';
+          catchBtn.disabled = true;
+          catchBtn.textContent = '捕捉失敗';
         }
+        S.pendingCatch = null;
       };
-      actions.appendChild(btn);
-    });
+      actions.appendChild(catchBtn);
+    } else {
+      S.pendingCatch = null;
+    }
+
     const okBtn = document.createElement('button');
     okBtn.className = 'btn btn-primary';
     okBtn.textContent = '確定';
     okBtn.onclick = () => {
-      S.wild = null; S.pendingCatch = null; S._catchCandidates = null;
+      S.wild = null; S.pendingCatch = null;
       $('result-modal').classList.add('hidden');
       if (typeof runPostBattleFlow === 'function') runPostBattleFlow();
       else showScreen('map');
     };
-    actions.appendChild(okBtn);
     actions.appendChild(okBtn);
   } else {
     // 敗北也給少量經驗（依表的 25%）
@@ -5598,7 +5591,6 @@ function toggleFormulaPanel() {
 window.toggleFormulaPanel = toggleFormulaPanel;
 
 function openPetInfo(idx) {
-  window._petInfoIdx = idx;
   const p = S.owned[idx];
   if (!p) return;
   window._petInfoIdx = idx;
@@ -6058,6 +6050,7 @@ setInterval(() => { try { if (typeof updateHeader === 'function' && !$('login-ov
 /* 自動維持登入：重新整理不需再登入 */
 async function tryRestoreSession() {
   try {
+    if (!sb) throw new Error('no supabase');
     // 1) 先看 Supabase 是否還有 session（預設存在 localStorage）
     const { data, error } = await sb.auth.getSession();
     if (error) console.warn('getSession:', error.message);
