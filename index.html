@@ -181,7 +181,8 @@
       line-height: 1.45; border: 2px solid #e0e0e0;
     }
 
-    .zone-panel { max-width: 500px; margin: 0 auto; text-align: center; }
+    .zone-panel { max-width: 500px; margin: 0 auto; text-align: center; transition: max-width 0.2s; }
+    .zone-panel.forge-wide { max-width: 720px; width: 100%; }
     .zone-panel .big { font-size: 3.5rem; margin-bottom: 4px; }
     .zone-panel h2 { font-size: 1.3rem; color: #2e7d32; }
     .zone-panel .desc { font-size: 0.85rem; color: #666; margin: 6px 0 14px; }
@@ -202,6 +203,25 @@
       background: #f5f5f5; border-radius: 10px; padding: 8px 12px; max-height: 140px;
       overflow-y: auto; font-size: 0.82rem; line-height: 1.45; border: 2px solid #e0e0e0; text-align: left;
     }
+    .log-box.forge-mode {
+      max-height: min(70vh, 560px);
+      min-height: 320px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      background: #fafafa;
+      border-color: #80cbc4;
+    }
+    .shop-grid.forge-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .shop-grid.forge-grid .shop-item {
+      padding: 16px 14px;
+      min-height: 260px;
+    }
+    .shop-grid.forge-grid .shop-item .emoji { font-size: 2.4rem; }
+    .shop-grid.forge-grid .shop-item .name { font-size: 1.05rem; }
+    .shop-grid.forge-grid .shop-item .desc { font-size: 0.8rem; line-height: 1.4; }
 
     .section-title { font-size: 1.05rem; font-weight: 800; color: #2e7d32; margin-bottom: 10px; text-align: center; }
     .pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
@@ -363,6 +383,51 @@
       35% { opacity: 1; transform: scale(1.15); }
       100% { opacity: 0; transform: scale(1.4); }
     }
+    /* 從目標正上方落下的不規則雷電 */
+    .fx-lightning-svg {
+      position: absolute;
+      pointer-events: none;
+      z-index: 256;
+      overflow: visible;
+      animation: fxBoltFlash 0.32s ease-out forwards;
+    }
+    @keyframes fxBoltFlash {
+      0% { opacity: 0; filter: brightness(2.4); }
+      10% { opacity: 1; filter: brightness(2); }
+      65% { opacity: 1; }
+      100% { opacity: 0; filter: brightness(1); }
+    }
+    .fx-beam-impact {
+      position: absolute;
+      width: 48px; height: 48px;
+      margin-left: -24px; margin-top: -24px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 257;
+      animation: fxImpact 0.32s ease-out forwards;
+    }
+    .fx-beam-impact.elec {
+      background: radial-gradient(circle, #fff 0%, #ffe566 30%, rgba(100,180,255,0.4) 55%, transparent 70%);
+      box-shadow: 0 0 18px #ffe566, 0 0 36px rgba(120,200,255,0.5);
+    }
+    .fx-beam-impact.crit {
+      background: radial-gradient(circle, #fff 0%, #ffeb3b 30%, #ff5722 55%, transparent 70%);
+      box-shadow: 0 0 20px #ff5722;
+    }
+    .fx-beam-impact.fire {
+      background: radial-gradient(circle, #fff 0%, #ff9100 40%, transparent 70%);
+    }
+    .fx-beam-impact.water {
+      background: radial-gradient(circle, #e3f2fd 0%, #42a5f5 40%, transparent 70%);
+    }
+    .fx-beam-impact.dark, .fx-beam-impact.heal {
+      background: radial-gradient(circle, #fff 0%, #ce93d8 40%, transparent 70%);
+    }
+    @keyframes fxImpact {
+      0% { opacity: 0; transform: scale(0.3); }
+      40% { opacity: 1; transform: scale(1.25); }
+      100% { opacity: 0; transform: scale(1.5); }
+    }
     .fx-shake {
       animation: fxShake 0.4s ease-in-out;
     }
@@ -420,6 +485,31 @@
       30% { transform: translateX(-50%) translateY(-12px) scale(1.2); }
       100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(1); }
     }
+    .crit-pop {
+      position: absolute; left: 50%; top: 8%;
+      transform: translateX(-50%);
+      text-align: center; pointer-events: none; z-index: 20;
+      animation: critPopAnim 1.05s ease forwards;
+    }
+    .crit-pop-title {
+      font-weight: 900; font-size: 0.95rem; letter-spacing: 0.06em;
+      color: #fff;
+      text-shadow: 0 0 6px #ff6f00, 0 0 12px #ff3d00, 0 1px 2px #000;
+      background: linear-gradient(90deg, transparent, rgba(255,80,0,0.85), transparent);
+      padding: 2px 14px;
+      white-space: nowrap;
+    }
+    .crit-pop-dmg {
+      font-weight: 900; font-size: 1.45rem; color: #ff6f00;
+      text-shadow: 0 0 8px #ffab40, 0 1px 2px #000;
+      margin-top: 2px;
+    }
+    @keyframes critPopAnim {
+      0% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.6); }
+      25% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.15); }
+      70% { opacity: 1; transform: translateX(-50%) translateY(-10px) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-36px) scale(0.95); }
+    }
 
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
     .overlay.hidden { display: none; }
@@ -469,12 +559,80 @@
     @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
 
     .modal { background: white; border-radius: 18px; padding: 24px 20px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 16px 40px rgba(0,0,0,0.2); }
+    .power-toast {
+      position: fixed; left: 50%; top: 18%; transform: translateX(-50%) translateY(-8px);
+      z-index: 9999; pointer-events: none;
+      background: linear-gradient(135deg, #fff8e1, #ffe0b2);
+      border: 2px solid #ffb74d; border-radius: 16px;
+      padding: 12px 18px; box-shadow: 0 8px 24px rgba(230,81,0,0.25);
+      font-weight: 800; color: #e65100; font-size: 0.95rem;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      text-align: center; max-width: 90vw;
+    }
+    .power-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .power-toast .pt-delta { color: #bf360c; font-size: 1.15rem; }
     .modal .big { font-size: 3.5rem; margin-bottom: 6px; }
     .modal h2 { font-size: 1.35rem; margin-bottom: 4px; }
     .modal p { color: #666; margin-bottom: 14px; font-size: 0.9rem; white-space: pre-line; }
     .pet-info-modal { max-width: 680px !important; max-height: 88vh; overflow-y: auto; }
     .pet-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; text-align: left; margin: 14px 0; }
     .pet-info-section { background: #f7fbf6; border: 1px solid #c8e6c9; border-radius: 12px; padding: 11px; }
+    .pet-triad-bars { margin: 6px 0 10px; display: flex; flex-direction: column; gap: 6px; }
+    .pet-triad-row { display: grid; grid-template-columns: 52px 1fr 42px; align-items: center; gap: 6px; font-size: 0.82rem; }
+    .pet-triad-row .lab { font-weight: 700; color: #555; }
+    .pet-triad-row .val { font-weight: 800; text-align: right; color: #333; }
+    .pet-triad-track {
+      height: 12px; border-radius: 999px; background: #eceff1;
+      overflow: hidden; border: 1px solid #cfd8dc;
+    }
+    .pet-triad-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, #66bb6a, #43a047);
+      min-width: 2px;
+      transition: width 0.25s ease;
+    }
+    .pet-triad-row.force .pet-triad-fill { background: linear-gradient(90deg, #ef5350, #e53935); }
+    .pet-triad-row.intel .pet-triad-fill { background: linear-gradient(90deg, #42a5f5, #1e88e5); }
+    .pet-triad-row.charm .pet-triad-fill { background: linear-gradient(90deg, #ab47bc, #8e24aa); }
+
+    /* ===== 公式展開 ===== */
+    .formula-toggle-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      margin: 10px 0 6px; padding: 8px 12px;
+      background: linear-gradient(90deg, #e8f5e9, #e3f2fd);
+      border: 2px solid #81c784; border-radius: 12px; cursor: pointer;
+      user-select: none; transition: background 0.2s;
+    }
+    .formula-toggle-bar:hover { background: linear-gradient(90deg, #c8e6c9, #bbdefb); }
+    .formula-toggle-bar .ft-title { font-weight: 800; color: #2e7d32; font-size: 0.9rem; }
+    .formula-toggle-bar .ft-hint { font-size: 0.75rem; color: #666; }
+    .formula-toggle-bar .ft-arrow {
+      font-size: 0.85rem; color: #2e7d32; font-weight: 800;
+      transition: transform 0.25s;
+    }
+    .formula-toggle-bar.open .ft-arrow { transform: rotate(180deg); }
+    .formula-panel { display: none; margin: 0 0 8px; animation: fadeIn 0.25s ease; }
+    .formula-panel.open { display: block; }
+    .formula-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+    .formula-tab {
+      padding: 4px 10px; border: 2px solid #c8e6c9; border-radius: 16px;
+      background: #f1f8e9; font-family: inherit; font-size: 0.72rem;
+      font-weight: 700; color: #33691e; cursor: pointer;
+    }
+    .formula-tab.active {
+      background: linear-gradient(90deg, #66bb6a, #43a047);
+      color: white; border-color: #43a047;
+    }
+    .formula-tab-body { display: none; }
+    .formula-tab-body.active { display: block; }
+    .formula-general {
+      margin: 4px 0 8px; padding: 8px 10px;
+      background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;
+      font-size: 0.76rem; line-height: 1.55; color: #444;
+    }
+    .formula-general b { color: #c62828; }
+    .formula-general .fg-title { font-weight: 800; color: #1565c0; margin-bottom: 2px; }
+
     .pet-info-section h3 { margin: 0 0 8px; font-size: 0.9rem; color: #2e7d32; }
     .skill-slots, .treasure-slots { display: grid; gap: 8px; }
     .skill-slots { grid-template-columns: repeat(2, 1fr); }
@@ -971,7 +1129,8 @@ const ZONES = [
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24},
   {id:'volcano',  name:'火山',      emoji:'🌋', desc:'島中央偏右的火山，隨時可能噴發。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40},
   {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
-  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao'], x:62, y:65}
+  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao'], x:62, y:65},
+  {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82}
 ];
 
 
@@ -1120,32 +1279,74 @@ const SHOP_ITEMS = [
 ];
 
 
-/* ===== 寶物系統 ===== */
+/* ===== 寶物系統 =====
+ * 全部靠收集「該寶物碎片」合成／升階（數量依手稿）
+ * 白 3 → 綠 15 → 藍 35 → 紫 60 → 金 80 → 紅 100
+ * 目前開放：雷刀（有效果）、冰刀、沙甲（暫無效果）
+ */
+const TREASURE_GRADE_COSTS = [3, 15, 35, 60, 80, 100]; // 各階所需碎片
+
 const ALL_TREASURES = [
   {
     id: 'lei_dao',
     name: '雷刀',
     emoji: '⚔️',
     desc: '雷屬寶刀。配戴後強化電系技能。',
-    // 各品階累加效果 + 升到下一階所需「雷刀碎片」
     grades: [
-      { name:'白', cost:3,  bonuses:{ force:5 } },
-      { name:'綠', cost:15, bonuses:{ intel:2 } },
-      { name:'藍', cost:35, bonuses:{ force:4 } },
-      { name:'紫', cost:60, bonuses:{ force:2 } },
-      { name:'金', cost:80, bonuses:{ force:6 } },
-      { name:'紅', cost:100,bonuses:{ atk:40 } }
+      { name:'白', cost:3,   bonuses:{ force:5 } },
+      { name:'綠', cost:15,  bonuses:{ intel:2 } },
+      { name:'藍', cost:35,  bonuses:{ force:4 } },
+      { name:'紫', cost:60,  bonuses:{ force:2 } },
+      { name:'金', cost:80,  bonuses:{ force:6 } },
+      { name:'紅', cost:100, bonuses:{ atk:40 } }
     ],
-    // 神・電電豬專屬：中階(19)+配戴 → 武力+10 且當電雷進化
+    // 首次合成＝湊滿白階碎片
+    craft: { frags: 3 },
     special: {
       petId: 'shen_diandian_zhu',
-      minEvoStage: 2, // 中階
+      minEvoStage: 2,
       minLevel: 19,
       extraForce: 10,
       evolveSkill: 'dangdianlei'
     }
+  },
+  {
+    id: 'bing_dao',
+    name: '冰刀',
+    emoji: '🧊',
+    desc: '寒冰寶刀。效果尚未開放。',
+    grades: [
+      { name:'白', cost:3,   bonuses:{} },
+      { name:'綠', cost:15,  bonuses:{} },
+      { name:'藍', cost:35,  bonuses:{} },
+      { name:'紫', cost:60,  bonuses:{} },
+      { name:'金', cost:80,  bonuses:{} },
+      { name:'紅', cost:100, bonuses:{} }
+    ],
+    craft: { frags: 3 }
+  },
+  {
+    id: 'sha_jia',
+    name: '沙甲',
+    emoji: '🏜️',
+    desc: '沙漠甲殼鍛成的寶物。（效果尚未開放）',
+    grades: [
+      { name:'白', cost:3,   bonuses:{} },
+      { name:'綠', cost:15,  bonuses:{} },
+      { name:'藍', cost:35,  bonuses:{} },
+      { name:'紫', cost:60,  bonuses:{} },
+      { name:'金', cost:80,  bonuses:{} },
+      { name:'紅', cost:100, bonuses:{} }
+    ],
+    craft: { frags: 3 }
   }
 ];
+
+/** 品階顯示色 */
+const TREASURE_GRADE_COLORS = {
+  '白': '#9e9e9e', '綠': '#43a047', '藍': '#1e88e5',
+  '紫': '#8e24aa', '金': '#f9a825', '紅': '#e53935'
+};
 
 
 function onPetCaught(pet) {
@@ -1177,7 +1378,9 @@ function equipTreasureOnPet(petIdx, treasureId) {
   }
   if (p.equippedTreasures.length >= 6) { alert('寶物格已滿'); return false; }
   p.equippedTreasures.push(treasureId);
+  if (p._lastPower == null) syncPetPowerBaseline(p);
   recalculatePetStats(p);
+  notifyIfPowerUp(p, '裝備寶物');
   saveGame();
   return true;
 }
@@ -1186,6 +1389,8 @@ function unequipTreasureOnPet(petIdx, treasureId) {
   if (!p || !p.equippedTreasures) return false;
   p.equippedTreasures = p.equippedTreasures.filter(id => id !== treasureId);
   recalculatePetStats(p);
+  // 卸下可能掉戰力：只更新基準，不通知
+  syncPetPowerBaseline(p);
   saveGame();
   return true;
 }
@@ -1412,9 +1617,8 @@ function rollBattleDrops(win) {
     if (meta.shaJiaMin != null) {
       const n = rand(meta.shaJiaMin, meta.shaJiaMax);
       if (n > 0) {
-        if (!S.items) S.items = {};
-        S.items.sha_jia = (S.items.sha_jia || 0) + n;
-        drops.lines.push('🛡️ 沙甲碎片 ×' + n);
+        addTreasureFragments('sha_jia', n);
+        drops.lines.push('🏜️ 沙甲碎片 ×' + n);
       }
     }
     if (meta.dropItem === 'hua_mi') {
@@ -1444,9 +1648,11 @@ function tryUpgradeStar(idx) {
   }
   const before = snapshotPetCombatStats(p);
   const fromStar = p.starLevel || 0;
+  if (p._lastPower == null) syncPetPowerBaseline(p);
   S.fragments[p.id] = have - need;
   p.starLevel = fromStar + 1;
   recalculatePetStats(p);
+  notifyIfPowerUp(p, '升星');
   saveGame();
   const next = getStarMeta(p.starLevel);
   const after = snapshotPetCombatStats(p);
@@ -1522,9 +1728,9 @@ const S = {
   treasures:{},
   treasureFrags:{},
   trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
-  unlocked:['plaza','meadow','beach'],
+  unlocked:['plaza','meadow','beach','coral_forge'],
   owned:[], team:[],
-  items:{potion:2,super:0,boost:1,shield:1,star:0,ball:3,evo:0},
+  items:{hua_mi:0},
   currentZone:null, battling:false,
   player:null, enemy:null, wild:null,
   atkBoost:false, defBoost:false, forceCrit:false,
@@ -1583,8 +1789,10 @@ function doStageEvolve(idx) {
   const toName = EVO_STAGE_NAMES[to] || ('階段'+to);
   if (!confirm('確定讓「' + (p.emoji||'') + p.name + '」進化？\n' + fromName + ' → ' + toName)) return false;
   const before = snapshotPetCombatStats(p);
+  if (p._lastPower == null) syncPetPowerBaseline(p);
   p.evoStage = to;
   recalculatePetStats(p, { restoreFullHp: true });
+  notifyIfPowerUp(p, '進化');
   saveGame();
   const after = snapshotPetCombatStats(p);
   const statLines = buildPetStatDeltaLines(before, after);
@@ -1602,6 +1810,74 @@ function doStageEvolve(idx) {
   });
   return true;
 }
+/** 戰力（僅供排序／寵物資訊內顯示，不進公式展開） */
+function calcCombatPower(p) {
+  if (!p) return 0;
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const hp = n(p.maxHp);
+  const mp = n(p.maxMp);
+  const atk = n(p.attack);
+  const def = n(p.defense);
+  const spd = n(p.speed);
+  const force = n(p.force) + n(p._treasureForce);
+  const intel = n(p.intel) + n(p._treasureIntel);
+  const charm = n(p.charm) + n(p._treasureCharm);
+  const lv = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, n(p.evoStage));
+  const star = Math.max(0, n(p.starLevel));
+  const crit = Math.max(0, Math.min(1, n(p.crit)));
+  const dodge = Math.max(0, Math.min(1, n(p.dodge)));
+  const hit = Math.max(0, Math.min(1, n(p.hit)));
+  const power =
+    hp * 0.4 + mp * 0.15 +
+    atk * 2.2 + def * 1.6 + spd * 1.2 +
+    force * 1.5 + intel * 1.2 + charm * 1.0 +
+    lv * 8 + stage * 25 + star * 12 +
+    crit * 180 + dodge * 150 + hit * 80;
+  // 放大約 16 倍：原本 ~1600 → 約 ~25,000
+  return Math.round(power * 16);
+}
+
+function showPowerToast(html) {
+  let el = document.getElementById('power-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'power-toast';
+    el.className = 'power-toast';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = html;
+  el.classList.add('show');
+  clearTimeout(showPowerToast._t);
+  showPowerToast._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/** 若戰力上升則跳出通知，並記住目前戰力 */
+function notifyIfPowerUp(pet, reason) {
+  if (!pet) return 0;
+  const now = calcCombatPower(pet);
+  const prev = (pet._lastPower != null) ? pet._lastPower : now;
+  pet._lastPower = now;
+  const delta = now - prev;
+  if (delta > 0) {
+    const name = (pet.emoji || '') + (pet.name || '寵物');
+    const why = reason ? ('（' + reason + '）') : '';
+    showPowerToast(
+      '⚔️ 戰力上升！' + why + '<br>' +
+      '<span style="font-size:0.85rem;color:#666">' + name + '</span><br>' +
+      '<span class="pt-delta">+' + delta.toLocaleString() + '</span>' +
+      '　→　<b>' + now.toLocaleString() + '</b>'
+    );
+  }
+  return delta;
+}
+
+/** 初始化／同步戰力基準（不跳通知） */
+function syncPetPowerBaseline(pet) {
+  if (!pet) return;
+  pet._lastPower = calcCombatPower(pet);
+}
+
 function canUseSkill(pet, sk) {
   if (!pet || !sk) return false;
   const lv = pet.level || 1;
@@ -1658,15 +1934,21 @@ function recalculatePetAttack(p) {
   if (!p) return 0;
   const base = getBase(p.id) || {};
   const number = value => Number.isFinite(Number(value)) ? Number(value) : 0;
-  const initialAtk = number(p.baseAtk ?? base.baseAtk);
+  const starLevel = number(p.starLevel ?? 0);
+  // 每升 1 星：基礎攻擊 +1（加進基礎攻擊再走完整公式）
+  const rawBaseAtk = number(p.baseAtk ?? base.baseAtk);
+  let initialAtk = rawBaseAtk + starLevel;
   const treasureAtk = number(p.treasureAtk ?? p.equipment?.treasureAtk ?? 0);
   const force = number(p.force ?? base.force);
   const intel = number(p.intel ?? base.intel);
   const tForce = number(p._treasureForce);
   const enhancementLevel = number(p.enhancementLevel ?? 0);
-  const starLevel = number(p.starLevel ?? 0);
   const level = Math.max(1, number(p.level) || 1);
   const stage = Math.max(0, Math.min(5, Math.floor(number(p.evoStage ?? base.evoStage))));
+  // 神·提升被動：每點武力 → 基礎攻擊 +1（需中階且≥19級）
+  if (p.id === 'shen_huobao_xiong' && stage >= 2 && level >= 19) {
+    initialAtk += force;
+  }
   const evolution = [
     { multiplier: 1, levelBonus: 6 },
     { multiplier: 1.1, levelBonus: 7 },
@@ -1678,15 +1960,11 @@ function recalculatePetAttack(p) {
   const B = initialAtk * 0.4 + treasureAtk * 0.2 + force * 0.1 + intel * 0.05
     + enhancementLevel * 15;
   p.treasureAtk = treasureAtk;
+  // 供介面顯示：含升星後的有效基礎攻擊
+  p.effectiveBaseAtk = initialAtk;
   let atk = evolution.multiplier * B + level * evolution.levelBonus;
-  // 每升 1 星：基礎攻擊 +1（直接加在最終攻擊上）
-  atk += starLevel * 1;
   // 寶物武力：每點額外轉成攻擊（裝備才有感）
   atk += tForce * 0.8;
-  // 神·提升被動：每點武力 → 基礎攻擊 +1（需中階且≥19級）
-  if (p.id === 'shen_huobao_xiong' && (p.evoStage|0) >= 2 && level >= 19) {
-    atk += force;
-  }
   p.attack = atk;
   return p.attack;
 }
@@ -1984,13 +2262,29 @@ function loadGameData(saved) {
     S.owned.forEach(p => { syncPetEvoStage(p); recalculatePetStats(p); });
     S.team = Array.isArray(d.team) ? d.team.filter(i => i >= 0 && i < S.owned.length) : [];
     if (S.owned.length && S.team.length === 0) S.team = [0];
-    S.items = d.items || {potion:2,super:0,boost:1,shield:1,star:0,ball:3,evo:0};
+    S.items = d.items || {hua_mi:0};
+    if (S.items) { const keep = { hua_mi: S.items.hua_mi || 0 }; S.items = keep; }
     S.fragments = d.fragments || {};
     S.treasures = d.treasures || {};
     S.treasureFrags = d.treasureFrags || {};
     if (d.gameTimeBaseReal != null) S.gameTimeBaseReal = d.gameTimeBaseReal;
     if (d.gameTimeBaseMin != null) S.gameTimeBaseMin = d.gameTimeBaseMin;
-    if (S.items.evo == null) S.items.evo = 0;
+    // 舊存檔自動解鎖珊瑚鍛造坊
+    if (Array.isArray(S.unlocked) && S.unlocked.indexOf('coral_forge') < 0) {
+      S.unlocked.push('coral_forge');
+    }
+    // 清理不存在的寵物碎片（佔位 id 等）
+    if (S.fragments) {
+      Object.keys(S.fragments).forEach(pid => {
+        if (!getBase(pid)) delete S.fragments[pid];
+      });
+    }
+    // 舊版道具「沙加」→ 寶物「沙甲」碎片
+    if (S.items && S.items.sha_jia > 0) {
+      if (!S.treasureFrags) S.treasureFrags = {};
+      S.treasureFrags.sha_jia = (S.treasureFrags.sha_jia || 0) + S.items.sha_jia;
+      delete S.items.sha_jia;
+    }
   }
   updateHeader();
   renderIsland();
@@ -2311,12 +2605,18 @@ function renderIsland() {
 
 function openZone(z) {
   S.currentZone = z;
-  $('zone-emoji').textContent = z.emoji;
-  $('zone-name').textContent = z.name;
+  // 還原鍛造坊放大狀態
+  const panel = document.querySelector('#zone .zone-panel');
+  if (panel) panel.classList.remove('forge-wide');
+  const logEl = $('zone-log');
+  if (logEl) logEl.classList.remove('forge-mode');
+  const ze = $('zone-emoji'); if (ze) { ze.style.display = ''; ze.textContent = z.emoji; }
+  const zn = $('zone-name'); if (zn) { zn.style.display = ''; zn.textContent = z.name; }
+  const zd = $('zone-desc');
   const clock = (typeof getGameClock === 'function') ? getGameClock() : null;
   let extra = z.danger ? '　危險度 '+('⭐'.repeat(z.danger)) : '';
   if ((z.timeSpawns || z.id === 'meadow') && clock) extra += '　🕒 ' + clock.label;
-  $('zone-desc').textContent = z.desc + extra;
+  if (zd) { zd.style.display = ''; zd.textContent = z.desc + extra; }
   const actions = $('zone-actions');
   actions.innerHTML = '';
   if(z.rest){
@@ -2327,6 +2627,10 @@ function openZone(z) {
   if(z.shop){
     const b=document.createElement('button'); b.className='btn btn-shop'; b.textContent='🛒 商店';
     b.onclick=()=>openShop(); actions.appendChild(b);
+  }
+  if(z.forge){
+    const b=document.createElement('button'); b.className='btn btn-purple'; b.textContent='🪸 進入鍛造坊';
+    b.onclick=()=>openForge(); actions.appendChild(b);
   }
   if(z.pets&&z.pets.length){
     const b=document.createElement('button'); b.className='btn btn-explore'; b.textContent='🔍 探索';
@@ -2412,7 +2716,6 @@ function tryCatch() {
     return;
   }
   let rate=0.35+(1-S.wild.hp/S.wild.maxHp)*0.4;
-  if((S.items.ball||0)>0){ rate+=0.2; S.items.ball--; addLog('zone-log','使用了捕捉球！🎾'); }
   rate=Math.min(0.85,rate);
   if(roll(rate)){
     S.owned.push(S.wild);
@@ -2510,32 +2813,85 @@ function startWildBattle() {
 
   // 敵方最多 3 隻（目前野生先 1 隻，之後可擴充）
   const ebase = getBase(S.wild.id) || {};
+  function randomEnemyStar(level) {
+    // 野生星級：多數偏低，高等才可能金／紅／閃金／閃彩
+    const lv = Math.max(1, level || 1);
+    const roll = Math.random();
+    let star = 0;
+    if (roll < 0.38) star = 0;
+    else if (roll < 0.58) star = rand(1, 3);
+    else if (roll < 0.74) star = rand(4, 8);
+    else if (roll < 0.86) star = rand(9, 14);
+    else if (roll < 0.93) star = rand(15, 22);
+    else if (roll < 0.97) star = rand(23, 29);
+    else if (roll < 0.99) star = rand(30, 34);
+    else star = rand(35, 39);
+    if (lv < 8) star = Math.min(star, 3);
+    else if (lv < 15) star = Math.min(star, 8);
+    else if (lv < 25) star = Math.min(star, 15);
+    else if (lv < 35) star = Math.min(star, 24);
+    else if (lv < 45) star = Math.min(star, 29);
+    else if (lv < 55) star = Math.min(star, 34);
+    else star = Math.min(star, 39);
+    return star;
+  }
   function makeEnemy(wildLike, lv) {
     const w = wildLike;
+    if (w.starLevel == null || w._starRandomized !== true) {
+      w.starLevel = randomEnemyStar(w.level || lv || 1);
+      w._starRandomized = true;
+    }
     recalculatePetStats(w);
     const eb = getBase(w.id) || {};
     const maxMpE = Math.floor((w.baseMp || eb.baseMp || 10) + (w.level || 1) * 5);
     return Object.assign({}, w, {
       skills: (eb.skills || []).map(s => Object.assign({}, s)),
+      starLevel: w.starLevel || 0,
       crit: w.crit != null ? w.crit : (eb.baseCrit || 0.08),
       dodge: w.dodge != null ? w.dodge : (eb.baseDodge || 0.09),
       hit: w.hit != null ? w.hit : (eb.baseHit || 0.85),
       attack: w.attack, defense: w.defense, speed: w.speed,
-      mp: maxMpE, maxMp: maxMpE
+      mp: maxMpE, maxMp: maxMpE,
+      catchable: w.catchable !== false
     });
   }
   S.battleEnemies = [makeEnemy(S.wild, S.wild.level)];
-  // 預留擴成 3：同種較低機率加援
-  if (Math.random() < 0.35) {
-    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) + rand(-1, 0)));
-    extra.catchable = false; // 援敵不可收服
+  // 加援：區域寵物池抽不同生物（最多 3），全部可嘗試收服
+  function pickExtraEnemyId(excludeIds) {
+    const zone = S.currentZone;
+    const used = excludeIds || [];
+    let pool = [];
+    if (zone && Array.isArray(zone.pets) && zone.pets.length) {
+      pool = zone.pets.filter(id => getBase(id));
+    }
+    if (zone && (zone.timeSpawns || zone.id === 'meadow') && typeof getZoneSpawnTable === 'function') {
+      const table = getZoneSpawnTable(zone) || [];
+      table.forEach(row => {
+        if (row && row.id && getBase(row.id) && pool.indexOf(row.id) < 0) pool.push(row.id);
+      });
+    }
+    if (!pool.length) pool = [S.wild.id];
+    const fresh = pool.filter(id => used.indexOf(id) < 0);
+    const candidates = fresh.length ? fresh : pool;
+    return candidates[rand(0, candidates.length - 1)] || S.wild.id;
+  }
+  function addExtraEnemy(levelOffset) {
+    const usedIds = S.battleEnemies.filter(Boolean).map(e => e.id);
+    const pid = pickExtraEnemyId(usedIds);
+    const base = getBase(pid) || getBase(S.wild.id);
+    if (!base) return;
+    let lv = Math.max(1, (S.wild.level || 1) + (levelOffset || 0));
+    if (base.minWildLevel) lv = Math.max(lv, base.minWildLevel);
+    const extra = clonePet(base, lv);
+    if (base.evoStage != null && base.evoStage > 0) {
+      extra.evoStage = base.evoStage;
+      recalculatePetStats(extra, { restoreFullHp: true });
+    }
+    extra.catchable = base.catchable !== false;
     S.battleEnemies.push(makeEnemy(extra));
   }
-  if (Math.random() < 0.15 && S.battleEnemies.length < 3) {
-    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) - 1));
-    extra.catchable = false;
-    S.battleEnemies.push(makeEnemy(extra));
-  }
+  if (Math.random() < 0.40) addExtraEnemy(rand(-1, 0));
+  if (Math.random() < 0.18 && S.battleEnemies.length < 3) addExtraEnemy(-1);
   while (S.battleEnemies.length < 3) S.battleEnemies.push(null);
   S.enemy = S.battleEnemies.find(e => e && e.hp > 0) || S.battleEnemies[0];
 
@@ -2618,14 +2974,18 @@ function renderAllyCard(pet, slot) {
   }
 
   let skillsHtml = '';
-  if (!dead && S.playerTurn && S.battling && phase === 'current') {
+  // 玩家回合：每隻存活寵物都可選／重選技能（含上一隻）
+  if (!dead && S.playerTurn && S.battling) {
     const normalAtk = { id:'normal', name:'普通攻擊', emoji:'👊', mp:0, atkPercent:100 };
     const defendAct = { id:'defend', name:'防禦', emoji:'🛡️', mp:0 };
     const skills = [normalAtk, defendAct].concat((pet.skills || []).filter(s => !s.passive)).slice(0, 6);
     const tgtIdx = S.selectedTargets && S.selectedTargets[slot];
     const tgtPet = (tgtIdx != null && S.battleEnemies) ? S.battleEnemies[tgtIdx] : null;
-    skillsHtml = '<div style="font-size:0.68rem;color:#e65100;font-weight:800;text-align:center;margin-bottom:3px">👉 輪到這隻選擇</div>';
-    skillsHtml += '<div class="bc-skills">' + skills.map(sk => {
+    let hint = '';
+    if (phase === 'current') hint = '<div style="font-size:0.68rem;color:#e65100;font-weight:800;text-align:center;margin-bottom:3px">👉 建議先選這隻</div>';
+    else if (phase === 'done') hint = '<div style="font-size:0.68rem;color:#2e7d32;font-weight:700;text-align:center;margin-bottom:3px">✓ 已選（可重選）</div>';
+    else hint = '<div style="font-size:0.68rem;color:#666;text-align:center;margin-bottom:3px">可選技能</div>';
+    skillsHtml = hint + '<div class="bc-skills">' + skills.map(sk => {
       const locked = sk.id !== 'normal' && sk.id !== 'defend' && !canUseSkill(pet, sk);
       const noMp = (sk.mp||0) > 0 && pet.mp != null && pet.mp < sk.mp;
       const buffActive = isSelfBuffSkill(sk) && pet._selfBuff && pet._selfBuff.turns > 0;
@@ -2643,16 +3003,6 @@ function renderAllyCard(pet, slot) {
     (chosen && chosen.id !== 'defend' && !isSupportSkill(chosen) ? ('<div style="font-size:0.68rem;color:#ef6c00;margin-top:4px;text-align:center">' +
       (tgtPet ? ('🎯 目標：' + tgtPet.name) : (livingEnemies().length > 1 ? '👆 點選敵方作為目標' : '')) + '</div>') : '') +
     '</div>';
-  } else if (!dead && phase === 'done' && chosen) {
-    const tgtIdx = S.selectedTargets && S.selectedTargets[slot];
-    const tgtPet = (tgtIdx != null && S.battleEnemies) ? S.battleEnemies[tgtIdx] : null;
-    const tgtTxt = (chosen.id === 'defend' || isSupportSkill(chosen))
-      ? ''
-      : (tgtPet ? (' → 🎯' + tgtPet.name) : '');
-    skillsHtml = '<div style="text-align:center;color:#2e7d32;font-weight:700;font-size:0.78rem">✓ ' +
-      (chosen.emoji||'') + chosen.name + tgtTxt + '</div>';
-  } else if (!dead && phase === 'wait') {
-    skillsHtml = '<div style="text-align:center;color:#999;font-size:0.75rem;padding:6px 0">等待前一隻選完…</div>';
   } else if (chosen) {
     skillsHtml = '<div style="text-align:center;color:#ef6c00;font-weight:700">→ ' + (chosen.emoji||'') + chosen.name + '</div>';
   }
@@ -2661,13 +3011,17 @@ function renderAllyCard(pet, slot) {
     : (phase === 'done' ? ' action-done'
     : (phase === 'wait' ? ' action-wait' : ''));
 
+  const cp = calcCombatPower(pet);
+  const starHtml = renderStarsHtml(pet.starLevel || 0, { size: 12 });
   return '<div class="bcard' + (dead ? ' empty' : '') + phaseCls + '" id="ally-card-' + slot + '">' +
     '<div class="bc-name">我方' + (slot+1) + '　' + pet.name +
       (phase === 'current' ? ' 👈' : '') + '</div>' +
+    '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#33691e;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
     '<div class="bc-face">' + petFaceHtml(pet, 40) + '</div>' +
+    '<div style="text-align:center;font-size:0.72rem;font-weight:800;color:#e65100;margin:1px 0">⚔️ ' + cp.toLocaleString() + '</div>' +
     '<div class="bc-stats">' +
       '<span>攻 ' + formatPetStat(pet.attack) + '</span><span>防 ' + formatPetStat(pet.defense) + '</span>' +
-      '<span>速 ' + formatPetStat(pet.speed) + '</span><span>Lv.' + pet.level + '</span>' +
+      '<span>速 ' + formatPetStat(pet.speed) + '</span>' +
     '</div>' +
     '<div class="bc-bar-label">HP</div>' + hpBarHtml(pet.hp, pet.maxHp) +
     mpBarHtml(pet.mp, pet.maxMp) +
@@ -2686,9 +3040,13 @@ function renderEnemyCard(pet, slot) {
   let extraCls = dead ? ' empty' : '';
   if (!dead && needPick) extraCls += ' selectable';
   if (!dead && isTargeted) extraCls += ' targeted';
+  const cp = calcCombatPower(pet);
+  const starHtml = renderStarsHtml(pet.starLevel || 0, { size: 12 });
   return '<div class="bcard enemy-card' + extraCls + '" id="enemy-card-' + slot + '" data-enemy-slot="' + slot + '">' +
     '<div class="bc-name">敵方' + (slot+1) + '　' + pet.name + '</div>' +
+    '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#b71c1c;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
     '<div class="bc-face">' + petFaceHtml(pet, 40) + '</div>' +
+    '<div style="text-align:center;font-size:0.72rem;font-weight:800;color:#c62828;margin:1px 0">⚔️ ' + cp.toLocaleString() + '</div>' +
     '<div class="bc-triad"><span>武' + formatPetStat(pet.force) + '</span><span>智' + formatPetStat(pet.intel) + '</span><span>魅' + formatPetStat(pet.charm) + '</span></div>' +
     '<div class="bc-bar-label">HP</div>' + hpBarHtml(pet.hp, pet.maxHp) +
     mpBarHtml(pet.mp, pet.maxMp) +
@@ -2698,9 +3056,40 @@ function renderEnemyCard(pet, slot) {
   '</div>';
 }
 
+function teamTotalPower(list) {
+  // 加總所有上場寵物（含已倒下），戰中總戰力不會突然少一截
+  return (list || []).reduce((sum, p) => sum + (p ? calcCombatPower(p) : 0), 0);
+}
+
 function renderBattleBoard() {
   const alliesBox = $('battle-allies');
   const enemiesBox = $('battle-enemies');
+  const allyTotal = teamTotalPower(S.battleAllies);
+  const enemyTotal = teamTotalPower(S.battleEnemies);
+  // 總戰力條
+  let powerBar = $('battle-power-bar');
+  if (!powerBar) {
+    powerBar = document.createElement('div');
+    powerBar.id = 'battle-power-bar';
+    const wrap = document.querySelector('.battle-screen-wrap');
+    if (wrap && alliesBox && wrap.contains(alliesBox)) {
+      wrap.insertBefore(powerBar, alliesBox);
+    } else if (alliesBox && alliesBox.parentNode) {
+      alliesBox.parentNode.insertBefore(powerBar, alliesBox);
+    }
+  }
+  if (powerBar) {
+    const ratio = enemyTotal > 0 ? (allyTotal / enemyTotal) : 1;
+    let tip = '';
+    if (ratio >= 1.2) tip = '優勢';
+    else if (ratio <= 0.8) tip = '劣勢';
+    else tip = '均勢';
+    powerBar.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;margin-bottom:6px;border-radius:12px;background:linear-gradient(90deg,#e8f5e9,#fff3e0,#ffebee);border:2px solid #ffcc80;font-size:0.82rem;font-weight:800';
+    powerBar.innerHTML =
+      '<span style="color:#2e7d32">🛡️ 我方總戰力 <b style="font-size:1.05rem">' + allyTotal.toLocaleString() + '</b></span>' +
+      '<span style="color:#666;font-size:0.75rem">' + tip + '</span>' +
+      '<span style="color:#c62828">⚔️ 敵方總戰力 <b style="font-size:1.05rem">' + enemyTotal.toLocaleString() + '</b></span>';
+  }
   if (alliesBox) {
     alliesBox.innerHTML = [0,1,2].map(i => renderAllyCard(S.battleAllies && S.battleAllies[i], i)).join('');
     alliesBox.querySelectorAll('.bc-sk').forEach(btn => {
@@ -2725,10 +3114,32 @@ function renderBattleBoard() {
         const eSlot = Number(card.dataset.enemySlot);
         const foe = S.battleEnemies && S.battleEnemies[eSlot];
         if (!foe || foe.hp <= 0) return;
-        // 由左到右：只允許為「目前這隻」指定目標
-        let allySlot = getCurrentActionSlot();
+        // 優先：正在選目標的那隻；否則找任一需要目標的攻擊技能
+        let allySlot = (S._pickingTargetFor != null) ? S._pickingTargetFor : -1;
         if (allySlot < 0) {
-          addBLog('全員指令已選好', 'sys');
+          const allies = S.battleAllies || [];
+          for (let i = 0; i < allies.length; i++) {
+            const p = allies[i];
+            if (!p || p.hp <= 0) continue;
+            const sk = S.selectedActions && S.selectedActions[i];
+            if (!sk || sk.id === 'defend' || isSupportSkill(sk)) continue;
+            const ti = S.selectedTargets && S.selectedTargets[i];
+            if (ti == null || !(S.battleEnemies[ti] && S.battleEnemies[ti].hp > 0)) {
+              allySlot = i;
+              break;
+            }
+          }
+        }
+        // 若都選完，允許點敵方替「最後一隻攻擊」改目標
+        if (allySlot < 0) {
+          const allies = S.battleAllies || [];
+          for (let i = allies.length - 1; i >= 0; i--) {
+            const sk = S.selectedActions && S.selectedActions[i];
+            if (sk && sk.id !== 'defend' && !isSupportSkill(sk)) { allySlot = i; break; }
+          }
+        }
+        if (allySlot < 0) {
+          addBLog('請先為我方選擇攻擊技能', 'sys');
           return;
         }
         const curSk = S.selectedActions && S.selectedActions[allySlot];
@@ -2750,7 +3161,7 @@ function renderBattleBoard() {
           const next = getCurrentActionSlot();
           if (next >= 0) {
             const np = S.battleAllies[next];
-            addBLog('接著為「' + ((np && np.name) || ('我方'+(next+1))) + '」選擇技能', 'sys');
+            addBLog('還可為「' + ((np && np.name) || ('我方'+(next+1))) + '」選擇（也可重選其他隻）', 'sys');
           } else {
             addBLog('全員指令已選好，請按「確認出招」！', 'sys');
           }
@@ -2801,15 +3212,7 @@ function isSupportSkill(sk) {
 
 function selectActionForSlot(slot, sk) {
   if (!S.playerTurn || !S.battling) return;
-  // 只能操作目前輪到的那一隻（由左到右）
-  const cur = getCurrentActionSlot();
-  if (cur !== slot) {
-    if (cur >= 0) {
-      const waitPet = S.battleAllies[cur];
-      addBLog('請先為「' + ((waitPet && waitPet.name) || ('我方'+(cur+1))) + '」選擇技能與目標', 'sys');
-    }
-    return;
-  }
+  // 任意存活我方可選／重選技能（含已選過的上一隻）
   const pet = S.battleAllies[slot];
   if (!pet || pet.hp <= 0) return;
   if (sk.id !== 'normal' && sk.id !== 'defend' && !canUseSkill(pet, sk)) return;
@@ -2837,16 +3240,19 @@ function selectActionForSlot(slot, sk) {
     } else if (S.selectedTargets[slot] == null || !(S.battleEnemies[S.selectedTargets[slot]] && S.battleEnemies[S.selectedTargets[slot]].hp > 0)) {
       S._pickingTargetFor = slot;
       addBLog(pet.name + '：請點選要攻擊的敵方目標', 'sys');
+    } else {
+      // 重選技能時保留原目標（若仍存活）
+      S._pickingTargetFor = null;
+      addBLog(pet.name + ' 改為使用 ' + (sk.emoji||'') + sk.name, 'sys');
     }
   }
-  // 若這隻已完成，提示下一隻
   if (isSlotActionComplete(slot)) {
     const next = getCurrentActionSlot();
     if (next >= 0 && next !== slot) {
       const np = S.battleAllies[next];
-      addBLog('接著為「' + ((np && np.name) || ('我方'+(next+1))) + '」選擇技能', 'sys');
+      addBLog('還可為「' + ((np && np.name) || ('我方'+(next+1))) + '」選擇技能（也可回去改上一隻）', 'sys');
     } else if (next < 0) {
-      addBLog('全員指令已選好，請按「確認出招」！', 'sys');
+      addBLog('全員指令已選好，請按「確認出招」！（仍可點技能重選）', 'sys');
     }
   }
   renderBattleBoard();
@@ -2882,29 +3288,16 @@ function renderBattleItems() {
   const box = $('item-btns');
   if (!box) return;
   box.innerHTML = '';
-  const fallback = {
-    potion:{emoji:'❤️',name:'愛心藥水',heal:40},
-    super:{emoji:'💖',name:'超級藥水',heal:70},
-    hua_mi:{emoji:'🍯',name:'花蜜',heal:120},
-    sha_jia:{emoji:'🛡️',name:'沙甲碎片'},
-    boost:{emoji:'🍬',name:'力量糖果',effect:'atkUp'},
-    shield:{emoji:'🫧',name:'防護泡泡',effect:'defUp'},
-    star:{emoji:'⭐',name:'幸運星星',effect:'luckUp'}
-  };
-  ['potion','super','boost','shield','star'].forEach(id => {
-    const cnt = S.items[id] || 0;
-    if (cnt <= 0) return;
-    const info = (SHOP_ITEMS.find(i => i.id === id)) || fallback[id];
-    if (!info) return;
+  const cnt = (S.items && S.items.hua_mi) || 0;
+  if (cnt > 0) {
     const b = document.createElement('button');
     b.className = 'act-btn act-item';
-    b.innerHTML = info.emoji + ' ' + info.name + '<span class="sub">×' + cnt + '</span>';
+    b.innerHTML = '🍯 花蜜<span class="sub">×' + cnt + '　回120</span>';
     b.disabled = !S.playerTurn || !S.battling;
-    b.onclick = () => useItem(id);
+    b.onclick = () => useItem('hua_mi');
     box.appendChild(b);
-  });
-  if (!box.children.length) {
-    box.innerHTML = '<span style="font-size:0.75rem;color:#888">道具：無（使用道具則本回合免選技能）</span>';
+  } else {
+    box.innerHTML = '<span style="font-size:0.75rem;color:#888">道具：僅花蜜（戰鬥掉落取得）</span>';
   }
 }
 
@@ -3003,12 +3396,121 @@ function ensureFxLayer() {
 function skillFxType(sk) {
   if (!sk) return 'dark';
   const n = (sk.name || '') + (sk.id || '') + (sk.emoji || '');
-  if (/火|炎|燃|爆|🌋|🔥/.test(n) || sk.burnChance) return 'fire';
-  if (/水|波|浪|滴|💧|🌊|🏄/.test(n) || sk.teamHealPercentMin != null || sk.heal) return 'water';
-  if (/電|雷|閃|⚡|🌩️/.test(n) || sk.stunChance) return 'elec';
-  if (/治|補|光|✨|💖|回復/.test(n)) return 'heal';
+  // 先判屬性技能（避免「爆」等字誤判）
+  if (/電|雷|閃|當電|天雷|⚡|🌩️/.test(n)) return 'elec';
+  if (/水|波|浪|滴|穿石|surf|💧|🌊|🏄/.test(n) || sk.teamHealPercentMin != null || sk.heal || sk.healPercent) return 'water';
+  if (/火|炎|燃|烈火|業火|火山|🌋|🔥/.test(n) || sk.burnChance) return 'fire';
+  if (/治|補|回復|💖/.test(n)) return 'heal';
+  if (sk.stunChance && !/水|火|波|滴/.test(n)) return 'elec';
   if (sk.selfBuff || sk.selfShield) return 'dark';
   return 'dark';
+}
+
+/** 取得施法者卡片中心 */
+function getBattleCasterPoint(opts) {
+  opts = opts || {};
+  let el = opts.casterEl || null;
+  if (!el && opts.castSlot != null) {
+    el = document.getElementById((opts.isEnemy ? 'enemy-card-' : 'ally-card-') + opts.castSlot);
+  }
+  if (!el) {
+    if (opts.isEnemy) {
+      el = document.querySelector('#battle-enemies .bcard:not(.empty)');
+    } else {
+      el = document.querySelector('#battle-allies .bcard:not(.empty)');
+    }
+  }
+  if (!el) {
+    return {
+      x: window.innerWidth * (opts.isEnemy ? 0.65 : 0.35),
+      y: window.innerHeight * 0.42,
+      el: null
+    };
+  }
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2, el: el };
+}
+
+/** 產生很歪的折線雷（左右大幅亂跳） */
+function buildLightningPath(w, h) {
+  let x = w * 0.5 + (Math.random() * 30 - 15);
+  let y = 0;
+  let d = 'M ' + x.toFixed(1) + ' ' + y.toFixed(1);
+  const segments = 8 + Math.floor(Math.random() * 5);
+  let side = Math.random() < 0.5 ? -1 : 1;
+  for (let i = 1; i <= segments; i++) {
+    y = h * (i / segments);
+    side = -side;
+    // 振幅更大 → 更歪
+    const amp = 18 + Math.random() * 28;
+    x = w * 0.5 + side * amp + (Math.random() * 16 - 8);
+    x = Math.max(2, Math.min(w - 2, x));
+    d += ' L ' + x.toFixed(1) + ' ' + y.toFixed(1);
+  }
+  // 終點仍落在底部，但可偏一點
+  const endX = w * 0.5 + (Math.random() * 20 - 10);
+  d += ' L ' + endX.toFixed(1) + ' ' + h.toFixed(1);
+  return d;
+}
+
+/** 從目標正上方落下不規則雷電（每道左右位置明顯不同） */
+function playBeamFx(opts) {
+  opts = opts || {};
+  const layer = ensureFxLayer();
+  const kind = opts.kind || 'elec';
+  const to = getBattleTargetPoint(opts);
+  const offX = (opts.boltOffsetX != null) ? opts.boltOffsetX : (Math.random() * 24 - 12);
+
+  // 每道高度略不同，避免長得一模一樣
+  const boltH = 100 + Math.random() * 70;
+  const boltW = 100; // 更寬才能看出左右亂折
+  const hitX = to.x + offX;
+  const left = hitX - boltW / 2;
+  const top = to.y - boltH;
+
+  const pathD = buildLightningPath(boltW, boltH);
+  const strokeMain = (kind === 'crit') ? '#ffab40' : '#ffffff';
+  const strokeGlow = (kind === 'crit') ? '#ff5722' : '#4fc3f7';
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'fx-lightning-svg');
+  svg.setAttribute('width', String(boltW));
+  svg.setAttribute('height', String(boltH));
+  svg.style.left = left + 'px';
+  svg.style.top = top + 'px';
+  // 外層藍光 + 內層白芯，更醒目
+  svg.innerHTML =
+    '<path d="' + pathD + '" fill="none" stroke="' + strokeGlow + '" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>' +
+    '<path d="' + pathD + '" fill="none" stroke="' + strokeMain + '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
+  layer.appendChild(svg);
+  setTimeout(() => svg.remove(), 380);
+
+  // 命中爆點（跟落點對齊）
+  const impact = document.createElement('div');
+  impact.className = 'fx-beam-impact ' + (kind === 'crit' ? 'crit' : 'elec');
+  impact.style.left = hitX + 'px';
+  impact.style.top = to.y + 'px';
+  layer.appendChild(impact);
+  setTimeout(() => impact.remove(), 320);
+
+  // 小數字標示第幾道（方便確認真的很多道）
+  if (opts.boltTotal && opts.boltTotal > 3 && opts.boltIndex != null) {
+    const tag = document.createElement('div');
+    tag.style.cssText = 'position:absolute;z-index:258;pointer-events:none;font-weight:800;font-size:0.7rem;color:#fff;text-shadow:0 0 4px #0288d1;';
+    tag.style.left = (hitX + 8) + 'px';
+    tag.style.top = (to.y - boltH + 4) + 'px';
+    tag.textContent = (opts.boltIndex + 1) + '';
+    tag.style.animation = 'fxBoltFlash 0.35s ease-out forwards';
+    layer.appendChild(tag);
+    setTimeout(() => tag.remove(), 360);
+  }
+
+  if (to.el) {
+    to.el.classList.remove('fx-hit');
+    void to.el.offsetWidth;
+    to.el.classList.add('fx-hit');
+    setTimeout(() => to.el.classList.remove('fx-hit'), 280);
+  }
 }
 
 /** 取得目標卡片中心座標（畫面座標） */
@@ -3052,20 +3554,56 @@ function playBattleFx(opts) {
   const isCrit = !!opts.crit;
   const isEnemy = !!opts.isEnemy;
   const light = !!opts.light;
+  // 暴擊仍用原本屬性特效，不要全部變成雷
+  const useKind = kind;
 
   const pt = getBattleTargetPoint(opts);
   const cx = pt.x;
   const cy = pt.y;
 
-  // 打在目標身上的局部閃光（不是全螢幕）
-  const flash = document.createElement('div');
-  flash.className = 'fx-flash-local ' + (isCrit ? 'crit' : kind);
-  flash.style.left = (cx - 70) + 'px';
-  flash.style.top = (cy - 70) + 'px';
-  layer.appendChild(flash);
-  setTimeout(() => flash.remove(), light ? 220 : 400);
+  // 只有電系才用「從上方落下的歪雷」
+  if (useKind === 'elec') {
+    playBeamFx(Object.assign({}, opts, { kind: isCrit ? 'crit' : 'elec' }));
+  } else {
+    const flashKind = isCrit ? 'crit' : useKind;
+    const flash = document.createElement('div');
+    flash.className = 'fx-flash-local ' + flashKind;
+    flash.style.left = (cx - 70) + 'px';
+    flash.style.top = (cy - 70) + 'px';
+    layer.appendChild(flash);
+    setTimeout(() => flash.remove(), light ? 220 : 400);
 
-  // 技能名橫幅：出現在目標上方
+    const emojiMap = {
+      fire: ['🔥','✨','💥'],
+      water: ['💧','🌊','💦'],
+      heal: ['💚','✨','🌟'],
+      crit: ['💥','⭐','💢'],
+      dark: ['✨','💫','🌟']
+    };
+    const emojis = emojiMap[isCrit ? 'crit' : useKind] || emojiMap.dark;
+    const count = light ? 4 : (isCrit ? 10 : 8);
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'fx-particle';
+      p.textContent = emojis[i % emojis.length];
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * (light ? 45 : 70);
+      p.style.left = (cx + (Math.random() * 16 - 8)) + 'px';
+      p.style.top = (cy + (Math.random() * 16 - 8)) + 'px';
+      p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(ang) * dist - 20 + 'px');
+      p.style.setProperty('--rot', (Math.random() * 120 - 60) + 'deg');
+      layer.appendChild(p);
+      setTimeout(() => p.remove(), 900);
+    }
+    if (pt.el) {
+      pt.el.classList.remove('fx-hit');
+      void pt.el.offsetWidth;
+      pt.el.classList.add('fx-hit');
+      setTimeout(() => pt.el.classList.remove('fx-hit'), 360);
+    }
+  }
+
   if (!opts.noBanner && sk && sk.name && sk.id !== 'normal' && sk.id !== 'defend') {
     const ban = document.createElement('div');
     ban.className = 'fx-skill-banner';
@@ -3077,42 +3615,6 @@ function playBattleFx(opts) {
     setTimeout(() => ban.remove(), 950);
   }
 
-  // 粒子從目標中心爆開
-  const emojiMap = {
-    fire: ['🔥','✨','💥'],
-    water: ['💧','🌊','✨'],
-    elec: ['⚡','✨','🌟'],
-    heal: ['💚','✨','🌟'],
-    crit: ['💥','⭐','💢'],
-    dark: ['✨','💫','🌟']
-  };
-  const emojis = emojiMap[isCrit ? 'crit' : kind] || emojiMap.dark;
-  const count = light ? 4 : (isCrit ? 12 : 8);
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'fx-particle';
-    p.textContent = emojis[i % emojis.length];
-    const ang = Math.random() * Math.PI * 2;
-    const dist = 20 + Math.random() * (light ? 45 : 70);
-    p.style.left = (cx + (Math.random() * 16 - 8)) + 'px';
-    p.style.top = (cy + (Math.random() * 16 - 8)) + 'px';
-    p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
-    p.style.setProperty('--dy', Math.sin(ang) * dist - 20 + 'px');
-    p.style.setProperty('--rot', (Math.random() * 120 - 60) + 'deg');
-    p.style.animationDelay = (Math.random() * 0.06) + 's';
-    layer.appendChild(p);
-    setTimeout(() => p.remove(), 900);
-  }
-
-  // 目標卡片震動
-  if (pt.el) {
-    pt.el.classList.remove('fx-hit');
-    void pt.el.offsetWidth;
-    pt.el.classList.add('fx-hit');
-    setTimeout(() => pt.el.classList.remove('fx-hit'), 360);
-  }
-
-  // 畫面震動（重擊／暴擊）
   if (!light && (isCrit || kind === 'fire' || kind === 'elec')) {
     const game = document.querySelector('.game');
     if (game) {
@@ -3123,7 +3625,6 @@ function playBattleFx(opts) {
     }
   }
 
-  // 施法者卡片發光
   if (opts.castSlot != null) {
     const card = document.getElementById((isEnemy ? 'enemy-card-' : 'ally-card-') + opts.castSlot);
     if (card) {
@@ -3135,16 +3636,55 @@ function playBattleFx(opts) {
   }
 }
 
-/** 多段攻擊：每一道都打在目標身上 */
+/** 多段攻擊：雷落在整張目標卡片範圍內（隨機左右） */
 function playMultiHitFx(hits, kind, isEnemy, targetOpts) {
   const n = Math.max(1, Math.min(Number(hits) || 1, 24));
-  const gap = n >= 15 ? 40 : (n >= 8 ? 55 : 70);
-  const base = Object.assign({ kind: kind || 'elec', isEnemy: !!isEnemy, noBanner: true, light: true, crit: false }, targetOpts || {});
+  const gap = n >= 18 ? 50 : (n >= 10 ? 60 : 75);
+  const k = kind || 'elec';
+  // 依卡片實際寬度決定可落雷範圍
+  let halfW = 48;
+  try {
+    const pt = getBattleTargetPoint(Object.assign({ isEnemy: !!isEnemy }, targetOpts || {}));
+    if (pt.el) {
+      const r = pt.el.getBoundingClientRect();
+      halfW = Math.max(36, r.width * 0.48);
+    }
+  } catch (e) {}
   for (let i = 0; i < n; i++) {
+    // 整張卡片範圍內隨機 X（夠歪、夠散）
+    const boltOffsetX = (Math.random() * 2 - 1) * halfW;
     setTimeout(() => {
-      playBattleFx(Object.assign({}, base));
+      try {
+        playBeamFx(Object.assign({
+          kind: k,
+          isEnemy: !!isEnemy,
+          boltOffsetX: boltOffsetX,
+          boltIndex: i,
+          boltTotal: n
+        }, targetOpts || {}));
+      } catch (e) {}
     }, i * gap);
   }
+}
+
+function showCritPop(target, dmg) {
+  let el = null;
+  if (target === 'e') {
+    el = document.querySelector('#battle-enemies .bcard:not(.empty)') ||
+         document.querySelector('.battle-row-enemies .bcard:not(.empty)');
+  } else {
+    el = document.querySelector('#battle-allies .bcard:not(.empty)') ||
+         document.querySelector('.battle-row-allies .bcard:not(.empty)');
+  }
+  if (!el) el = document.getElementById('battle') || document.body;
+  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'crit-pop';
+  wrap.innerHTML = '<div class="crit-pop-title">CRITICAL HIT</div>' +
+    '<div class="crit-pop-dmg">-' + dmg + '</div>';
+  el.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 1100);
 }
 
 function showPop(target,text,type){
@@ -3529,24 +4069,29 @@ function executeSkill(pl, sk, onDone, isEnemy){
         targetEl = document.getElementById('enemy-card-' + targetSlot);
       }
     }
-    // 多段：每一道都打在目標身上
+    // 施法者槽位（光束起點）
+    let castSlot = isEnemy
+      ? (S.battleEnemies || []).indexOf(pl)
+      : (S.battleAllies || []).indexOf(pl);
+    if (castSlot < 0) castSlot = 0;
+    const beamOpts = {
+      targetEl: targetEl,
+      targetSlot: targetSlot,
+      castSlot: castSlot,
+      isEnemy: !!isEnemy
+    };
+    // 多段：每一道光都打在目標身上
     if (hits > 1) {
       try {
-        playMultiHitFx(hits, skillFxType(skUse || sk), isEnemy, {
-          targetEl: targetEl,
-          targetSlot: targetSlot
-        });
+        playMultiHitFx(hits, skillFxType(skUse || sk), isEnemy, beamOpts);
       } catch (e) {}
     } else {
       try {
-        playBattleFx({
+        playBattleFx(Object.assign({
           kind: skillFxType(skUse || sk),
           skill: null,
-          noBanner: true,
-          isEnemy: !!isEnemy,
-          targetEl: targetEl,
-          targetSlot: targetSlot
-        });
+          noBanner: true
+        }, beamOpts));
       } catch (e) {}
     }
     for (let h = 0; h < hits; h++) {
@@ -3583,9 +4128,9 @@ function executeSkill(pl, sk, onDone, isEnemy){
       defender.hp = Math.max(0, defender.hp - realDmg);
       const side = isEnemy ? 'en' : 'p';
       if (r.type === 'crit') {
-        addBLog('💥 暴擊！對 ' + defender.name + ' 第' + (h+1) + '下 ' + r.dmg + ' 傷害！', 'crit');
-        showPop(isEnemy ? 'p' : 'e', 'CRIT -' + r.dmg, 'c');
-        try { playBattleFx({ kind: 'crit', crit: true, isEnemy: !!isEnemy, skill: null }); } catch (e) {}
+        addBLog('💥 CRITICAL HIT！對 ' + defender.name + ' 第' + (h+1) + '下 ' + r.dmg + ' 傷害！', 'crit');
+        showCritPop(isEnemy ? 'p' : 'e', r.dmg);
+        try { playBattleFx({ kind: skillFxType(skUse || sk), crit: true, isEnemy: !!isEnemy, skill: null, targetEl: targetEl, targetSlot: targetSlot }); } catch (e) {}
       } else if (hits === 1) {
         addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '，對 ' + defender.name + ' 造成 ' + r.dmg + ' 傷害', side);
         showPop(isEnemy ? 'p' : 'e', '-' + r.dmg, 'd');
@@ -3675,30 +4220,15 @@ function executeSkill(pl, sk, onDone, isEnemy){
 
 function useItem(id){
   if(!S.playerTurn||!S.battling||!(S.items[id]>0)) return;
-  // 使用道具：本回合三隻都不必選技能
+  if (id !== 'hua_mi') { addBLog('此道具已停用','sys'); return; }
   setBattleBtns(false); S.items[id]--;
-  const fallback = {
-    potion:{emoji:'❤️',name:'愛心藥水',heal:40},
-    super:{emoji:'💖',name:'超級藥水',heal:70},
-    hua_mi:{emoji:'🍯',name:'花蜜',heal:120},
-    sha_jia:{emoji:'🛡️',name:'沙甲碎片'},
-    boost:{emoji:'🍬',name:'力量糖果',effect:'atkUp'},
-    shield:{emoji:'🫧',name:'防護泡泡',effect:'defUp'},
-    star:{emoji:'⭐',name:'幸運星星',effect:'luckUp'}
-  };
-  const info = (SHOP_ITEMS.find(i=>i.id===id)) || fallback[id];
-  if (!info) { setBattleBtns(true); return; }
-  if (info.heal) {
-    // 補第一隻還活著的
-    const target = (S.battleAllies || []).find(p => p.hp > 0) || S.player;
-    if (target) {
-      target.hp = Math.min(target.maxHp, target.hp + info.heal);
-      addBLog('使用 '+info.emoji+info.name+'，'+target.name+' 回復 '+info.heal+'！','heal');
-    }
-    updateBattleHp();
-  } else if (info.effect==='atkUp'){ S.atkBoost=true; addBLog('力量提升！本回合全隊下次攻擊增傷','sys'); }
-  else if (info.effect==='defUp'){ S.defBoost=true; addBLog('防護展開！','sys'); }
-  else if (info.effect==='luckUp'){ addBLog('幸運上升！','lucky'); }
+  const heal = 120;
+  const target = (S.battleAllies || []).find(p => p.hp > 0) || S.player;
+  if (target) {
+    target.hp = Math.min(target.maxHp, target.hp + heal);
+    addBLog('使用 🍯花蜜，'+target.name+' 回復 '+heal+'！','heal');
+  }
+  updateBattleHp();
   syncAlliesHpToOwned();
   S.selectedActions = {};
   setTimeout(enemyTurn, 700);
@@ -3747,16 +4277,25 @@ function enemyTurn(){
     }
   }
 
-  // 灼燒傷害（敵方身上）
+  // 灼燒傷害：對所有仍存活的敵方各結算一次（不可因單一 S.enemy 死亡就整場勝利）
   if (S.eEffects && S.eEffects.burn > 0) {
-    // 灼燒：每回合扣「當前血量」3%~5%，持續回合由 tickEffects 遞減
-    const pct = 0.03 + Math.random() * 0.02;
-    const burnDmg = Math.max(1, Math.floor(S.enemy.hp * pct));
-    S.enemy.hp = Math.max(0, S.enemy.hp - burnDmg);
-    addBLog('🔥 灼燒造成 ' + burnDmg + ' 傷害（約 ' + Math.round(pct*100) + '% 當前血量）！', 'sys');
-    showPop('e', '-' + burnDmg, 'd');
+    (S.battleEnemies || []).forEach((en, ei) => {
+      if (!en || en.hp <= 0) return;
+      // 灼燒：每回合扣「當前血量」3%~5%
+      const pct = 0.03 + Math.random() * 0.02;
+      const burnDmg = Math.max(1, Math.floor(en.hp * pct));
+      en.hp = Math.max(0, en.hp - burnDmg);
+      addBLog('🔥 ' + en.name + ' 受到灼燒 ' + burnDmg + ' 傷害（約 ' + Math.round(pct * 100) + '%）！', 'sys');
+      try {
+        const card = document.getElementById('enemy-card-' + ei);
+        if (card) {
+          // 簡易飄字：沿用更新後血量條
+        }
+      } catch (e) {}
+    });
     updateBattleHp();
-    if (S.enemy.hp <= 0) { setTimeout(() => endBattle(true), 500); return; }
+    // 必須全部敵人都倒下才算勝利
+    if (livingEnemies().length === 0) { setTimeout(() => endBattle(true), 500); return; }
   }
 
   // 所有存活敵方依速度行動
@@ -4091,7 +4630,7 @@ function showLevelUpScreen(info) {
     if (info.canEvo) lines.push('✨ <b>可以進化了！</b>到隊伍按「進化」');
   } else if (kind === 'star') {
     lines.push('⭐ 星級：<b>' + (info.fromLabel || '') + ' → ' + (info.toLabel || '') + '</b>');
-    lines.push('<span style="color:#e65100;font-weight:800">⚔️ 基礎攻擊 +1</span>（每升 1 星固定加成）');
+    lines.push('<span style="color:#e65100;font-weight:800">⚔️ 基礎攻擊 +1</span>（每升 1 星，加入基礎攻擊後重算）');
     if (info.remainingFrags != null) lines.push('🧩 剩餘碎片：<b>' + info.remainingFrags + '</b>');
   } else if (kind === 'evo') {
     lines.push('✨ 進化階段：<b>' + (info.fromLabel || '') + ' → ' + (info.toLabel || '') + '</b>');
@@ -4159,10 +4698,12 @@ function endBattle(win){
       while (pet.exp >= (pet.level || 1) * 25) {
         pet.exp -= (pet.level || 1) * 25;
         const petBefore = snapshotPetCombatStats(pet);
+        if (pet._lastPower == null) syncPetPowerBaseline(pet);
         pet.level = (pet.level || 1) + 1;
         toLv = pet.level;
         leveledUp = true;
         recalculatePetStats(pet, { restoreFullHp: true });
+        notifyIfPowerUp(pet, '升級 Lv.' + toLv);
         const petAfter = snapshotPetCombatStats(pet);
         petStatLines = buildPetStatDeltaLines(petBefore, petAfter);
         if (canStageEvolve(pet)) canEvo = true;
@@ -4215,64 +4756,86 @@ function endBattle(win){
     }
     petLevelUpQueue.forEach(q => S._pendingLevelUpQueue.push(q));
     S._pendingLevelUp = null;
-    if(S.wild && S.wild.catchable !== false) winMsg+='\n🎾 獲得一次捕捉機會';
+    // 可收服名單：本場所有敵方（最多 3），各自計算機率，選 1 隻
+    const catchCandidates = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
+    if (catchCandidates.length) winMsg += '\n🎾 可選擇收服 1 隻（各別機率）';
     if(drops.lines.length) winMsg+='\n'+drops.lines.join('\n');
     $('res-msg').textContent=winMsg;
 
-    // 戰鬥勝利後：可收服對象有「一次」捕捉機會
-    if (S.wild && S.wild.catchable !== false) {
-      const wildSnap = {
-        id: S.wild.id,
-        name: S.wild.name,
-        emoji: S.wild.emoji,
-        level: S.wild.level || 1,
-        catchable: true
-      };
-      S.pendingCatch = wildSnap;
-      S._postBattleCatchUsed = false;
-      const catchBtn = document.createElement('button');
-      catchBtn.className = 'btn btn-purple';
-      catchBtn.textContent = '🎾 捕捉 ' + (wildSnap.emoji || '') + wildSnap.name + '（僅一次）';
-      catchBtn.onclick = () => {
-        if (S._postBattleCatchUsed || !S.pendingCatch) return;
-        S._postBattleCatchUsed = true;
-        let rate = 0.55;
-        if ((S.items.ball || 0) > 0) { rate += 0.25; S.items.ball--; }
-        rate = Math.min(0.95, rate);
-        if (roll(rate)) {
-          const base = getBase(S.pendingCatch.id) || S.pendingCatch;
-          const caught = clonePet(base, S.pendingCatch.level || 1);
-          caught.level = S.pendingCatch.level || 1;
-          recalculatePetStats(caught, { restoreFullHp: true });
-          S.owned.push(caught);
-          onPetCaught(caught);
-          updateHeader();
-          saveGame();
-          if (typeof updateRedDots === 'function') updateRedDots();
-          $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name + '！';
-          catchBtn.disabled = true;
-          catchBtn.textContent = '已捕捉 ✓';
-        } else {
-          $('res-msg').textContent += '\n💨 ' + S.pendingCatch.name + ' 逃走了…（機會已用完）';
-          catchBtn.disabled = true;
-          catchBtn.textContent = '捕捉失敗';
-        }
-        S.pendingCatch = null;
-      };
-      actions.appendChild(catchBtn);
-    } else {
-      S.pendingCatch = null;
+    S._postBattleCatchUsed = false;
+    S.pendingCatch = null;
+    S._catchCandidates = catchCandidates.map(e => ({
+      id: e.id,
+      name: e.name,
+      emoji: e.emoji,
+      level: e.level || 1,
+      starLevel: Math.max(0, Number(e.starLevel) || 0),
+      evoStage: Math.max(0, Number(e.evoStage) || 0),
+      catchable: true
+    }));
+
+    function calcPostBattleCatchRate(snap) {
+      const base = getBase(snap.id) || {};
+      let rate = (base.captureRate != null) ? Number(base.captureRate) : 0.55;
+      rate = rate + 0.20; // 戰鬥勝利加成
+      return Math.max(0.05, Math.min(0.95, rate));
+    }
+
+    if (S._catchCandidates.length) {
+      S._catchCandidates.forEach((snap, idx) => {
+        const rate = calcPostBattleCatchRate(snap);
+        const pct = Math.round(rate * 100);
+        const starLabel = (typeof getStarMeta === 'function')
+          ? getStarMeta(snap.starLevel || 0).label : '';
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-purple';
+        btn.dataset.catchIdx = String(idx);
+        btn.textContent = '🎾 ' + (snap.emoji || '') + snap.name +
+          ' Lv.' + snap.level +
+          (starLabel ? ' ' + starLabel : '') +
+          '（' + pct + '%）';
+        btn.onclick = () => {
+          if (S._postBattleCatchUsed) return;
+          S._postBattleCatchUsed = true;
+          actions.querySelectorAll('[data-catch-idx]').forEach(b => { b.disabled = true; });
+          const finalRate = calcPostBattleCatchRate(snap);
+          if (roll(finalRate)) {
+            const base = getBase(snap.id) || snap;
+            const caught = clonePet(base, snap.level || 1);
+            caught.level = snap.level || 1;
+            caught.starLevel = Math.max(0, Number(snap.starLevel) || 0);
+            if (snap.evoStage != null) caught.evoStage = Math.max(0, Number(snap.evoStage) || 0);
+            recalculatePetStats(caught, { restoreFullHp: true });
+            S.owned.push(caught);
+            onPetCaught(caught);
+            updateHeader();
+            saveGame();
+            if (typeof updateRedDots === 'function') updateRedDots();
+            const keepStar = (typeof getStarMeta === 'function')
+              ? getStarMeta(caught.starLevel || 0).label : '';
+            $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name +
+              (keepStar ? '（' + keepStar + '）' : '') + '！';
+            btn.textContent = '已捕捉 ✓';
+          } else {
+            $('res-msg').textContent += '\n💨 ' + snap.name + ' 逃走了…（本場捕捉機會已用完）';
+            btn.textContent = '捕捉失敗';
+          }
+          S.pendingCatch = null;
+        };
+        actions.appendChild(btn);
+      });
     }
 
     const okBtn = document.createElement('button');
     okBtn.className = 'btn btn-primary';
     okBtn.textContent = '確定';
     okBtn.onclick = () => {
-      S.wild = null; S.pendingCatch = null;
+      S.wild = null; S.pendingCatch = null; S._catchCandidates = null;
       $('result-modal').classList.add('hidden');
       if (typeof runPostBattleFlow === 'function') runPostBattleFlow();
       else showScreen('map');
     };
+    actions.appendChild(okBtn);
     actions.appendChild(okBtn);
   } else {
     // 敗北也給少量經驗（依表的 25%）
@@ -4295,10 +4858,12 @@ function endBattle(win){
       while (pet.exp >= (pet.level || 1) * 25) {
         pet.exp -= (pet.level || 1) * 25;
         const petBefore = snapshotPetCombatStats(pet);
+        if (pet._lastPower == null) syncPetPowerBaseline(pet);
         pet.level = (pet.level || 1) + 1;
         toLv = pet.level;
         leveledUp = true;
         recalculatePetStats(pet, { restoreFullHp: true });
+        notifyIfPowerUp(pet, '升級 Lv.' + toLv);
         petStatLines = buildPetStatDeltaLines(petBefore, snapshotPetCombatStats(pet));
         if (canStageEvolve(pet)) canEvo = true;
       }
@@ -4367,14 +4932,192 @@ function openShop(){
   }
 }
 
+/* ===== 珊瑚鍛造坊 ===== */
+function formatTreasureBonuses(bonuses) {
+  if (!bonuses) return '';
+  const map = { force:'武力', intel:'智力', charm:'魅力', atk:'攻擊', def:'防禦', hp:'HP' };
+  return Object.keys(bonuses).filter(k => bonuses[k]).map(k => map[k] + '+' + bonuses[k]).join('　');
+}
+
+function openForge() {
+  const panel = document.querySelector('#zone .zone-panel');
+  if (panel) panel.classList.add('forge-wide');
+  const logEl = $('zone-log');
+  if (logEl) logEl.classList.add('forge-mode');
+
+  // 進入鍛造時收合上方說明，把空間留給列表
+  const ze = $('zone-emoji'); if (ze) ze.style.display = 'none';
+  const zn = $('zone-name'); if (zn) zn.style.display = 'none';
+  const zd = $('zone-desc'); if (zd) zd.style.display = 'none';
+
+  const actions = $('zone-actions');
+  actions.innerHTML = '';
+  const back = document.createElement('button');
+  back.className = 'btn btn-back';
+  back.textContent = '← 返回';
+  back.onclick = () => openZone(S.currentZone);
+  actions.appendChild(back);
+
+  logEl.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'section-title';
+  title.style.margin = '4px 0 10px';
+  title.style.fontSize = '1.25rem';
+  title.textContent = '🪸 珊瑚鍛造坊';
+  logEl.appendChild(title);
+
+  const mat = document.createElement('div');
+  mat.style.cssText = 'text-align:center;font-size:0.9rem;color:#00695c;margin-bottom:8px;padding:8px 12px;background:#e0f2f1;border-radius:12px;border:2px solid #80cbc4';
+  mat.innerHTML = '全部寶物皆靠收集碎片合成／升階';
+  logEl.appendChild(mat);
+
+  const hint = document.createElement('p');
+  hint.style.cssText = 'text-align:center;font-size:0.82rem;color:#666;margin-bottom:12px';
+  hint.textContent = '白3 → 綠15 → 藍35 → 紫60 → 金80 → 紅100　（各階消耗該寶物碎片）';
+  logEl.appendChild(hint);
+
+  const grid = document.createElement('div');
+  grid.className = 'shop-grid forge-grid';
+
+  ALL_TREASURES.forEach(def => {
+    const grade = getTreasureGrade(def.id);
+    const owned = grade >= 0;
+    const frags = getTreasureFragment(def.id);
+    const card = document.createElement('div');
+    card.className = 'shop-item';
+    card.style.borderColor = owned ? (TREASURE_GRADE_COLORS[(def.grades[grade] || {}).name] || '#ffcc80') : '#80cbc4';
+    card.style.background = owned
+      ? 'linear-gradient(145deg, #fff8e1, #fce4ec)'
+      : 'linear-gradient(145deg, #e0f7fa, #e8f5e9)';
+    card.style.textAlign = 'left';
+
+    // 一階一階列出：已達顯示效果，未達顯示「達到OO階時開放」
+    let gradeRows = '';
+    (def.grades || []).forEach((g, i) => {
+      const color = TREASURE_GRADE_COLORS[g.name] || '#666';
+      const reached = owned && i <= grade;
+      const isCur = owned && i === grade;
+      const isDone = owned && i < grade;
+      let effectTxt;
+      if (reached) {
+        effectTxt = formatTreasureBonuses(g.bonuses) || '（暫無效果）';
+      } else {
+        effectTxt = '達到' + g.name + '階時開放';
+      }
+      let mark = '';
+      if (isCur) mark = ' ← 目前';
+      else if (isDone) mark = ' ✓';
+      const bg = isCur ? 'background:rgba(255,193,7,0.18);' : (isDone ? 'background:rgba(129,199,132,0.12);' : '');
+      const effectColor = reached ? '#333' : '#999';
+      gradeRows +=
+        '<div style="display:flex;justify-content:space-between;gap:6px;padding:4px 6px;border-radius:6px;margin:2px 0;' + bg + 'font-size:0.78rem;line-height:1.4">' +
+          '<span><b style="color:' + color + '">' + g.name + '</b>：' +
+            '<span style="color:' + effectColor + '">' + effectTxt + '</span>' + mark +
+          '</span>' +
+          '<span style="color:#666;white-space:nowrap">需 ' + g.cost + ' 片</span>' +
+        '</div>';
+    });
+
+    let headStatus = '';
+    if (!owned) {
+      const need = (def.craft && def.craft.frags) || 3;
+      headStatus = '<div class="desc" style="margin:4px 0 6px">未擁有　碎片 ' + frags + '/' + need + '</div>';
+    } else {
+      const gName = (def.grades[grade] || {}).name || '?';
+      const color = TREASURE_GRADE_COLORS[gName] || '#666';
+      headStatus = '<div class="desc" style="margin:4px 0 6px">持有碎片 ×' + frags +
+        '　目前 <b style="color:' + color + '">' + gName + '階</b></div>';
+    }
+
+    card.innerHTML =
+      '<div style="text-align:center">' +
+        '<div class="emoji">' + def.emoji + '</div>' +
+        '<div class="name">' + def.name + '</div>' +
+        '<div class="desc" style="margin-bottom:4px">' + def.desc + '</div>' +
+      '</div>' +
+      headStatus +
+      '<div style="border-top:1px dashed #ccc;padding-top:4px;margin-top:2px">' + gradeRows + '</div>';
+
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-purple';
+    btn.style.padding = '10px 18px';
+    btn.style.fontSize = '0.95rem';
+    btn.style.marginTop = '8px';
+    btn.style.width = '100%';
+
+    if (!owned) {
+      btn.textContent = '🔨 合成白階';
+      btn.onclick = () => craftTreasure(def.id);
+    } else if (grade >= 5) {
+      btn.textContent = '已滿階';
+      btn.disabled = true;
+    } else {
+      const nextName = (def.grades[grade + 1] || {}).name || '下一';
+      btn.textContent = '⬆️ 升至' + nextName + '階';
+      btn.onclick = () => upgradeTreasure(def.id);
+    }
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+
+  logEl.appendChild(grid);
+}
+
+function craftTreasure(treasureId) {
+  const def = getTreasureDef(treasureId);
+  if (!def) { addLog('zone-log', '無法製作此寶物'); return; }
+  if (getTreasureGrade(treasureId) >= 0) { addLog('zone-log', '已擁有「' + def.name + '」'); return; }
+  const needFrag = (def.craft && def.craft.frags) || (def.grades[0] && def.grades[0].cost) || 3;
+  const haveFrag = getTreasureFragment(treasureId);
+  if (haveFrag < needFrag) {
+    addLog('zone-log', '「' + def.name + '」碎片不足（' + haveFrag + '/' + needFrag + '），請先收集。');
+    return;
+  }
+  if (!S.treasureFrags) S.treasureFrags = {};
+  S.treasureFrags[treasureId] = haveFrag - needFrag;
+  unlockTreasure(treasureId, 0);
+  updateHeader();
+  saveGame();
+  addLog('zone-log', '🎉 成功合成「' + def.emoji + def.name + '」（白階）！可在寵物資訊裝備。');
+  openForge();
+}
+
+function upgradeTreasure(treasureId) {
+  const def = getTreasureDef(treasureId);
+  if (!def) return;
+  const grade = getTreasureGrade(treasureId);
+  if (grade < 0) { addLog('zone-log', '尚未擁有此寶物，請先合成'); return; }
+  if (grade >= 5) { addLog('zone-log', '已達最高紅階'); return; }
+  const next = def.grades[grade + 1];
+  if (!next) return;
+  const needFrag = next.cost || 0;
+  const haveFrag = getTreasureFragment(treasureId);
+  if (haveFrag < needFrag) {
+    addLog('zone-log', '碎片不足（' + haveFrag + '/' + needFrag + '）。請繼續收集「' + def.name + '」碎片。');
+    return;
+  }
+  if (!S.treasureFrags) S.treasureFrags = {};
+  S.treasureFrags[treasureId] = haveFrag - needFrag;
+  S.treasures[treasureId].grade = grade + 1;
+  (S.owned || []).forEach(p => {
+    if (p && p.equippedTreasures && p.equippedTreasures.indexOf(treasureId) >= 0) {
+      if (p._lastPower == null) syncPetPowerBaseline(p);
+      recalculatePetStats(p);
+      notifyIfPowerUp(p, '寶物升階');
+    }
+  });
+  updateHeader();
+  saveGame();
+  const bonTxt = formatTreasureBonuses(getTreasureBonuses(treasureId));
+  addLog('zone-log', '✨ 「' + def.emoji + def.name + '」升至【' + next.name + '階】！' + (bonTxt || '（暫無效果）'));
+  openForge();
+}
+
 function canEvolve(p) {
   const base = getBase(p.id);
   if (!base || !base.evolvesTo) return false;
   const need = base.evolveLv || 8;
-  if (p.level >= need) return true;
-  // 有進化晶石可提前 3 級
-  if ((S.items.evo || 0) > 0 && p.level >= Math.max(1, need - 3)) return true;
-  return false;
+  return p.level >= need;
 }
 
 function evolveNeedText(p) {
@@ -4382,7 +5125,6 @@ function evolveNeedText(p) {
   if (!base || !base.evolvesTo) return '';
   const need = base.evolveLv || 8;
   if (p.level >= need) return '可進化！';
-  if ((S.items.evo || 0) > 0 && p.level >= need - 3) return '可用💎進化（需 Lv.' + (need-3) + '+）';
   return '進化需 Lv.' + need;
 }
 
@@ -4398,7 +5140,7 @@ function openEvolve(idx) {
   $('evo-to').textContent = next.emoji;
   $('evo-title').textContent = p.name + ' → ' + next.name;
   const need = base.evolveLv || 8;
-  let costNote = p.level >= need ? '達到等級，可免費進化！' : '將消耗 1 顆 💎進化晶石';
+  let costNote = p.level >= need ? '達到等級，可以進化！' : '等級不足，需 Lv.' + need;
   const preview = Object.assign({}, p, {
     id: next.id, baseHp: next.baseHp, force: next.force, charm: next.charm,
     evoStage: next.evoStage || 0
@@ -4416,8 +5158,8 @@ function confirmEvolve() {
   if (!p || !next) return;
   const need = base.evolveLv || 8;
   if (p.level < need) {
-    if ((S.items.evo || 0) <= 0) { alert('需要進化晶石！'); return; }
-    S.items.evo--;
+    alert('等級不足，需達到 Lv.' + need + ' 才能進化');
+    return;
   }
   const before = snapshotPetCombatStats(p);
   const fromName = base.name;
@@ -4441,7 +5183,9 @@ function confirmEvolve() {
   p.evoStage = next.evoStage || 0;
   p.crit = next.crit;
   p.dodge = next.dodge;
+  if (p._lastPower == null) syncPetPowerBaseline(p);
   recalculatePetStats(p, { restoreFullHp: true });
+  notifyIfPowerUp(p, '型態進化');
   const after = snapshotPetCombatStats(p);
   const statLines = buildPetStatDeltaLines(before, after);
   // exp 保留
@@ -4466,6 +5210,328 @@ function formatPetStat(value) {
   return Number.isInteger(number) ? String(number) : number.toFixed(1);
 }
 
+/** 攻擊公式拆解（給寵物資訊顯示） */
+function getAttackFormulaBreakdown(p) {
+  if (!p) return { final: 0, html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const starLevel = n(p.starLevel);
+  const rawBaseAtk = n(p.baseAtk ?? base.baseAtk);
+  let initialAtk = rawBaseAtk + starLevel;
+  const treasureAtk = n(p.treasureAtk);
+  const force = n(p.force ?? base.force);
+  const intel = n(p.intel ?? base.intel);
+  const tForce = n(p._treasureForce);
+  const enhancementLevel = n(p.enhancementLevel);
+  const level = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
+  let passiveNote = '';
+  if (p.id === 'shen_huobao_xiong' && stage >= 2 && level >= 19) {
+    initialAtk += force;
+    passiveNote = '（含神·提升：武力→基礎攻擊 +' + force + '）';
+  }
+  const evolution = [
+    { multiplier: 1, levelBonus: 6 },
+    { multiplier: 1.1, levelBonus: 7 },
+    { multiplier: 1.2, levelBonus: 8 },
+    { multiplier: 1.35, levelBonus: 9 },
+    { multiplier: 1.5, levelBonus: 10 },
+    { multiplier: 1.7, levelBonus: 11 }
+  ][stage];
+  const termBase = initialAtk * 0.4;
+  const termTreasure = treasureAtk * 0.2;
+  const termForce = force * 0.1;
+  const termIntel = intel * 0.05;
+  const termEnh = enhancementLevel * 15;
+  const B = termBase + termTreasure + termForce + termIntel + termEnh;
+  const afterEvo = evolution.multiplier * B;
+  const levelPart = level * evolution.levelBonus;
+  const treasureForcePart = tForce * 0.8;
+  const final = afterEvo + levelPart + treasureForcePart;
+  const starTxt = starLevel > 0 ? (' + 星' + starLevel) : '';
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#5d4037">' +
+    '<b style="color:#e65100">💥 攻擊公式</b><br>' +
+    '有效基礎攻擊 = 基礎攻擊 ' + rawBaseAtk + starTxt + (passiveNote ? (' ' + passiveNote) : '') + ' = <b>' + initialAtk + '</b><br>' +
+    'B = 基礎×0.4 + 寶物攻×0.2 + 武力×0.1 + 智力×0.05 + 強化×15<br>' +
+    '　= ' + initialAtk + '×0.4 + ' + treasureAtk + '×0.2 + ' + force + '×0.1 + ' + intel + '×0.05 + ' + enhancementLevel + '×15<br>' +
+    '　= ' + termBase.toFixed(2) + ' + ' + termTreasure.toFixed(2) + ' + ' + termForce.toFixed(2) + ' + ' + termIntel.toFixed(2) + ' + ' + termEnh.toFixed(2) + ' = <b>' + B.toFixed(2) + '</b><br>' +
+    '攻擊 = 進化倍率×B + 等級×等級加成 + 寶物武力×0.8<br>' +
+    '　= ' + evolution.multiplier + '×' + B.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + ' + ' + tForce + '×0.8<br>' +
+    '　= ' + afterEvo.toFixed(2) + ' + ' + levelPart.toFixed(2) + ' + ' + treasureForcePart.toFixed(2) + ' = <b style="color:#e65100">' + final.toFixed(2) + '</b>' +
+    '</div>';
+  return { final: final, html: html };
+}
+
+/** 防禦公式拆解 */
+function getDefenseFormulaBreakdown(p) {
+  if (!p) return { final: 0, html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const initialDef = n(p.baseDef ?? base.baseDef);
+  const treasureDef = n(p.treasureDef);
+  const intel = n(p.intel ?? base.intel);
+  const charm = n(p.charm ?? base.charm);
+  const enhancementLevel = n(p.enhancementLevel);
+  const starLevel = n(p.starLevel);
+  const level = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
+  const evolution = [
+    { multiplier: 1, levelBonus: 5 },
+    { multiplier: 1.1, levelBonus: 6 },
+    { multiplier: 1.2, levelBonus: 7 },
+    { multiplier: 1.35, levelBonus: 8 },
+    { multiplier: 1.5, levelBonus: 9 },
+    { multiplier: 1.7, levelBonus: 10 }
+  ][stage];
+  const termDef = initialDef * 0.4;
+  const termTreasure = treasureDef * 0.1;
+  const termIntel = intel * 0.1;
+  const termCharm = charm * 0.05;
+  const termEnh = enhancementLevel * 15;
+  const termStar = starLevel * 0.2;
+  const B = termDef + termTreasure + termIntel + termCharm + termEnh + termStar;
+  const afterEvo = evolution.multiplier * B;
+  const levelPart = level * evolution.levelBonus;
+  const final = afterEvo + levelPart;
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#1565c0">' +
+    '<b style="color:#0d47a1">🛡️ 防禦公式</b><br>' +
+    '基礎防禦 = <b>' + initialDef + '</b><br>' +
+    'B = 基礎防×0.4 + 寶物防×0.1 + 智力×0.1 + 魅力×0.05 + 強化×15 + 星級×0.2<br>' +
+    '　= ' + initialDef + '×0.4 + ' + treasureDef + '×0.1 + ' + intel + '×0.1 + ' + charm + '×0.05 + ' + enhancementLevel + '×15 + ' + starLevel + '×0.2<br>' +
+    '　= ' + termDef.toFixed(2) + ' + ' + termTreasure.toFixed(2) + ' + ' + termIntel.toFixed(2) + ' + ' + termCharm.toFixed(2) + ' + ' + termEnh.toFixed(2) + ' + ' + termStar.toFixed(2) + ' = <b>' + B.toFixed(2) + '</b><br>' +
+    '防禦 = 進化倍率×B + 等級×等級加成<br>' +
+    '　= ' + evolution.multiplier + '×' + B.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + '<br>' +
+    '　= ' + afterEvo.toFixed(2) + ' + ' + levelPart.toFixed(2) + ' = <b style="color:#0d47a1">' + final.toFixed(2) + '</b>' +
+    '</div>';
+  return { final: final, html: html };
+}
+
+
+/** 速度公式拆解 */
+function getSpeedFormulaBreakdown(p) {
+  if (!p) return { final: 0, html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const initialSpeed = n(p.baseSpeed ?? base.baseSpeed ?? 10);
+  const charm = n(p.charm ?? base.charm);
+  const level = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
+  const evolution = [
+    { multiplier: 1, levelBonus: 3 },
+    { multiplier: 1.06, levelBonus: 4 },
+    { multiplier: 1.12, levelBonus: 5 },
+    { multiplier: 1.18, levelBonus: 6 },
+    { multiplier: 1.24, levelBonus: 6 },
+    { multiplier: 1.26, levelBonus: 7 }
+  ][stage];
+  const core = initialSpeed + 0.56 + charm * 0.4;
+  const afterEvo = evolution.multiplier * core;
+  const levelPart = level * evolution.levelBonus;
+  const final = Math.floor(afterEvo + levelPart);
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#6a1b9a">' +
+    '<b style="color:#4a148c">⚡ 速度公式</b><br>' +
+    '基礎速度 = <b>' + initialSpeed + '</b>　魅力 = <b>' + charm + '</b><br>' +
+    '核心 = 基礎速度 + 0.56 + 魅力×0.4<br>' +
+    '　= ' + initialSpeed + ' + 0.56 + ' + charm + '×0.4 = <b>' + core.toFixed(2) + '</b><br>' +
+    '速度 = ⌊進化倍率×核心 + 等級×等級加成⌋<br>' +
+    '　= ⌊' + evolution.multiplier + '×' + core.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + '⌋<br>' +
+    '　= ⌊' + afterEvo.toFixed(2) + ' + ' + levelPart.toFixed(2) + '⌋ = <b style="color:#4a148c">' + final + '</b>' +
+    '</div>';
+  return { final: final, html: html };
+}
+
+
+/** 血量公式拆解 */
+function getHpFormulaBreakdown(p) {
+  if (!p) return { final: 0, html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const initialHp = n(p.baseHp ?? base.baseHp ?? base.maxHp);
+  const treasureHp = n(p.treasureHp);
+  let charm = n(p.charm ?? base.charm);
+  const force = n(p.force ?? base.force);
+  const enhancementLevel = n(p.enhancementLevel);
+  const starLevel = n(p.starLevel);
+  const level = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
+  let passiveNote = '';
+  if (p.id === 'shen_huobao_xiong' && stage >= 2 && level >= 19) {
+    const add = force * 2;
+    charm += add;
+    passiveNote = '（神·提升：魅力 +' + add + '）';
+  }
+  const evolution = [
+    { multiplier: 1, levelBonus: 31 },
+    { multiplier: 1.05, levelBonus: 34 },
+    { multiplier: 1.1, levelBonus: 37 },
+    { multiplier: 1.2, levelBonus: 40 },
+    { multiplier: 1.3, levelBonus: 43 },
+    { multiplier: 1.4, levelBonus: 46 }
+  ][stage];
+  const tHp = initialHp * 0.5, tTr = treasureHp * 0.2, tCh = charm * 0.1, tFo = force * 0.05;
+  const tEn = enhancementLevel * 15, tSt = starLevel * 0.1;
+  const core = tHp + tTr + tCh + tFo + tEn + tSt;
+  const afterEvo = evolution.multiplier * core;
+  const levelPart = level * evolution.levelBonus;
+  const final = Math.floor(afterEvo + levelPart);
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#b71c1c">' +
+    '<b style="color:#c62828">❤️ 血量公式</b><br>' +
+    '基礎HP = <b>' + initialHp + '</b>　魅力 = <b>' + charm + '</b>' + (passiveNote ? (' ' + passiveNote) : '') + '<br>' +
+    '核心 = 基礎HP×0.5 + 寶物HP×0.2 + 魅力×0.1 + 武力×0.05 + 強化×15 + 星級×0.1<br>' +
+    '　= ' + initialHp + '×0.5 + ' + treasureHp + '×0.2 + ' + charm + '×0.1 + ' + force + '×0.05 + ' + enhancementLevel + '×15 + ' + starLevel + '×0.1<br>' +
+    '　= ' + tHp.toFixed(2) + ' + ' + tTr.toFixed(2) + ' + ' + tCh.toFixed(2) + ' + ' + tFo.toFixed(2) + ' + ' + tEn.toFixed(2) + ' + ' + tSt.toFixed(2) + ' = <b>' + core.toFixed(2) + '</b><br>' +
+    '最大HP = ⌊進化倍率×核心 + 等級×等級加成⌋<br>' +
+    '　= ⌊' + evolution.multiplier + '×' + core.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + '⌋ = <b style="color:#c62828">' + final + '</b>' +
+    '</div>';
+  return { final: final, html: html };
+}
+
+/** MP 公式拆解 */
+function getMpFormulaBreakdown(p) {
+  if (!p) return { final: 0, html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const initialMp = n(p.baseMp ?? base.baseMp ?? 10);
+  const intel = n(p.intel ?? base.intel);
+  const level = Math.max(1, n(p.level) || 1);
+  const stage = Math.max(0, Math.min(6, Math.floor(n(p.evoStage ?? base.evoStage))));
+  const evolution = [
+    { multiplier: 1, levelBonus: 7 },
+    { multiplier: 1.05, levelBonus: 8 },
+    { multiplier: 1.15, levelBonus: 9 },
+    { multiplier: 1.2, levelBonus: 10 },
+    { multiplier: 1.3, levelBonus: 10 },
+    { multiplier: 1.45, levelBonus: 11 },
+    { multiplier: 1.6, levelBonus: 12 }
+  ][stage];
+  const core = initialMp * 0.7 + intel * 0.4;
+  const afterEvo = evolution.multiplier * core;
+  const levelPart = level * evolution.levelBonus;
+  const final = Math.floor(afterEvo + levelPart);
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#e0f7fa;border:1px solid #80deea;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#006064">' +
+    '<b style="color:#00838f">💙 MP 公式</b><br>' +
+    '基礎MP = <b>' + initialMp + '</b>　智力 = <b>' + intel + '</b><br>' +
+    '核心 = 基礎MP×0.7 + 智力×0.4<br>' +
+    '　= ' + initialMp + '×0.7 + ' + intel + '×0.4 = <b>' + core.toFixed(2) + '</b><br>' +
+    '最大MP = ⌊進化倍率×核心 + 等級×等級加成⌋<br>' +
+    '　= ⌊' + evolution.multiplier + '×' + core.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + '⌋ = <b style="color:#00838f">' + final + '</b>' +
+    '</div>';
+  return { final: final, html: html };
+}
+
+/** 技能傷害公式展開（通用） */
+function getDamageFormulaBreakdown(p) {
+  if (!p) return { html: '' };
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const atk = n(p.attack);
+  const defExample = 50;
+  const critDmg = n(p.critDmg) || (1.3 + Math.max(1, n(p.level) || 1) * 0.03);
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#fce4ec;border:1px solid #f48fb1;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#880e4f">' +
+    '<b style="color:#ad1457">⚔️ 技能傷害公式</b><br>' +
+    '<span class="fg-title" style="color:#ad1457">① 百分比傷害技能（多數攻擊技）</span><br>' +
+    '基礎傷害 = 攻擊力 × (技能% / 100)<br>' +
+    '最終傷害 = max(1, ⌊基礎傷害 − 防禦×0.25 + 亂數(−3~5)⌋)<br>' +
+    '以你目前攻擊 <b>' + atk.toFixed(1) + '</b>、假設敵防 ' + defExample + '、技能 100% 為例：<br>' +
+    '　= max(1, ⌊' + atk.toFixed(1) + '×1.00 − ' + defExample + '×0.25 + 亂數⌋)<br>' +
+    '　≈ <b>' + Math.max(1, Math.floor(atk - defExample * 0.25)).toFixed(0) + '</b>（未計亂數）<br><br>' +
+    '<span style="color:#ad1457;font-weight:800">② 武力百分比技能</span><br>' +
+    '技能% = 武力 + 固定加成　→　傷害 = 攻擊 × (技能%/100) − 防禦×0.25<br><br>' +
+    '<span style="color:#ad1457;font-weight:800">③ 基礎% + 武力縮放（如炎·聖火）</span><br>' +
+    '技能% = 基礎% + ⌊武力 / 縮放單位⌋ × 加成%<br>' +
+    '傷害 = 攻擊 × (技能%/100) − 防禦×0.25<br><br>' +
+    '<span style="color:#ad1457;font-weight:800">④ 暴擊</span><br>' +
+    '若觸發暴擊：最終傷害 = ⌊傷害 × 暴擊倍率⌋<br>' +
+    '你的暴擊倍率 = <b>×' + critDmg.toFixed(2) + '</b>（公式：1.3 + 等級×0.03）<br><br>' +
+    '<span style="color:#ad1457;font-weight:800">⑤ 其他倍率</span><br>' +
+    '力量糖果 ×1.5　｜　敵人減速 ×1.2　｜　敵人魅惑 ×0.7　｜　防護泡泡 ×0.5' +
+    '</div>';
+  return { html: html };
+}
+
+/** 經驗／升級公式展開 */
+function getExpFormulaBreakdown(p) {
+  if (!p) return { html: '' };
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const lv = Math.max(1, n(p.level) || 1);
+  const need = lv * 30;
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#1b5e20">' +
+    '<b style="color:#2e7d32">✨ 經驗／升級公式</b><br>' +
+    '升到下一級所需經驗 = 目前等級 × 30<br>' +
+    '　Lv.' + lv + ' → Lv.' + (lv + 1) + ' 需要 <b>' + need + '</b> 經驗<br><br>' +
+    '戰鬥經驗依區域危險度與勝敗計算；寵物與玩家各自累積。<br>' +
+    '升級後會重算 HP／MP／攻擊／防禦／速度／暴擊等所有衍生數值。' +
+    '</div>';
+  return { html: html };
+}
+
+/** 捕捉公式展開 */
+function getCaptureFormulaBreakdown() {
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#6a1b9a">' +
+    '<b style="color:#6a1b9a">🎾 捕捉／收服公式</b><br>' +
+    '<span style="font-weight:800">野外直接捕捉</span><br>' +
+    '成功率 = min(0.85, 0.35 + (1 − 剩餘HP比例)×0.4 + 捕捉球?0.2:0)<br>' +
+    '→ 血越少越好抓；使用捕捉球 +20%<br><br>' +
+    '<span style="font-weight:800">戰鬥勝利後收服</span><br>' +
+    '成功率 = min(0.95, 0.55 + 捕捉球?0.25:0)<br>' +
+    '→ 打倒後基礎 55%，有球可到約 80%' +
+    '</div>';
+  return { html: html };
+}
+
+/** 暴擊／閃避／命中／暴擊傷害公式 */
+function getCombatRatesFormulaBreakdown(p) {
+  if (!p) return { html: '' };
+  const base = getBase(p.id) || {};
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const level = Math.max(1, n(p.level) || 1);
+  const force = n(p.force ?? base.force);
+  const intel = n(p.intel ?? base.intel);
+  const charm = n(p.charm ?? base.charm);
+  const initCritPct = n(p.baseCrit ?? base.baseCrit ?? 0.08) * 100;
+  const initDodgePct = n(p.baseDodge ?? base.baseDodge ?? 0.09) * 100;
+  const initHitPct = n(p.baseHit ?? base.baseHit ?? 0.85) * 100;
+  let critPct = initCritPct * 0.9 + force * 0.02 + level;
+  let dodgePct = initDodgePct * 0.9 + intel * 0.02 + level;
+  let hitPct = initHitPct * 0.8 + charm * 0.07 + level;
+  const critRaw = critPct, dodgeRaw = dodgePct, hitRaw = hitPct;
+  critPct = Math.max(1, Math.min(80, critPct));
+  dodgePct = Math.max(1, Math.min(60, dodgePct));
+  hitPct = Math.max(30, Math.min(100, hitPct));
+  const critDmg = 1.3 + level * 0.03;
+  const html =
+    '<div style="margin:4px 0 8px;padding:8px 10px;background:#fff3e0;border:1px solid #ffcc80;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#e65100">' +
+    '<b style="color:#ef6c00">🎯 暴擊／閃避／命中公式</b><br>' +
+    '暴擊% = 基礎暴擊%×0.9 + 武力×0.02 + 等級<br>' +
+    '　= ' + initCritPct.toFixed(1) + '×0.9 + ' + force + '×0.02 + ' + level + ' = ' + critRaw.toFixed(2) + '% → <b>限制 1～80 → ' + critPct.toFixed(2) + '%</b><br>' +
+    '閃避% = 基礎閃避%×0.9 + 智力×0.02 + 等級<br>' +
+    '　= ' + initDodgePct.toFixed(1) + '×0.9 + ' + intel + '×0.02 + ' + level + ' = ' + dodgeRaw.toFixed(2) + '% → <b>限制 1～60 → ' + dodgePct.toFixed(2) + '%</b><br>' +
+    '命中% = 基礎命中%×0.8 + 魅力×0.07 + 等級<br>' +
+    '　= ' + initHitPct.toFixed(1) + '×0.8 + ' + charm + '×0.07 + ' + level + ' = ' + hitRaw.toFixed(2) + '% → <b>限制 30～100 → ' + hitPct.toFixed(2) + '%</b><br>' +
+    '暴擊傷害倍率 = 1.3 + 等級×0.03 = 1.3 + ' + level + '×0.03 = <b>×' + critDmg.toFixed(2) + '</b>' +
+    '</div>';
+  return { html: html };
+}
+
+/** 公式展開面板開關 */
+function toggleFormulaPanel() {
+  const bar = document.getElementById('formula-toggle');
+  const panel = document.getElementById('formula-panel');
+  if (!bar || !panel) return;
+  const open = panel.classList.toggle('open');
+  bar.classList.toggle('open', open);
+  const hint = bar.querySelector('.ft-hint');
+  if (hint) hint.textContent = open ? '點此收合' : '點此查看完整數值計算過程';
+}
+window.toggleFormulaPanel = toggleFormulaPanel;
+
 function openPetInfo(idx) {
   const p = S.owned[idx];
   if (!p) return;
@@ -4476,20 +5542,86 @@ function openPetInfo(idx) {
   $('pet-info-emoji').innerHTML = petFaceHtml(p, 64);
   $('pet-info-name').textContent = p.name + '　Lv.' + p.level;
   $('pet-info-summary').textContent = (p.type || '未知') + '｜' + stages[stage];
+  const atkFx = getAttackFormulaBreakdown(p);
+  const defFx = getDefenseFormulaBreakdown(p);
+  const spdFx = getSpeedFormulaBreakdown(p);
+  const hpFx = getHpFormulaBreakdown(p);
+  const mpFx = getMpFormulaBreakdown(p);
+  const rateFx = getCombatRatesFormulaBreakdown(p);
+  const forceV = (Number(p.force)||0) + (Number(p._treasureForce)||0);
+  const intelV = (Number(p.intel)||0) + (Number(p._treasureIntel)||0);
+  const charmV = (Number(p.charm)||0) + (Number(p._treasureCharm)||0);
+  // 長條以 150 為滿格參考（神話三圍上限附近），超過仍顯示 100%
+  const barMax = 150;
+  const pct = (v) => Math.max(0, Math.min(100, (v / barMax) * 100));
+  const triadHtml =
+    '<div class="pet-triad-bars">' +
+      '<div class="pet-triad-row force"><span class="lab">💪 武力</span><div class="pet-triad-track"><div class="pet-triad-fill" style="width:' + pct(forceV) + '%"></div></div><span class="val">' + formatPetStat(forceV) + '</span></div>' +
+      '<div class="pet-triad-row intel"><span class="lab">🧠 智力</span><div class="pet-triad-track"><div class="pet-triad-fill" style="width:' + pct(intelV) + '%"></div></div><span class="val">' + formatPetStat(intelV) + '</span></div>' +
+      '<div class="pet-triad-row charm"><span class="lab">✨ 魅力</span><div class="pet-triad-track"><div class="pet-triad-fill" style="width:' + pct(charmV) + '%"></div></div><span class="val">' + formatPetStat(charmV) + '</span></div>' +
+    '</div>';
+
+  // 公式展開面板（預設收合，點擊展開）
+  const formulaHtml =
+    '<div class="formula-toggle-bar" id="formula-toggle" onclick="toggleFormulaPanel()">' +
+      '<span class="ft-title">📐 公式展開</span>' +
+      '<span class="ft-hint">點此查看完整數值計算過程</span>' +
+      '<span class="ft-arrow">▼</span>' +
+    '</div>' +
+    '<div class="formula-panel" id="formula-panel">' +
+      '<div class="formula-tabs" id="formula-tabs">' +
+        '<button type="button" class="formula-tab active" data-tab="hp">❤️ HP</button>' +
+        '<button type="button" class="formula-tab" data-tab="mp">💙 MP</button>' +
+        '<button type="button" class="formula-tab" data-tab="atk">💥 攻擊</button>' +
+        '<button type="button" class="formula-tab" data-tab="def">🛡️ 防禦</button>' +
+        '<button type="button" class="formula-tab" data-tab="spd">⚡ 速度</button>' +
+        '<button type="button" class="formula-tab" data-tab="rate">🎯 暴擊閃避</button>' +
+      '</div>' +
+      '<div class="formula-tab-body active" data-body="hp">' + hpFx.html + '</div>' +
+      '<div class="formula-tab-body" data-body="mp">' + mpFx.html + '</div>' +
+      '<div class="formula-tab-body" data-body="atk">' + atkFx.html + '</div>' +
+      '<div class="formula-tab-body" data-body="def">' + defFx.html + '</div>' +
+      '<div class="formula-tab-body" data-body="spd">' + spdFx.html + '</div>' +
+      '<div class="formula-tab-body" data-body="rate">' + rateFx.html + '</div>' +
+    '</div>';
+
+  const combatPower = calcCombatPower(p);
   $('pet-info-detail').innerHTML =
-    '❤️ 血量：<b>' + formatPetStat(p.hp) + ' / ' + formatPetStat(p.maxHp) + '</b><br>' +
-    '💥 攻擊：<b>' + formatPetStat(p.attack) + '</b>　🛡️ 防禦：<b>' + formatPetStat(p.defense) + '</b><br>' +
-    '💪 武力：' + formatPetStat((Number(p.force)||0) + (Number(p._treasureForce)||0)) + (p._treasureForce ? ('<span style="color:#2e7d32">(共+'+formatPetStat(p._treasureForce)+')</span>') : '') +
-    '　🧠 智力：' + formatPetStat((Number(p.intel)||0) + (Number(p._treasureIntel)||0)) + (p._treasureIntel ? ('<span style="color:#2e7d32">(共+'+formatPetStat(p._treasureIntel)+')</span>') : '') +
-    '　✨ 魅力：' + formatPetStat((Number(p.charm)||0) + (Number(p._treasureCharm)||0)) + (p._treasureCharm ? ('<span style="color:#2e7d32">(共+'+formatPetStat(p._treasureCharm)+')</span>') : '') + '<br>' +
-    '🎒 寶物：武+' + formatPetStat(p._treasureForce||0) + '／智+' + formatPetStat(p._treasureIntel||0) +
-    '／攻+' + formatPetStat(p.treasureAtk) + '／防+' + formatPetStat(p.treasureDef) + '／血+' + formatPetStat(p.treasureHp) + '<br>' +
-    '⬆️ 強化等級：' + formatPetStat(p.enhancementLevel) + '<br>' +
-    '⭐ 星級：' + renderStarsHtml(p.starLevel || 0, { size: 20 }) +
-    '　<span style="color:#e65100;font-size:0.85rem">（基礎攻擊 +' + (Math.max(0, Number(p.starLevel)||0)) + '）</span><br>' +
-    '🧩 碎片：<b>' + getFragmentCount(p.id) + '</b>' +
-    (getStarMeta(p.starLevel || 0).isMax ? '（已滿星）' : '／升星需要 <b>' + getStarMeta(p.starLevel || 0).nextCost + '</b>') +
-    '<br>♻️ 分解可得：<b>' + calcDismantleFragments(p) + '</b> 片碎片';
+    triadHtml +
+    '❤️ 血量：<b>' + formatPetStat(p.hp) + ' / ' + formatPetStat(p.maxHp) + '</b>　💙 MP：<b>' + formatPetStat(p.mp) + ' / ' + formatPetStat(p.maxMp) + '</b><br>' +
+    '💥 攻擊：<b>' + formatPetStat(p.attack) + '</b>　🛡️ 防禦：<b>' + formatPetStat(p.defense) + '</b>　⚡ 速度：<b>' + formatPetStat(p.speed) + '</b><br>' +
+    '🎯 暴擊：<b>' + ((Number(p.crit)||0)*100).toFixed(1) + '%</b>　💨 閃避：<b>' + ((Number(p.dodge)||0)*100).toFixed(1) + '%</b>　📍 命中：<b>' + ((Number(p.hit)||0)*100).toFixed(1) + '%</b><br>' +
+    formulaHtml +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:180px">' +
+        '⬆️ 強化等級：' + formatPetStat(p.enhancementLevel) + '<br>' +
+        '⭐ 星級：' + renderStarsHtml(p.starLevel || 0, { size: 20 }) +
+        '　<span style="color:#e65100;font-size:0.85rem">（基礎攻擊 +' + (Math.max(0, Number(p.starLevel)||0)) + '）</span><br>' +
+        '🧩 碎片：<b>' + getFragmentCount(p.id) + '</b>' +
+        (getStarMeta(p.starLevel || 0).isMax ? '（已滿星）' : '／升星需要 <b>' + getStarMeta(p.starLevel || 0).nextCost + '</b>') +
+        '<br>♻️ 分解可得：<b>' + calcDismantleFragments(p) + '</b> 片碎片' +
+      '</div>' +
+      '<div style="text-align:center;padding:10px 16px;border-radius:14px;background:linear-gradient(145deg,#fff3e0,#fce4ec);border:2px solid #ffb74d;min-width:110px">' +
+        '<div style="font-size:0.75rem;color:#e65100;font-weight:700">⚔️ 戰力</div>' +
+        '<div style="font-size:1.55rem;font-weight:900;color:#bf360c;line-height:1.2">' + combatPower.toLocaleString() + '</div>' +
+      '</div>' +
+    '</div>';
+
+  // 綁定分頁切換
+  setTimeout(() => {
+    const tabs = document.querySelectorAll('#formula-tabs .formula-tab');
+    tabs.forEach(tab => {
+      tab.onclick = (e) => {
+        e.stopPropagation();
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const key = tab.dataset.tab;
+        document.querySelectorAll('#formula-panel .formula-tab-body').forEach(b => {
+          b.classList.toggle('active', b.dataset.body === key);
+        });
+      };
+    });
+  }, 0);
   // 技能存在圖鑑基底上，擁有實例本身通常不帶 skills
   const basePet = getBase(p.id) || {};
   const skills = Array.isArray(basePet.skills) ? basePet.skills : (Array.isArray(p.skills) ? p.skills : []);
@@ -4591,7 +5723,78 @@ function renderTeam(){
   teamBox.innerHTML=''; ownedBox.innerHTML='';
   S.team.forEach(idx=>{ const p=S.owned[idx]; if(p) teamBox.appendChild(makePetCard(p,idx,true)); });
   if(!S.team.length) teamBox.innerHTML='<p style="text-align:center;color:#888;grid-column:1/-1">尚未設定出戰寵物</p>';
-  S.owned.forEach((p,idx)=>{ ownedBox.appendChild(makePetCard(p,idx,S.team.includes(idx))); });
+
+  // 擁有的寵物：依戰力由高到低排列（不改動 S.owned 索引，避免隊伍錯位）
+  const ownedOrder = (S.owned || []).map((_, i) => i)
+    .sort((a, b) => calcCombatPower(S.owned[b]) - calcCombatPower(S.owned[a]));
+  ownedOrder.forEach(idx => {
+    ownedBox.appendChild(makePetCard(S.owned[idx], idx, S.team.includes(idx)));
+  });
+
+  // 尚未擁有、但可用碎片合成的寵物（排在後面）
+  const ownedIds = {};
+  (S.owned || []).forEach(p => { if (p && p.id) ownedIds[p.id] = true; });
+  ALL_PETS.forEach(base => {
+    if (!base || base.evolved) return;
+    if (ownedIds[base.id]) return;
+    const need = base.fragmentSummon || 0;
+    if (need <= 0) return;
+    const have = getFragmentCount(base.id);
+    ownedBox.appendChild(makeSummonCard(base, have, need));
+  });
+}
+
+function makeSummonCard(base, have, need) {
+  const div = document.createElement('div');
+  div.className = 'pet-card';
+  div.style.opacity = have >= need ? '1' : '0.75';
+  div.style.borderColor = have >= need ? '#ab47bc' : '#bdbdbd';
+  div.style.background = have >= need
+    ? 'linear-gradient(145deg, #f3e5f5, #e8f5e9)'
+    : 'linear-gradient(145deg, #eceff1, #f5f5f5)';
+  const can = have >= need;
+  const btnHtml = can
+    ? '<button class="btn btn-purple" style="padding:6px 12px;font-size:0.78rem;margin-top:6px" data-summon="' + base.id + '">✨ 合成</button>'
+    : '<div style="font-size:0.72rem;color:#888;margin-top:6px">碎片不足</div>';
+  div.innerHTML =
+    '<span class="team-label" style="background:#78909c">未獲得</span>' +
+    '<div class="emoji">' + (base.emoji || '❓') + '</div>' +
+    '<div class="name">' + base.name + '</div>' +
+    '<div class="meta">' + (base.type || '') + '　' + (base.rarity || '') +
+      '<br>🧩 碎片 ' + have + '/' + need +
+      '<br>合成後獲得 Lv.1' +
+    '</div>' + btnHtml;
+  const btn = div.querySelector('[data-summon]');
+  if (btn) {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      summonPetFromFragments(base.id);
+    };
+  }
+  return div;
+}
+
+function summonPetFromFragments(petId) {
+  const base = getBase(petId);
+  if (!base) { alert('找不到此寵物'); return; }
+  const need = base.fragmentSummon || 0;
+  if (need <= 0) { alert('此寵物無法合成'); return; }
+  const have = getFragmentCount(petId);
+  if (have < need) {
+    alert('碎片不足（' + have + '/' + need + '）');
+    return;
+  }
+  if (!S.fragments) S.fragments = {};
+  S.fragments[petId] = have - need;
+  const pet = clonePet(base, 1);
+  S.owned.push(pet);
+  // 若隊伍未滿，自動加入
+  if (S.team.length < 3) S.team.push(S.owned.length - 1);
+  saveGame();
+  alert('🎉 成功合成「' + base.emoji + base.name + '」！');
+  renderTeam();
+  updateHeader();
+  if (typeof updateRedDots === 'function') updateRedDots();
 }
 function makePetCard(p,idx,inTeam){
   const base=getBase(p.id) || {type:'?'};
@@ -4610,7 +5813,8 @@ function makePetCard(p,idx,inTeam){
   const teamBtn = '<button class="btn btn-back" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-team="'+idx+'">'+(inTeam?'移出隊伍':'加入隊伍')+'</button>';
   const needDot = canStageEvolve(p) || (getStarMeta(p.starLevel||0).nextCost != null && getFragmentCount(p.id) >= (getStarMeta(p.starLevel||0).nextCost||9999) && !getStarMeta(p.starLevel||0).isMax);
   const cardDot = needDot ? '<span class="red-dot"></span>' : '';
-  div.innerHTML=cardDot+(inTeam?'<span class="team-label">出戰</span>':'')+evoBadge+'<div class="emoji">'+petFaceHtml(p,52)+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+(base.type||'')+'　'+(EVO_STAGE_NAMES[Math.max(0,Number(p.evoStage)||0)]||'')+'<br>'+renderStarsHtml(p.starLevel||0,{size:14})+'<br>❤️ '+formatPetStat(p.hp)+'/'+formatPetStat(p.maxHp)+'　🧩'+getFragmentCount(p.id)+'</div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>'+evoBtn+teamBtn;
+  const cp = calcCombatPower(p);
+  div.innerHTML=cardDot+(inTeam?'<span class="team-label">出戰</span>':'')+evoBadge+'<div class="emoji">'+petFaceHtml(p,52)+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+(base.type||'')+'　'+(EVO_STAGE_NAMES[Math.max(0,Number(p.evoStage)||0)]||'')+'<br>'+renderStarsHtml(p.starLevel||0,{size:14})+'<br>❤️ '+formatPetStat(p.hp)+'/'+formatPetStat(p.maxHp)+'　🧩'+getFragmentCount(p.id)+'<br><span style="color:#e65100;font-weight:800;font-size:0.72rem">⚔️ '+cp.toLocaleString()+'</span></div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>'+evoBtn+teamBtn;
   const stageBtn = div.querySelector('[data-stage-evo]');
   if (stageBtn) {
     stageBtn.onclick = (e) => { e.stopPropagation(); doStageEvolve(idx); };
@@ -4633,13 +5837,73 @@ function toggleTeam(idx){
 }
 function renderBag(){
   const box=$('item-list'); box.innerHTML=''; let has=false;
-  SHOP_ITEMS.forEach(it=>{
-    const cnt=S.items[it.id]||0; if(cnt<=0) return; has=true;
-    const d=document.createElement('div'); d.className='item-card';
-    d.innerHTML='<div class="emoji">'+it.emoji+'</div><div class="name">'+it.name+'</div><div class="count">×'+cnt+'</div><div style="font-size:0.7rem;color:#666;margin-top:3px">'+it.desc+'</div>';
+
+  // ① 金幣
+  {
+    has = true;
+    const d = document.createElement('div'); d.className = 'item-card';
+    d.style.borderColor = '#ffb300';
+    d.innerHTML = '<div class="emoji">💰</div><div class="name">金幣</div><div class="count">×' + (S.coins || 0) + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">通用貨幣</div>';
+    box.appendChild(d);
+  }
+
+  // ② 花蜜（唯一一般道具）
+  {
+    const cnt = (S.items && S.items.hua_mi) || 0;
+    if (cnt > 0) {
+      has = true;
+      const d = document.createElement('div'); d.className = 'item-card';
+      d.innerHTML = '<div class="emoji">🍯</div><div class="name">花蜜</div><div class="count">×'+cnt+'</div><div style="font-size:0.7rem;color:#666;margin-top:3px">戰鬥中回復 120 HP</div>';
+      box.appendChild(d);
+    }
+  }
+
+  // ③ 寵物碎片（僅顯示正式存在的寵物；清理無效 id）
+  const fragMap = S.fragments || {};
+  Object.keys(fragMap).forEach(pid => {
+    const n = fragMap[pid] || 0;
+    if (n <= 0) return;
+    const base = getBase(pid);
+    // 無效寵物碎片（例如手稿佔位 id）直接刪除、不顯示
+    if (!base) {
+      delete S.fragments[pid];
+      return;
+    }
+    has = true;
+    const d = document.createElement('div'); d.className = 'item-card';
+    d.style.borderColor = '#81c784';
+    d.innerHTML = '<div class="emoji">' + (base.emoji || '🧩') + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">用於升星／召喚</div>';
     box.appendChild(d);
   });
-  if(!has) box.innerHTML='<p style="text-align:center;color:#888;grid-column:1/-1">背包是空的</p>';
+
+  // ④ 寶物碎片（全部）
+  ALL_TREASURES.forEach(def => {
+    const fr = getTreasureFragment(def.id);
+    if (fr <= 0) return;
+    has = true;
+    const g = getTreasureGrade(def.id);
+    const gName = g >= 0 ? ((def.grades[g] || {}).name || '') + '階' : '未製作';
+    const d = document.createElement('div'); d.className = 'item-card';
+    d.style.borderColor = '#ce93d8';
+    d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '碎片</div><div class="count">×' + fr + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + gName + '　用於升階</div>';
+    box.appendChild(d);
+  });
+
+  // ⑤ 已擁有寶物（非碎片，方便對照）
+  ALL_TREASURES.forEach(def => {
+    const g = getTreasureGrade(def.id);
+    if (g < 0) return;
+    has = true;
+    const gName = (def.grades[g] || {}).name || '?';
+    const color = (TREASURE_GRADE_COLORS && TREASURE_GRADE_COLORS[gName]) || '#666';
+    const bon = formatTreasureBonuses(getTreasureBonuses(def.id));
+    const d = document.createElement('div'); d.className = 'item-card';
+    d.style.borderColor = color;
+    d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count" style="color:' + color + '">' + gName + '階</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (bon || '已擁有') + '</div>';
+    box.appendChild(d);
+  });
+
+  if (!has) box.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1">背包是空的</p>';
 }
 function renderCodex(){
   const box=$('codex-list'); box.innerHTML='';
