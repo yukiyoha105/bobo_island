@@ -950,6 +950,19 @@
     </div>
   </div>
 
+
+  <div class="overlay hidden" id="app-confirm-modal" style="z-index:400">
+    <div class="modal" style="max-width:340px">
+      <div class="big" id="app-confirm-emoji">❓</div>
+      <h2 id="app-confirm-title">請確認</h2>
+      <p id="app-confirm-msg" style="white-space:pre-line;text-align:left"></p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+        <button type="button" class="btn btn-purple" id="app-confirm-ok">確定</button>
+        <button type="button" class="btn btn-back" id="app-confirm-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay hidden" id="evo-modal">
     <div class="modal">
       <div class="big" id="evo-from">🐱</div>
@@ -1775,6 +1788,37 @@ function calcDismantleFragments(p) {
   // 基礎 1 + 每 5 級 +1 + 星級 + 進化階段
   return Math.max(1, 1 + Math.floor(lv / 5) + star + stage);
 }
+
+/** 遊戲內確認（取代原生 confirm，手機較穩定） */
+function appConfirm(opts) {
+  opts = opts || {};
+  return new Promise((resolve) => {
+    const ov = document.getElementById('app-confirm-modal');
+    if (!ov) { resolve(window.confirm(opts.message || '確定？')); return; }
+    const em = document.getElementById('app-confirm-emoji');
+    const title = document.getElementById('app-confirm-title');
+    const msg = document.getElementById('app-confirm-msg');
+    const okBtn = document.getElementById('app-confirm-ok');
+    const cancelBtn = document.getElementById('app-confirm-cancel');
+    if (em) em.textContent = opts.emoji || '❓';
+    if (title) title.textContent = opts.title || '請確認';
+    if (msg) msg.textContent = opts.message || '確定要執行嗎？';
+    if (okBtn) okBtn.textContent = opts.okText || '確定';
+    if (cancelBtn) cancelBtn.textContent = opts.cancelText || '取消';
+    const cleanup = () => {
+      ov.classList.add('hidden');
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      ov.onclick = null;
+    };
+    okBtn.onclick = (e) => { if (e) e.stopPropagation(); cleanup(); resolve(true); };
+    cancelBtn.onclick = (e) => { if (e) e.stopPropagation(); cleanup(); resolve(false); };
+    // 點遮罩 = 取消
+    ov.onclick = (e) => { if (e.target === ov) { cleanup(); resolve(false); } };
+    ov.classList.remove('hidden');
+  });
+}
+
 function tryDismantlePet(idx) {
   if (idx == null || idx < 0 || idx >= S.owned.length) return false;
   const p = S.owned[idx];
@@ -1785,91 +1829,34 @@ function tryDismantlePet(idx) {
   }
   const gain = calcDismantleFragments(p);
   const starLabel = getStarMeta(p.starLevel || 0).label;
-  const ok = confirm(
-    '確定要分解「' + (p.emoji || '') + p.name + '」嗎？\n' +
+  const msg = '確定要分解「' + (p.emoji || '') + p.name + '」嗎？\n' +
     'Lv.' + p.level + '　' + starLabel + '\n\n' +
     '將獲得 🧩 ' + p.name + ' 碎片 ×' + gain + '\n' +
-    '（分解後無法復原）'
-  );
-  if (!ok) return false;
-
-  addFragments(p.id, gain);
-  const name = p.name;
-  const emoji = p.emoji || '';
-
-  // 從隊伍移除，並修正索引
-  S.team = (S.team || []).filter(i => i !== idx).map(i => (i > idx ? i - 1 : i));
-  S.owned.splice(idx, 1);
-  // 若隊伍空了但還有寵物，自動放入第一隻
-  if (S.team.length === 0 && S.owned.length > 0) S.team = [0];
-
-  $('pet-info-modal').classList.add('hidden');
-  window._petInfoIdx = null;
-  updateHeader();
-  if (typeof renderTeam === 'function') renderTeam();
-  saveGame();
-  alert('♻️ 已分解 ' + emoji + name + '\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
+    '（分解後無法復原）';
+  appConfirm({ emoji: '♻️', title: '分解寵物', message: msg, okText: '確定分解', cancelText: '取消' }).then(function(ok) {
+    if (!ok) return;
+    // 索引可能已變，用 id+引用再找一次
+    let i = idx;
+    if (!S.owned[i] || S.owned[i] !== p) {
+      i = S.owned.indexOf(p);
+      if (i < 0) { alert('找不到該寵物'); return; }
+    }
+    addFragments(p.id, gain);
+    const name = p.name;
+    const emoji = p.emoji || '';
+    S.team = (S.team || []).filter(ti => ti !== i).map(ti => (ti > i ? ti - 1 : ti));
+    S.owned.splice(i, 1);
+    if (S.team.length === 0 && S.owned.length > 0) S.team = [0];
+    $('pet-info-modal').classList.add('hidden');
+    window._petInfoIdx = null;
+    updateHeader();
+    if (typeof renderTeam === 'function') renderTeam();
+    saveGame();
+    alert('♻️ 已分解 ' + emoji + name + '\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
+  });
   return true;
 }
 
-
-
-
-const S = {
-  coins:80, level:1, exp:0, wins:0,
-  fragments:{},
-  treasures:{},
-  treasureFrags:{},
-  trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
-  unlocked:['plaza','meadow','beach','coral_forge'],
-  owned:[], team:[],
-  items:{hua_mi:0},
-  currentZone:null, battling:false,
-  player:null, enemy:null, wild:null,
-  atkBoost:false, defBoost:false, forceCrit:false,
-  eEffects:{}, playerTurn:true,
-  pendingCatch:null
-};
-
-function expNeeded(lv){ return lv * 30; }
-
-const $ = id => document.getElementById(id);
-const roll = c => Math.random() < c;
-const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
-const getBase = id => ALL_PETS.find(p=>p.id===id);
-
-const EVO_STAGE_NAMES = ['基礎','初始進化','中階進化','進階進化','終極進化','完美進化'];
-/** 依等級對應進化階段：0~12基 / 13~18初 / 19~28中 / 29~36進 / 37~48終 / 49+完 */
-function evoStageFromLevel(level) {
-  const lv = Math.max(0, Math.floor(Number(level) || 0));
-  if (lv >= 49) return 5;
-  if (lv >= 37) return 4;
-  if (lv >= 29) return 3;
-  if (lv >= 19) return 2;
-  if (lv >= 13) return 1;
-  return 0;
-}
-/** 目前等級「最高可進化到」的階段（不自動升，需按進化按鈕） */
-function maxEvoStageForPet(p) {
-  return evoStageFromLevel(p && p.level != null ? p.level : 1);
-}
-/** 是否可手動進化到下一階段 */
-function canStageEvolve(p) {
-  if (!p) return false;
-  const cur = Math.max(0, Number(p.evoStage) || 0);
-  const max = maxEvoStageForPet(p);
-  return max > cur && cur < 5;
-}
-/** 讀檔時：不自動升階；僅修正非法過高階段 */
-function syncPetEvoStage(p, { allowDowngrade = false } = {}) {
-  if (!p) return 0;
-  const max = maxEvoStageForPet(p);
-  let cur = Math.max(0, Number(p.evoStage) || 0);
-  if (cur > max) cur = max; // 等級不夠時壓回
-  if (allowDowngrade) cur = Math.min(cur, max);
-  p.evoStage = cur;
-  return p.evoStage;
-}
 function doStageEvolve(idx) {
   const p = S.owned[idx];
   if (!p || !canStageEvolve(p)) {
@@ -1880,29 +1867,38 @@ function doStageEvolve(idx) {
   const to = from + 1;
   const fromName = EVO_STAGE_NAMES[from] || ('階段'+from);
   const toName = EVO_STAGE_NAMES[to] || ('階段'+to);
-  if (!confirm('確定讓「' + (p.emoji||'') + p.name + '」進化？\n' + fromName + ' → ' + toName)) return false;
-  const before = snapshotPetCombatStats(p);
-  if (p._lastPower == null) syncPetPowerBaseline(p);
-  p.evoStage = to;
-  recalculatePetStats(p, { restoreFullHp: true });
-  notifyIfPowerUp(p, '進化');
-  saveGame();
-  const after = snapshotPetCombatStats(p);
-  const statLines = buildPetStatDeltaLines(before, after);
-  if (typeof renderTeam === 'function') renderTeam();
-  updateHeader();
-  if (typeof updateRedDots === 'function') updateRedDots();
-  window._reopenPetInfoIdx = idx;
-  showLevelUpScreen({
-    kind: 'evo',
-    name: p.name,
-    emoji: p.emoji || '✨',
-    fromLabel: fromName,
-    toLabel: toName,
-    statLines: statLines
+  const msg = '確定讓「' + (p.emoji||'') + p.name + '」進化？\n' + fromName + ' → ' + toName;
+  appConfirm({ emoji: '✨', title: '進化確認', message: msg, okText: '確認進化', cancelText: '取消' }).then(function(ok) {
+    if (!ok) return;
+    let i = idx;
+    if (!S.owned[i] || S.owned[i] !== p) {
+      i = S.owned.indexOf(p);
+      if (i < 0) { alert('找不到該寵物'); return; }
+    }
+    const before = snapshotPetCombatStats(p);
+    if (p._lastPower == null) syncPetPowerBaseline(p);
+    p.evoStage = to;
+    recalculatePetStats(p, { restoreFullHp: true });
+    notifyIfPowerUp(p, '進化');
+    saveGame();
+    const after = snapshotPetCombatStats(p);
+    const statLines = buildPetStatDeltaLines(before, after);
+    if (typeof renderTeam === 'function') renderTeam();
+    updateHeader();
+    if (typeof updateRedDots === 'function') updateRedDots();
+    window._reopenPetInfoIdx = i;
+    showLevelUpScreen({
+      kind: 'evo',
+      name: p.name,
+      emoji: p.emoji || '✨',
+      fromLabel: fromName,
+      toLabel: toName,
+      statLines: statLines
+    });
   });
   return true;
 }
+
 /** 戰力（僅供排序／寵物資訊內顯示，不進公式展開） */
 function calcCombatPower(p) {
   if (!p) return 0;
