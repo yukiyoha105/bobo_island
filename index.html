@@ -2,7 +2,11 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4caf50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>波波島 🏝️</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -307,8 +311,12 @@
       display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center;
     }
     @media (max-width: 560px) {
-      .battle-row-allies, .battle-row-enemies { grid-template-columns: 1fr; }
-      .bcard .bc-face { font-size: 1.5rem; }
+      .battle-row-allies, .battle-row-enemies { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+      .bcard { min-height: 0; padding: 4px 3px; font-size: 0.62rem; }
+      .bcard .bc-face { font-size: 1.35rem; }
+      .bcard .bc-name { font-size: 0.68rem; }
+      .bcard .bc-sk { font-size: 0.55rem; padding: 4px 1px; min-height: 28px; }
+      .battle-log-panel { height: 72px; font-size: 0.72rem; padding: 4px 8px; }
     }
 
     .battle-arena {
@@ -639,14 +647,71 @@
     .treasure-slots { grid-template-columns: repeat(3, 1fr); }
     .info-slot { min-height: 48px; display: flex; align-items: center; justify-content: center; border: 2px dashed #a5d6a7; border-radius: 9px; color: #78909c; background: white; font-size: 0.78rem; text-align: center; padding: 4px; }
 
+    /* ===== 手機版介面（≤560px；電腦版維持原樣）===== */
     @media (max-width: 560px) {
-      .fighter-emoji { font-size: 3.2rem; }
+      html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+      body { padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); align-items: stretch; background: #6bb8d6; }
+      .game {
+        max-width: 100%; width: 100%; min-height: 100vh; min-height: 100dvh;
+        border-radius: 0; border-width: 0; box-shadow: none; display: flex; flex-direction: column;
+      }
+      .header { padding: 8px 10px; padding-top: max(8px, env(safe-area-inset-top, 8px)); gap: 4px; flex-shrink: 0; }
+      .header h1 { font-size: 1.05rem; }
+      .header-stats { width: 100%; flex-wrap: wrap; gap: 4px; font-size: 0.72rem; }
+      .stat-chip { padding: 4px 8px; border-radius: 12px; font-size: 0.72rem; }
+      .nav { flex-shrink: 0; position: sticky; top: 0; z-index: 40; }
+      .nav-btn { padding: 12px 2px; font-size: 0.78rem; min-height: 44px; }
+      .screen { padding: 8px; min-height: 0; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .island-wrap { max-width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; border-width: 2px; }
+      .spot-icon { font-size: 1.45rem; }
+      .spot-label { font-size: 0.55rem; padding: 1px 4px; max-width: 4.5em; overflow: hidden; text-overflow: ellipsis; }
+      .btn { padding: 12px 16px; font-size: 0.88rem; min-height: 44px; border-radius: 22px; }
+      .pet-list, .item-list, .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .battle-bottom-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+      .battle-bottom-bar .btn { width: 100%; }
       .pet-info-grid { grid-template-columns: 1fr; }
-      .battle-actions { grid-template-columns: 1fr; }
-      .spot-icon { font-size: 1.5rem; }
-      .spot-label { font-size: 0.58rem; }
-      .island-wrap { aspect-ratio: 1 / 1; }
+      .modal { max-width: 94vw; padding: 18px 14px; border-radius: 16px; }
+      .overlay { padding: 10px; padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)); align-items: flex-end; }
+      #res-actions { display: flex; flex-direction: column; gap: 6px; }
+      #res-actions .btn { width: 100%; }
+      input, button, .btn, .nav-btn, .act-btn, .bc-sk { touch-action: manipulation; }
     }
+    @media (max-width: 380px) {
+      .header h1 { font-size: 0.95rem; }
+      .stat-chip { font-size: 0.66rem; padding: 3px 6px; }
+      .nav-btn { font-size: 0.72rem; }
+    }
+    @media (max-width: 900px) and (orientation: landscape) {
+      body { padding: 0; }
+      .game { max-width: 100%; border-radius: 0; border-width: 0; min-height: 100dvh; }
+      .island-wrap { max-height: 70vh; aspect-ratio: 16 / 10; }
+      .overlay { align-items: center; }
+    }
+    /* 寵物資訊底部操作列固定 */
+    .pet-info-actions {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;
+      background: #fff; position: sticky; bottom: 0; z-index: 5;
+      padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+    }
+    .pet-info-actions .btn {
+      min-height: 44px; min-width: 72px; flex: 1 1 auto; max-width: 140px;
+      touch-action: manipulation; -webkit-user-select: none; user-select: none;
+    }
+    .pet-info-modal { display: flex; flex-direction: column; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    @media (max-width: 560px) {
+      .overlay#pet-info-modal { align-items: flex-end; padding: 0; }
+      .overlay#pet-info-modal .pet-info-modal {
+        max-width: 100% !important; width: 100%; max-height: min(92vh, 100dvh);
+        border-radius: 18px 18px 0 0; margin: 0; padding: 14px 12px 0;
+      }
+      .pet-info-actions {
+        gap: 6px; padding: 10px 4px max(12px, env(safe-area-inset-bottom, 12px));
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+      }
+      .pet-info-actions .btn { max-width: none; font-size: 0.85rem; padding: 12px 8px; }
+    }
+
 
     .farm-wrap { max-width: 900px; margin: 0 auto; }
     #farm-game {
@@ -848,7 +913,7 @@
           <div class="treasure-slots" id="pet-info-treasures"></div>
         </section>
       </div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+      <div class="pet-info-actions" id="pet-info-actions">
         <button class="btn btn-purple" id="pet-info-evo" style="position:relative;display:none">✨ 進化</button>
         <button class="btn btn-shop" id="pet-info-star" style="position:relative">⭐ 升星</button>
         <button class="btn btn-pink" id="pet-info-dismantle">♻️ 分解</button>
@@ -1828,13 +1893,16 @@ function calcCombatPower(p) {
   const crit = Math.max(0, Math.min(1, n(p.crit)));
   const dodge = Math.max(0, Math.min(1, n(p.dodge)));
   const hit = Math.max(0, Math.min(1, n(p.hit)));
-  const power =
+  let power =
     hp * 0.4 + mp * 0.15 +
     atk * 2.2 + def * 1.6 + spd * 1.2 +
     force * 1.5 + intel * 1.2 + charm * 1.0 +
     lv * 8 + stage * 25 + star * 12 +
     crit * 180 + dodge * 150 + hit * 80;
-  // 放大約 16 倍：原本 ~1600 → 約 ~25,000
+  const petType = (p.type || (typeof getBase === 'function' && getBase(p.id) && getBase(p.id).type) || '');
+  if (petType === '神') {
+    power *= (1.18 + Math.min(0.12, stage * 0.02));
+  }
   return Math.round(power * 16);
 }
 
@@ -2494,21 +2562,26 @@ function bindGameHandlers() {
       cb();
     }
   };
-  const petStarBtn = $('pet-info-star');
-  if (petStarBtn) petStarBtn.onclick = () => {
-    if (window._petInfoIdx == null) return;
-    tryUpgradeStar(window._petInfoIdx);
-  };
-  const petEvoBtn = $('pet-info-evo');
-  if (petEvoBtn) petEvoBtn.onclick = () => {
-    if (window._petInfoIdx == null) return;
-    doStageEvolve(window._petInfoIdx);
-  };
-  const petDisBtn = $('pet-info-dismantle');
-  if (petDisBtn) petDisBtn.onclick = () => {
-    if (window._petInfoIdx == null) return;
-    tryDismantlePet(window._petInfoIdx);
-  };
+  function bindPetInfoAction(btn, fn) {
+    if (!btn) return;
+    const run = (e) => {
+      if (btn._petActLock) return;
+      btn._petActLock = true;
+      setTimeout(() => { btn._petActLock = false; }, 500);
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      const idx = window._petInfoIdx;
+      if (idx == null || idx < 0 || !S.owned[idx]) {
+        alert('請重新點開寵物資訊後再試');
+        return;
+      }
+      fn(idx);
+    };
+    btn.ontouchend = (e) => { run(e); };
+    btn.onclick = (e) => { run(e); };
+  }
+  bindPetInfoAction($('pet-info-star'), (idx) => tryUpgradeStar(idx));
+  bindPetInfoAction($('pet-info-evo'), (idx) => doStageEvolve(idx));
+  bindPetInfoAction($('pet-info-dismantle'), (idx) => tryDismantlePet(idx));
   const confAct = $('confirm-actions-btn');
   if (confAct) confAct.onclick = () => resolvePlayerActions();
   const fleeBtn = $('flee-battle-btn');
@@ -2814,7 +2887,6 @@ function startWildBattle() {
   // 敵方最多 3 隻（目前野生先 1 隻，之後可擴充）
   const ebase = getBase(S.wild.id) || {};
   function randomEnemyStar(level) {
-    // 野生星級：多數偏低，高等才可能金／紅／閃金／閃彩
     const lv = Math.max(1, level || 1);
     const roll = Math.random();
     let star = 0;
@@ -2856,17 +2928,13 @@ function startWildBattle() {
     });
   }
   S.battleEnemies = [makeEnemy(S.wild, S.wild.level)];
-  // 加援：區域寵物池抽不同生物（最多 3），全部可嘗試收服
   function pickExtraEnemyId(excludeIds) {
     const zone = S.currentZone;
     const used = excludeIds || [];
     let pool = [];
-    if (zone && Array.isArray(zone.pets) && zone.pets.length) {
-      pool = zone.pets.filter(id => getBase(id));
-    }
+    if (zone && Array.isArray(zone.pets) && zone.pets.length) pool = zone.pets.filter(id => getBase(id));
     if (zone && (zone.timeSpawns || zone.id === 'meadow') && typeof getZoneSpawnTable === 'function') {
-      const table = getZoneSpawnTable(zone) || [];
-      table.forEach(row => {
+      (getZoneSpawnTable(zone) || []).forEach(row => {
         if (row && row.id && getBase(row.id) && pool.indexOf(row.id) < 0) pool.push(row.id);
       });
     }
@@ -4756,50 +4824,38 @@ function endBattle(win){
     }
     petLevelUpQueue.forEach(q => S._pendingLevelUpQueue.push(q));
     S._pendingLevelUp = null;
-    // 可收服名單：本場所有敵方（最多 3），各自計算機率，選 1 隻
-    const catchCandidates = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
+        const catchCandidates = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
     if (catchCandidates.length) winMsg += '\n🎾 可選擇收服 1 隻（各別機率）';
     if(drops.lines.length) winMsg+='\n'+drops.lines.join('\n');
     $('res-msg').textContent=winMsg;
-
     S._postBattleCatchUsed = false;
     S.pendingCatch = null;
     S._catchCandidates = catchCandidates.map(e => ({
-      id: e.id,
-      name: e.name,
-      emoji: e.emoji,
-      level: e.level || 1,
+      id: e.id, name: e.name, emoji: e.emoji, level: e.level || 1,
       starLevel: Math.max(0, Number(e.starLevel) || 0),
       evoStage: Math.max(0, Number(e.evoStage) || 0),
       catchable: true
     }));
-
     function calcPostBattleCatchRate(snap) {
       const base = getBase(snap.id) || {};
       let rate = (base.captureRate != null) ? Number(base.captureRate) : 0.55;
-      rate = rate + 0.20; // 戰鬥勝利加成
-      return Math.max(0.05, Math.min(0.95, rate));
+      return Math.max(0.05, Math.min(0.95, rate + 0.20));
     }
-
     if (S._catchCandidates.length) {
       S._catchCandidates.forEach((snap, idx) => {
         const rate = calcPostBattleCatchRate(snap);
         const pct = Math.round(rate * 100);
-        const starLabel = (typeof getStarMeta === 'function')
-          ? getStarMeta(snap.starLevel || 0).label : '';
+        const starLabel = (typeof getStarMeta === 'function') ? getStarMeta(snap.starLevel || 0).label : '';
         const btn = document.createElement('button');
         btn.className = 'btn btn-purple';
         btn.dataset.catchIdx = String(idx);
-        btn.textContent = '🎾 ' + (snap.emoji || '') + snap.name +
-          ' Lv.' + snap.level +
-          (starLabel ? ' ' + starLabel : '') +
-          '（' + pct + '%）';
+        btn.textContent = '🎾 ' + (snap.emoji || '') + snap.name + ' Lv.' + snap.level +
+          (starLabel ? ' ' + starLabel : '') + '（' + pct + '%）';
         btn.onclick = () => {
           if (S._postBattleCatchUsed) return;
           S._postBattleCatchUsed = true;
           actions.querySelectorAll('[data-catch-idx]').forEach(b => { b.disabled = true; });
-          const finalRate = calcPostBattleCatchRate(snap);
-          if (roll(finalRate)) {
+          if (roll(calcPostBattleCatchRate(snap))) {
             const base = getBase(snap.id) || snap;
             const caught = clonePet(base, snap.level || 1);
             caught.level = snap.level || 1;
@@ -4808,11 +4864,9 @@ function endBattle(win){
             recalculatePetStats(caught, { restoreFullHp: true });
             S.owned.push(caught);
             onPetCaught(caught);
-            updateHeader();
-            saveGame();
+            updateHeader(); saveGame();
             if (typeof updateRedDots === 'function') updateRedDots();
-            const keepStar = (typeof getStarMeta === 'function')
-              ? getStarMeta(caught.starLevel || 0).label : '';
+            const keepStar = (typeof getStarMeta === 'function') ? getStarMeta(caught.starLevel || 0).label : '';
             $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name +
               (keepStar ? '（' + keepStar + '）' : '') + '！';
             btn.textContent = '已捕捉 ✓';
@@ -4825,7 +4879,6 @@ function endBattle(win){
         actions.appendChild(btn);
       });
     }
-
     const okBtn = document.createElement('button');
     okBtn.className = 'btn btn-primary';
     okBtn.textContent = '確定';
@@ -5116,8 +5169,7 @@ function upgradeTreasure(treasureId) {
 function canEvolve(p) {
   const base = getBase(p.id);
   if (!base || !base.evolvesTo) return false;
-  const need = base.evolveLv || 8;
-  return p.level >= need;
+  return p.level >= (base.evolveLv || 8);
 }
 
 function evolveNeedText(p) {
@@ -5715,7 +5767,14 @@ function openPetInfo(idx) {
     const canStar = !meta.isMax && getFragmentCount(p.id) >= (meta.nextCost || 999999);
     starBtn.innerHTML = canStar ? '⭐ 升星<span class="red-dot"></span>' : '⭐ 升星';
   }
-  $('pet-info-modal').classList.remove('hidden');
+  const modal = $('pet-info-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    const actions = document.getElementById('pet-info-actions');
+    if (actions && window.innerWidth <= 560) {
+      try { actions.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
+  }, 50);
 }
 
 function renderTeam(){
@@ -5847,7 +5906,7 @@ function renderBag(){
     box.appendChild(d);
   }
 
-  // ② 花蜜（唯一一般道具）
+  // ② 花蜜
   {
     const cnt = (S.items && S.items.hua_mi) || 0;
     if (cnt > 0) {
