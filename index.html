@@ -250,7 +250,6 @@
     .shop-item .price { color: #e65100; font-weight: 700; font-size: 0.85rem; }
     .shop-item .desc { font-size: 0.7rem; color: #666; margin: 3px 0 6px; }
 
-
     /* ===== 戰鬥畫面（手稿：上我方3 / 中訊息 / 下敵方3）===== */
     .battle-screen-wrap { display: flex; flex-direction: column; gap: 8px; }
     .battle-row-allies, .battle-row-enemies {
@@ -681,7 +680,6 @@
     .pet-card .red-dot { top: 4px; right: 4px; }
     .btn .red-dot { top: 2px; right: 2px; }
 
-
     /* 手機版 ≤560；電腦版不變 */
     @media (max-width: 560px) {
       body { padding: 0; align-items: stretch; }
@@ -729,6 +727,268 @@
       .pet-info-actions .btn { max-width: none; }
     }
 
+    /* ===== 新手引導／說明 ===== */
+    .help-modal {
+      max-width: 520px !important; max-height: 88vh; overflow: hidden;
+      display: flex !important; flex-direction: column;
+      padding: 16px 14px 0 !important;
+    }
+    .help-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 10px; justify-content: center;
+    }
+    .help-tab {
+      padding: 6px 12px; border: 2px solid #c8e6c9; border-radius: 16px;
+      background: #f1f8e9; font-family: inherit; font-size: 0.78rem;
+      font-weight: 700; color: #33691e; cursor: pointer;
+    }
+    .help-tab.active {
+      background: linear-gradient(90deg, #66bb6a, #43a047);
+      color: white; border-color: #43a047;
+    }
+    .help-body {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      text-align: left; font-size: 0.88rem; line-height: 1.6; color: #444;
+      padding-bottom: 8px; min-height: 0;
+    }
+    .help-body h3 { color: #2e7d32; font-size: 1rem; margin: 12px 0 6px; }
+    .help-body h3:first-child { margin-top: 0; }
+    .help-body ul { padding-left: 1.2em; margin: 4px 0 8px; }
+    .help-body li { margin: 3px 0; }
+    .help-body .tip {
+      background: #fff8e1; border-left: 4px solid #ffb300;
+      padding: 8px 10px; border-radius: 0 8px 8px 0; margin: 8px 0; font-size: 0.82rem;
+    }
+    .type-table {
+      width: 100%; border-collapse: collapse; font-size: 0.75rem; margin: 8px 0;
+    }
+    .type-table th, .type-table td {
+      border: 1px solid #c8e6c9; padding: 4px 3px; text-align: center;
+    }
+    .type-table th { background: #e8f5e9; color: #1b5e20; font-weight: 800; }
+    .type-table .type-name { font-weight: 800; background: #f5f5f5; white-space: nowrap; }
+    .type-mul-good { background: #c8e6c9; color: #1b5e20; font-weight: 800; }
+    .type-mul-bad { background: #ffcdd2; color: #b71c1c; font-weight: 700; }
+    .type-mul-same { background: #fff3e0; color: #e65100; }
+    .type-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.75rem; margin: 6px 0 10px; }
+    .type-legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .type-legend i {
+      display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ccc;
+    }
+    .help-footer {
+      flex: 0 0 auto; padding: 10px 4px max(12px, env(safe-area-inset-bottom, 12px));
+      border-top: 1px solid #e0e0e0; background: #fff;
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+
+    /* ===== 強制新手教學 ===== */
+    .tut-overlay {
+      position: fixed; inset: 0; z-index: 450;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .tut-overlay.hidden { display: none; }
+    .tut-card {
+      background: linear-gradient(180deg,#fffef9,#e8f5e9);
+      border: 3px solid #66bb6a; border-radius: 18px;
+      padding: 20px 18px; max-width: 400px; width: 100%;
+      text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    }
+    .tut-card .big { font-size: 3rem; margin-bottom: 4px; }
+    .tut-card h2 { color: #2e7d32; font-size: 1.25rem; margin-bottom: 6px; }
+    .tut-card p { color: #555; font-size: 0.9rem; line-height: 1.55; margin-bottom: 12px; white-space: pre-line; text-align: left; }
+    .tut-card .tut-step {
+      display: inline-block; background: #43a047; color: #fff;
+      font-size: 0.72rem; font-weight: 800; padding: 2px 10px; border-radius: 10px; margin-bottom: 8px;
+    }
+    .tut-battle-hint {
+      position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+      z-index: 260; max-width: 92vw; width: 420px;
+      background: linear-gradient(135deg,#fff8e1,#e8f5e9);
+      border: 2px solid #ffb300; border-radius: 14px;
+      padding: 10px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      font-size: 0.88rem; font-weight: 700; color: #5d4037;
+      text-align: center; line-height: 1.45;
+      pointer-events: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tut-battle-hint.hidden { display: none; }
+    .tut-pulse {
+      animation: tutPulse 1.2s ease-in-out infinite;
+    }
+    @keyframes tutPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,112,67,0.55); }
+      50% { box-shadow: 0 0 0 8px rgba(255,112,67,0); }
+    }
+
+    /* 教學：全暗只留一個技能可選 */
+    .battle-screen-wrap.tut-skill-lock {
+      position: relative;
+    }
+    .tut-skill-veil {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 40;
+      pointer-events: auto;
+      border-radius: 12px;
+    }
+    .bcard.tut-focus-card {
+      position: relative;
+      z-index: 50 !important;
+      filter: none !important;
+      opacity: 1 !important;
+      box-shadow: 0 0 0 3px #ff7043, 0 8px 28px rgba(0,0,0,0.35);
+    }
+    .bc-sk.tut-only-skill {
+      position: relative;
+      z-index: 55 !important;
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 2px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      transform: scale(1.08);
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+    .bc-sk.tut-dim-skill {
+      opacity: 0.22 !important;
+      filter: grayscale(1) !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
+    }
+    .battle-log-panel.tut-dim-panel,
+    .battle-row-enemies.tut-dim-panel,
+    .battle-bottom-bar.tut-dim-panel {
+      position: relative;
+      z-index: 1;
+      filter: brightness(0.35);
+      pointer-events: none;
+    }
+    .battle-bottom-bar.tut-confirm-ready {
+      position: relative;
+      z-index: 50 !important;
+      filter: none !important;
+      pointer-events: auto !important;
+    }
+    #confirm-actions-btn.tut-only-confirm {
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 3px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      transform: scale(1.06);
+    }
+
+    .info-slot.skill-slot-btn {
+      cursor: pointer; flex-direction: column; gap: 2px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .info-slot.skill-slot-btn:hover {
+      border-color: #66bb6a; background: #f1f8e9;
+    }
+    .info-slot.skill-slot-btn.locked {
+      opacity: 0.45; filter: grayscale(0.4); cursor: pointer;
+    }
+    #skill-detail-modal .skill-detail-body {
+      text-align: left; font-size: 0.88rem; line-height: 1.6; color: #444;
+      background: #f7fbf6; border: 1px solid #c8e6c9; border-radius: 12px;
+      padding: 12px 14px; margin: 8px 0 14px;
+    }
+
+    #pet-info-star.tut-star-pulse {
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 3px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      z-index: 5;
+    }
+    .pet-card.tut-pet-card {
+      outline: 3px solid #ff7043;
+      outline-offset: 2px;
+      animation: tutPulse 1.2s ease-in-out infinite;
+    }
+
+    .enemy-card.tut-target-card {
+      position: relative;
+      z-index: 55 !important;
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 3px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      filter: none !important;
+      opacity: 1 !important;
+      cursor: pointer !important;
+    }
+    .battle-row-enemies.tut-target-row {
+      position: relative;
+      z-index: 50 !important;
+      filter: none !important;
+      pointer-events: auto !important;
+    }
+    .battle-row-allies.tut-dim-allies {
+      filter: brightness(0.35);
+      pointer-events: none;
+    }
+
+    /* 升星教學：遮罩只變暗、不擋點擊；真正鎖的是非目標元素 */
+    .tut-star-veil {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 30;
+      pointer-events: none !important;
+      border-radius: 0;
+    }
+    .pet-card.tut-dim-card {
+      filter: brightness(0.4) grayscale(0.45) !important;
+      opacity: 0.5 !important;
+      /* 不要 pointer-events:none，否則點擊會穿透到下層導致「點了沒反應」 */
+    }
+    .pet-card.tut-pet-card {
+      position: relative !important;
+      z-index: 60 !important;
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 3px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      filter: none !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      background: #fff8e1 !important;
+      cursor: pointer !important;
+      box-shadow: 0 0 0 4px rgba(255,235,59,0.45), 0 8px 24px rgba(0,0,0,0.25) !important;
+    }
+    #pet-info-modal.tut-star-mode .pet-info-modal {
+      position: relative;
+    }
+    #pet-info-modal.tut-star-mode .tut-petinfo-veil {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 5;
+      border-radius: 18px;
+      pointer-events: none !important;
+    }
+    #pet-info-modal.tut-star-mode .pet-info-actions,
+    #pet-info-modal.tut-star-mode #pet-info-star {
+      position: relative !important;
+      z-index: 20 !important;
+    }
+    #pet-info-modal.tut-star-mode #pet-info-star {
+      outline: 3px solid #ffeb3b !important;
+      outline-offset: 3px;
+      animation: tutPulse 1.1s ease-in-out infinite;
+      pointer-events: auto !important;
+      filter: none !important;
+      opacity: 1 !important;
+      box-shadow: 0 0 0 4px rgba(255,235,59,0.4) !important;
+    }
+    #pet-info-modal.tut-star-mode #pet-info-close,
+    #pet-info-modal.tut-star-mode #pet-info-evo,
+    #pet-info-modal.tut-star-mode #pet-info-dismantle {
+      pointer-events: none !important;
+      opacity: 0.25 !important;
+      filter: grayscale(0.8);
+    }
+    #team.tut-star-team .nav-tabs {
+      pointer-events: none;
+      opacity: 0.45;
+    }
   </style>
 </head>
 <body>
@@ -742,6 +1002,7 @@
         <span class="stat-chip" id="pet-count">🐾 0</span>
         <span class="stat-chip" id="user-display" style="display:none"></span>
         <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
+        <button class="stat-chip" id="help-btn" title="新手引導／屬性相剋" style="border:none;cursor:pointer;font-family:inherit;font-weight:700;background:rgba(255,255,255,0.4);">❓ 說明</button>
       </div>
     </div>
     <div class="nav">
@@ -821,7 +1082,6 @@
       <p style="margin-top:12px;font-size:0.68rem;color:#999;">＊進度會雲端存檔到你的帳號，換裝置登入同一帳號即可繼續。</p>
     </div>
   </div>
-
 
   <div class="overlay hidden" id="levelup-modal">
     <div class="modal levelup-modal">
@@ -934,6 +1194,44 @@
     </div>
   </div>
 
+  
+  <div class="tut-overlay hidden" id="tut-modal">
+    <div class="tut-card">
+      <div class="tut-step" id="tut-step-label">新手教學 1/3</div>
+      <div class="big" id="tut-emoji">🦭</div>
+      <h2 id="tut-title">新手戰鬥教學</h2>
+      <p id="tut-msg"></p>
+      <button type="button" class="btn btn-explore" id="tut-next">開始！</button>
+    </div>
+  </div>
+  <div class="tut-battle-hint hidden" id="tut-battle-hint"></div>
+
+  <div class="overlay hidden" id="skill-detail-modal" style="z-index:420">
+    <div class="modal" style="max-width:360px">
+      <div class="big" id="skd-emoji">💥</div>
+      <h2 id="skd-name">技能</h2>
+      <p id="skd-sub" style="color:#888;font-size:0.85rem;margin-bottom:4px"></p>
+      <div class="skill-detail-body" id="skd-body"></div>
+      <button type="button" class="btn btn-primary" id="skd-close">關閉</button>
+    </div>
+  </div>
+
+<div class="overlay hidden" id="help-modal">
+    <div class="modal help-modal">
+      <div class="big" style="font-size:2.4rem;margin-bottom:2px">📖</div>
+      <h2 style="margin-bottom:0">波波島說明</h2>
+      <div class="help-tabs" id="help-tabs">
+        <button type="button" class="help-tab active" data-htab="guide">🌱 新手引導</button>
+        <button type="button" class="help-tab" data-htab="type">⚔️ 屬性相剋</button>
+        <button type="button" class="help-tab" data-htab="battle">🎮 戰鬥與收服</button>
+        <button type="button" class="help-tab" data-htab="grow">⭐ 養成</button>
+      </div>
+      <div class="help-body" id="help-body"></div>
+      <div class="help-footer">
+        <button type="button" class="btn btn-primary" id="help-close">知道了！</button>
+      </div>
+    </div>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -952,7 +1250,6 @@ try {
   sb = null;
 }
 /* ============================================================= */
-
 
 const ALL_PETS = [
   {
@@ -1037,7 +1334,7 @@ const ALL_PETS = [
     dropPlayerExp: [180, 300],
     dropCoins: [200, 300],
     skills: [
-      { id:'shen_yehuo', name:'神·業火燃燒', emoji:'🔥', evoReq:2, unlockLv:19, mp:30, forcePercent:130, burnChance:1.0, burnTurns:4 },
+      { id:'shen_yehuo', name:'神·業火燃燒', emoji:'🔥', evoReq:0, unlockLv:0, mp:30, forcePercent:130, burnChance:1.0, burnTurns:4 },
       { id:'shen_huohong', name:'神·火紅戰士', emoji:'🛡️', evoReq:2, unlockLv:19, mp:60, selfShield:{ hpPercent:200 } },
       { id:'shen_tisheng', name:'神·提升', emoji:'⬆️', evoReq:2, unlockLv:19, mp:0, passive:true,
         effectDesc:'每「提升」1點武力：魅力+2、基礎攻擊+1' },
@@ -1050,34 +1347,105 @@ const ALL_PETS = [
     name: '水波豹',
     emoji: '🦭',
     type: '水',
-    force: 80,
-    intel: 100,
-    charm: 100,
-    baseAtk: 22,
-    baseDef: 40,
-    baseHp: 45,
-    baseCrit: 0.07,
-    baseDodge: 0.11,
-    baseHit: 0.81,
-    baseSpeed: 33,
-    baseMp: 11,
+    rarity: '普通',
+    force: 95,
+    intel: 120,
+    charm: 120,
+    baseAtk: 50,
+    baseDef: 38,
+    baseHp: 60,
+    baseCrit: 0.14,
+    baseDodge: 0.08,
+    baseHit: 0.84,
+    baseSpeed: 26,
+    baseMp: 24,
     evoStage: 0,
-    maxHp: 45,
-    crit: 0.07,
-    dodge: 0.11,
+    maxHp: 60,
+    crit: 0.14,
+    dodge: 0.08,
+    // 手稿：收集 2 碎片可召喚；荷花池塘 50%、沙灘 24%；收服 64%
+    fragmentSummon: 2,
+    spawnZones: { swamp: 0.50, beach: 0.24 },
+    captureRate: 0.64,
+    evoReqs: [
+      { to:1, level:13, force:100 },
+      { to:2, level:19 },
+      { to:3, level:29, intel:125 },
+      { to:4, level:37, charm:123 },
+      { to:5, level:49, speed:35 }
+    ],
+    dropFrags: [1, 4],
+    dropPetExp: [40, 70],
+    dropPlayerExp: [80, 120],
+    dropCoins: [90, 100],
+    // 20% 機率掉水刀碎片 10~20（在 rollBattleDrops 處理）
+    dropShuiDaoFrags: [10, 20],
+    dropShuiDaoChance: 0.20,
     skills: [
-      // 基 0級：滴水穿石 — 130% 攻擊傷害
-      { id:'dishui', name:'滴水穿石', emoji:'💧', evoReq:0, unlockLv:0, mp:5, atkPercent:130 },
-      // 準 0級：神奇衝浪板 — 速度+30、閃避+25%、命中+10%、暴擊+25%
+      // 基 0級 5MP：背水一戰 — 100~130% 傷害，並回復自身 30~40% 血量
+      { id:'qingshui', name:'背水一戰', emoji:'💧', evoReq:0, unlockLv:0, mp:5,
+        atkPercentMin:100, atkPercentMax:130, fixedHits:1,
+        selfHealPercentMin:30, selfHealPercentMax:40 },
+      // 基 0級 12MP：神奇衝浪板 — 我方全員 速度+30、暴擊+30%、閃避+20%，2 回合
       { id:'chonglang', name:'神奇衝浪板', emoji:'🏄', evoReq:0, unlockLv:0, mp:12,
-        selfBuff:{ speedBonus:30, dodgeBonus:0.25, hitBonus:0.10, critBonus:0.25, turns:3 } },
-      // 初 13級：波濤大浪 — 5 次 (30~70)% 傷害，之後命中+10%
-      { id:'botao', name:'波濤大浪', emoji:'🌊', evoReq:1, unlockLv:13, mp:30,
-        fixedHits:5, atkPercentMin:30, atkPercentMax:70, afterHitBonus:0.10 },
-      // 進 29級：水光瀲灩 — 隊友補血 15~25% 標準血量 + 對敵兩次 40~55% 傷害
-      { id:'shuiguang', name:'水光瀲灩', emoji:'✨', evoReq:3, unlockLv:29, mp:105,
-        teamHealPercentMin:15, teamHealPercentMax:25,
-        fixedHits:2, atkPercentMin:40, atkPercentMax:55 }
+        teamBuff:{ speedBonus:30, critBonus:0.30, dodgeBonus:0.20, turns:2 } },
+      // 進 29級 105MP：水龍捲 — 3 道 40~90% + 1 道 80~130%
+      { id:'shuilongjuan', name:'水龍捲', emoji:'🌪️', evoReq:3, unlockLv:29, mp:105,
+        fixedHits:4, hitAtkPercents:[90, 90, 90, 130],
+        atkPercentMin:40, atkPercentMax:90 },
+      // 進 29級 100MP：波濤大浪 — 300% 傷害，並為我方血量最低者回復傷害 18%
+      { id:'botao', name:'波濤大浪', emoji:'🌊', evoReq:3, unlockLv:29, mp:100,
+        atkPercent:300, healLowestAllyFromDamage:0.18 }
+    ]
+  },
+  {
+    id: 'hai_shuibo_bao',
+    name: '海·水波豹',
+    emoji: '🌊',
+    type: '神',
+    rarity: '神話',
+    force: 105,
+    intel: 131,
+    charm: 128,
+    baseAtk: 50,
+    baseDef: 46,
+    baseHp: 75,
+    baseCrit: 0.15,
+    baseDodge: 0.12,
+    baseHit: 0.90,
+    baseSpeed: 45,
+    baseMp: 56,
+    evoStage: 2,
+    maxHp: 75,
+    crit: 0.15,
+    dodge: 0.12,
+    // 手稿：收集 40 碎片可召喚；荷花池塘 10%、沙灘 15%；收服 2.7%
+    fragmentSummon: 40,
+    spawnZones: { swamp: 0.10, beach: 0.15 },
+    captureRate: 0.027,
+    // 掉落：水波豹碎片 18~26 + 自身碎片 1~3
+    dropFrags: [18, 26],
+    dropFragsTo: 'shuibo_bao',
+    dropSelfFrags: [1, 3],
+    dropPetExp: [180, 260],
+    dropPlayerExp: [220, 326],
+    dropCoins: [300, 420],
+    dropShuiDaoFrags: [21, 35],
+    dropShuiDaoChance: 0.30,
+    skills: [
+      // 基 0級 45MP：海洋之母的力量 — 治療我方 60% 血量
+      { id:'haiyangzhimu', name:'海洋之母的力量', emoji:'🌊', evoReq:0, unlockLv:0, mp:45,
+        teamHealPercentMin:60, teamHealPercentMax:60 },
+      // 基 0級 60MP：波塞頓的三叉戟 — 敵方全體 120% 攻擊傷害
+      { id:'bosai_dun', name:'波塞頓的三叉戟', emoji:'🔱', evoReq:0, unlockLv:0, mp:60,
+        atkPercent:120, hitAllEnemies:true },
+      // 進 29級 120MP：海龍捲 — 4 道 50~100% + 1 道 90~140%
+      { id:'hailongjuan', name:'海龍捲', emoji:'🌀', evoReq:2, unlockLv:29, mp:120,
+        fixedHits:5, atkPercentMin:50, atkPercentMax:100,
+        hitAtkPercents:[100, 100, 100, 100, 140] },
+      // 終 37級 160MP：海·波濤大浪 — 360% + 另外 2 人 100%，回復我方最低 HP 總傷 18%
+      { id:'hai_botao', name:'海·波濤大浪', emoji:'🌊', evoReq:4, unlockLv:37, mp:160,
+        atkPercent:360, splashOtherEnemies:100, healLowestAllyFromDamage:0.18 }
     ]
   },
   {
@@ -1197,15 +1565,14 @@ const ALL_PETS = [
 const ZONES = [
   /* 依截圖紅圈：標記落在各區域正中央；家在池塘右下方 */
   {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以休息與整理隊伍。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
-  {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。', unlock:0, danger:1, pets:['shuibo_bao'], x:18, y:76},
+  {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。', unlock:0, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76},
   {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24},
   {id:'volcano',  name:'火山',      emoji:'🌋', desc:'島中央偏右的火山，隨時可能噴發。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40},
   {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
-  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao'], x:62, y:65},
+  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao','hai_shuibo_bao'], x:62, y:65},
   {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82}
 ];
-
 
 /* ===== 遊戲時間（隨現實時間流動）=====
  * 現實 5 秒 ≈ 遊戲 6 分鐘
@@ -1260,7 +1627,6 @@ const MEADOW_SPAWNS = {
     { id:'huobao_xiong', weight:49, expTag:'中',   fragMin:8, fragMax:9,  coinMin:20, coinMax:40, note:'貓頭鷹' }
   ]
 };
-
 
 function pickWeighted(list) {
   const total = list.reduce((s, x) => s + (x.weight || 1), 0);
@@ -1346,11 +1712,9 @@ function calcBattleCoinReward(win) {
   return 15 + rand(5, 25) + danger * 8;
 }
 
-
 const SHOP_ITEMS = [
   // 暫時清空：之後再補商品
 ];
-
 
 /* ===== 寶物系統 =====
  * 全部靠收集「該寶物碎片」合成／升階（數量依手稿）
@@ -1381,6 +1745,27 @@ const ALL_TREASURES = [
       minLevel: 19,
       extraForce: 10,
       evolveSkill: 'dangdianlei'
+    }
+  },
+  {
+    id: 'shui_dao',
+    name: '水刀',
+    emoji: '🗡️',
+    desc: '水系寶刀。配戴後強化水系技能。',
+    grades: [
+      { name:'白', cost:3,   bonuses:{ force:5 } },
+      { name:'綠', cost:15,  bonuses:{ intel:2 } },
+      { name:'藍', cost:35,  bonuses:{ force:4 } },
+      { name:'紫', cost:60,  bonuses:{ force:2 } },
+      { name:'金', cost:80,  bonuses:{ force:6 } },
+      { name:'紅', cost:100, bonuses:{ atk:40 } }
+    ],
+    craft: { frags: 3 },
+    special: {
+      petId: 'shuibo_bao',
+      minEvoStage: 1,
+      minLevel: 13,
+      extraForce: 10
     }
   },
   {
@@ -1420,7 +1805,6 @@ const TREASURE_GRADE_COLORS = {
   '白': '#9e9e9e', '綠': '#43a047', '藍': '#1e88e5',
   '紫': '#8e24aa', '金': '#f9a825', '紅': '#e53935'
 };
-
 
 function onPetCaught(pet) {
   if (!pet) return;
@@ -1555,7 +1939,6 @@ function applyTreasureStatsToPet(p) {
 
 const AVATARS = ['🧑‍🌾','👧','👦','🧙','🦸','🧝','🧛','🧔','👩‍🚀','🥷'];
 
-
 /* ===== 星級系統：碎片需求 ===== */
 const STAR_COLORS = ['白','綠','藍','紫','金','紅','閃金','閃彩'];
 const STAR_COLOR_HEX = [
@@ -1685,6 +2068,22 @@ function rollBattleDrops(win) {
     }
   }
 
+  // 水刀碎片（機率）
+  if (base && base.dropShuiDaoFrags && base.dropShuiDaoFrags.length >= 2) {
+    const chance = (base.dropShuiDaoChance != null) ? base.dropShuiDaoChance : 1;
+    if (Math.random() < chance) {
+      const n = rand(base.dropShuiDaoFrags[0], base.dropShuiDaoFrags[1]);
+      if (n > 0) {
+        if (typeof addTreasureFragments === 'function') addTreasureFragments('shui_dao', n);
+        else {
+          if (!S.treasureFrags) S.treasureFrags = {};
+          S.treasureFrags.shui_dao = (S.treasureFrags.shui_dao || 0) + n;
+        }
+        drops.lines.push('🗡️ 水刀碎片 ×' + n);
+      }
+    }
+  }
+
   // 出沒表特殊道具
   if (meta) {
     if (meta.shaJiaMin != null) {
@@ -1706,8 +2105,15 @@ function rollBattleDrops(win) {
 }
 
 function tryUpgradeStar(idx) {
-  const p = S.owned[idx];
-  if (!p) return false;
+    const p = S.owned[idx];
+  if (!p) {
+        return false;
+  }
+  // 教學中只能升指定寵物
+  if (!S.tutorialDone && S.tutorialStep === 4 && S._tutStarPetIdx != null && idx !== S._tutStarPetIdx) {
+        alert('📘 教學中請先為標示的那隻寵物升星！');
+    return false;
+  }
   const meta = getStarMeta(p.starLevel || 0);
   if (meta.isMax) {
     alert('已達滿星！');
@@ -1733,7 +2139,15 @@ function tryUpgradeStar(idx) {
   if (typeof renderTeam === 'function') renderTeam();
   updateHeader();
   if (typeof updateRedDots === 'function') updateRedDots();
-  window._reopenPetInfoIdx = idx;
+  const isTutStar = !S.tutorialDone && S.tutorialStep === 4;
+    // 教學升星成功：不要再打開寵物資訊（否則會擋住 completeTutorial）
+  if (!isTutStar) {
+    window._reopenPetInfoIdx = idx;
+  } else {
+    window._reopenPetInfoIdx = null;
+    if (typeof clearStarTutorialSpotlight === 'function') clearStarTutorialSpotlight();
+    S.tutorialStep = 5;
+      }
   showLevelUpScreen({
     kind: 'star',
     name: p.name,
@@ -1743,6 +2157,11 @@ function tryUpgradeStar(idx) {
     remainingFrags: getFragmentCount(p.id),
     statLines: statLines
   });
+  if (isTutStar) {
+    window._onLevelUpClosed = function() {
+      if (typeof completeTutorialAll === 'function') completeTutorialAll();
+    };
+  }
   return true;
 }
 
@@ -1824,9 +2243,6 @@ function doDismantlePetConfirmed(idx, p, gain) {
   return true;
 }
 
-
-
-
 const S = {
   coins:80, level:1, exp:0, wins:0,
   fragments:{},
@@ -1840,7 +2256,11 @@ const S = {
   player:null, enemy:null, wild:null,
   atkBoost:false, defBoost:false, forceCrit:false,
   eEffects:{}, playerTurn:true,
-  pendingCatch:null
+  pendingCatch:null,
+  // 新手教學：0=未完成需引導 / 1=進行中 / 2=已完成
+  tutorialDone: false,
+  tutorialStep: 0,
+  tutorialTargetDone: false
 };
 
 function expNeeded(lv){ return lv * 30; }
@@ -2009,8 +2429,6 @@ function skillLockReason(pet, sk) {
   if (sk.unlockLv != null && lv < sk.unlockLv) return 'Lv.' + sk.unlockLv;
   return '';
 }
-
-
 
 // 防禦會以寵物目前的等級、進化階段與可接入的培養欄位即時計算。
 // treasureDef、enhancementLevel、starLevel 目前預設為 0，之後可由裝備／培養系統直接更新。
@@ -2240,8 +2658,6 @@ function recalculatePetStats(p, options) {
   return p;
 }
 
-
-
 function petFaceHtml(p, size) {
   size = size || 48;
   const base = (p && p.id) ? (getBase(p.id) || p) : p;
@@ -2281,21 +2697,358 @@ const clonePet = (base,lv=1) => {
   return p;
 };
 
-/** 開局贈寵：4等白二星水波豹 + 4等白一星火爆熊 */
+/** 開局贈寵：僅 1 隻 Lv.5 白2★ 水波豹（教學用較好打） */
 function createStarterPets() {
-  const water = clonePet(getBase('shuibo_bao'), 4);
+  const water = clonePet(getBase('shuibo_bao'), 5);
   water.starLevel = 1; // 白2★
   water.exp = 0;
   if (typeof syncPetEvoStage === 'function') syncPetEvoStage(water);
   recalculatePetStats(water, { restoreFullHp: true });
+  return [water];
+}
 
-  const fire = clonePet(getBase('huobao_xiong'), 4);
-  fire.starLevel = 0; // 白1★
-  fire.exp = 0;
-  if (typeof syncPetEvoStage === 'function') syncPetEvoStage(fire);
-  recalculatePetStats(fire, { restoreFullHp: true });
+/** 教學戰敵方：Lv.4 白1★ 火爆熊（血量刻意偏低，必勝） */
+function createTutorialWild() {
+  const base = getBase('huobao_xiong');
+  const wild = clonePet(base, 4);
+  wild.starLevel = 0; // 白1★
+  wild.exp = 0;
+  if (typeof syncPetEvoStage === 'function') syncPetEvoStage(wild);
+  recalculatePetStats(wild, { restoreFullHp: true });
+  // 壓低血量與攻擊，確保新手必勝、也能示範傷害
+  wild.maxHp = Math.max(35, Math.floor((wild.maxHp || 50) * 0.45));
+  wild.hp = wild.maxHp;
+  wild.attack = Math.max(8, Math.floor((wild.attack || 30) * 0.35));
+  wild.defense = Math.max(5, Math.floor((wild.defense || 20) * 0.4));
+  wild.catchable = true;
+  wild._tutorialEnemy = true;
+  return wild;
+}
 
-  return [water, fire];
+/* ===== 強制新手教學流程 =====
+ * 步驟：0 未開始 → 1 說明 → 2 戰鬥教選技能 → 3 勝利後教收服 → 完成 tutorialDone
+ */
+function isTutorialActive() {
+  return !S.tutorialDone && (S.tutorialStep > 0 || (!S.tutorialDone && S.nameSet));
+}
+function setTutBattleHint(text) {
+  const el = document.getElementById('tut-battle-hint');
+  if (!el) return;
+  if (!text) { el.classList.add('hidden'); el.textContent = ''; return; }
+  el.textContent = text;
+  el.classList.remove('hidden');
+}
+function showTutModal(opts) {
+  opts = opts || {};
+  const modal = document.getElementById('tut-modal');
+  if (!modal) return;
+  const stepEl = document.getElementById('tut-step-label');
+  const emoji = document.getElementById('tut-emoji');
+  const title = document.getElementById('tut-title');
+  const msg = document.getElementById('tut-msg');
+  const btn = document.getElementById('tut-next');
+  if (stepEl) stepEl.textContent = opts.stepLabel || '新手教學';
+  if (emoji) emoji.textContent = opts.emoji || '🏝️';
+  if (title) title.textContent = opts.title || '教學';
+  if (msg) msg.textContent = opts.msg || '';
+  if (btn) {
+    btn.textContent = opts.btnText || '繼續';
+    btn.onclick = typeof opts.onNext === 'function' ? opts.onNext : closeTutModal;
+  }
+  modal.classList.remove('hidden');
+}
+function closeTutModal() {
+  const modal = document.getElementById('tut-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function startNewbieTutorial() {
+  if (S.tutorialDone) return;
+  S.tutorialStep = 1;
+  saveGame();
+  showTutModal({
+    stepLabel: '新手教學 1/3',
+    emoji: '🦭',
+    title: '你的第一隻夥伴！',
+    msg: '冒險者你好！\n開局夥伴只有一隻：「水波豹」（水系）。\n\n接下來教學戰會遇到野生火爆熊：\n• 學會如何選擇技能\n• 勝利後學會收服\n\n（火爆熊是對手／收服目標，不是開局就送的）\n這場無法跳過，也一定會勝利！',
+    btnText: '開始教學戰鬥 ▶',
+    onNext: () => {
+      closeTutModal();
+      beginTutorialBattle();
+    }
+  });
+}
+
+function beginTutorialBattle() {
+  if (S.tutorialDone) return;
+  S.tutorialStep = 2;
+  // 確保有出戰
+  if (!S.owned.length) {
+    S.owned = createStarterPets();
+  }
+  if (!S.team.length) S.team = [0];
+  // 回滿血
+  S.owned.forEach(p => {
+    if (!p) return;
+    recalculatePetStats(p, { restoreFullHp: true });
+  });
+  S.wild = createTutorialWild();
+  S.currentZone = ZONES.find(z => z.id === 'beach') || ZONES[0];
+  saveGame();
+  startWildBattle();
+  setTimeout(() => {
+    setTutBattleHint('👆 點你寵物卡片上的「技能」選一個，全部選完後按下方「✅ 確認出招」');
+    // 高亮確認鈕稍後由 updateConfirmBtn 處理
+    const conf = document.getElementById('confirm-actions-btn');
+    if (conf) conf.classList.add('tut-pulse');
+  }, 400);
+}
+
+function onTutorialBattleWin() {
+  if (S.tutorialDone || S.tutorialStep < 2) return;
+  S.tutorialStep = 3;
+  setTutBattleHint('');
+  const conf = document.getElementById('confirm-actions-btn');
+  if (conf) conf.classList.remove('tut-pulse');
+}
+
+function finishTutorialAfterCatch() {
+    setTutBattleHint('');
+  // 剛收服的火爆熊可加入隊伍（開局仍只有水波豹，火爆熊是教學戰收服的）
+  if (S.owned.length >= 2 && S.team.length < 3) {
+    const fireIdx = S.owned.findIndex(p => p && p.id === 'huobao_xiong');
+    if (fireIdx >= 0 && S.team.indexOf(fireIdx) < 0) S.team.push(fireIdx);
+  }
+  // 升星教學：升「開局夥伴水波豹」
+  let targetIdx = S.owned.findIndex(p => p && p.id === 'shuibo_bao');
+  if (targetIdx < 0) targetIdx = 0;
+  const target = S.owned[targetIdx];
+  if (target) {
+    const meta = getStarMeta(target.starLevel || 0);
+    const need = meta.isMax ? 0 : (meta.nextCost || 1);
+    const have = getFragmentCount(target.id);
+    if (need > 0 && have < need) {
+      addFragments(target.id, need - have);
+    }
+    S._tutStarPetIdx = targetIdx;
+  }
+  S.tutorialStep = 4; // 升星引導
+  saveGame();
+  const petName = (target && target.name) || '水波豹';
+  showTutModal({
+    stepLabel: '新手教學 3/3',
+    emoji: '⭐',
+    title: '為水波豹升星！',
+    msg: '開局夥伴是「水波豹」。\n收集同種碎片可以升星，讓牠變強。\n\n接下來請：\n1. 打開「🐾 隊伍」\n2. 點選水波豹\n3. 按「⭐ 升星」\n\n（已準備好足夠碎片，無法跳過）',
+    btnText: '去幫' + petName + '升星 ▶',
+    onNext: () => {
+      closeTutModal();
+      beginStarTutorial();
+    }
+  });
+}
+
+function beginStarTutorial() {
+    S.tutorialStep = 4;
+  saveGame();
+  // 關掉可能擋住點擊的殘留視窗
+  ['result-modal','capture-modal','levelup-modal','tut-modal','app-confirm-modal','evo-modal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('hidden');
+          }
+  });
+  showScreen('team');
+    if (typeof renderTeam === 'function') renderTeam();
+    setTimeout(() => {
+        window._lastTutStarSig = null;
+    applyStarTutorialSpotlight();
+  }, 80);
+}
+
+/** 升星教學：變暗 + 只允許點目標（用捕捉階段監聽，避免被遮罩擋） */
+function ensureStarTutClickGuard() {
+  if (window._starTutGuardBound) {
+        return;
+  }
+  window._starTutGuardBound = true;
+    document.addEventListener('click', function starTutCapture(e) {
+    if (S.tutorialDone || S.tutorialStep !== 4) return;
+    const tag = (e.target && (e.target.id || e.target.className || e.target.tagName)) || '?';
+        const petModal = document.getElementById('pet-info-modal');
+    const petOpen = petModal && !petModal.classList.contains('hidden');
+    const idx = S._tutStarPetIdx;
+
+    if (petOpen) {
+      if (e.target.closest && e.target.closest('#pet-info-star')) {
+                return;
+      }
+      if (e.target.closest && (
+        e.target.closest('#pet-info-close') ||
+        e.target.closest('#pet-info-evo') ||
+        e.target.closest('#pet-info-dismantle')
+      )) {
+                e.preventDefault();
+        e.stopPropagation();
+        setTutBattleHint('⭐ 請點「升星」');
+      }
+      return;
+    }
+
+    const card = e.target.closest && e.target.closest('.pet-card[data-owned-idx]');
+    if (card) {
+      const cidx = Number(card.getAttribute('data-owned-idx'));
+            if (cidx !== Number(idx)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setTutBattleHint('👆 請點亮起的那一隻');
+      } else {
+              }
+    } else {
+          }
+  }, true);
+}
+
+function applyStarTutorialSpotlight() {
+  if (S.tutorialDone || S.tutorialStep !== 4) {
+    clearStarTutorialSpotlight();
+    return;
+  }
+  ensureStarTutClickGuard();
+
+  const petModal = document.getElementById('pet-info-modal');
+  const petOpen = petModal && !petModal.classList.contains('hidden');
+  let idx = (S._tutStarPetIdx != null) ? S._tutStarPetIdx : S.owned.findIndex(p => p && p.id === 'shuibo_bao');
+  if (idx < 0) idx = 0;
+  S._tutStarPetIdx = idx;
+  const p = S.owned[idx];
+  
+  // 清掉可能擋點擊的殘留遮罩
+  document.querySelectorAll('.tut-star-veil').forEach(el => el.remove());
+
+  if (petOpen) {
+        clearTeamStarVeil();
+    petModal.classList.add('tut-star-mode');
+    const modalBox = petModal.querySelector('.pet-info-modal');
+    if (modalBox && !modalBox.querySelector('.tut-petinfo-veil')) {
+      const v = document.createElement('div');
+      v.className = 'tut-petinfo-veil';
+      modalBox.appendChild(v);
+    }
+    const starBtn = document.getElementById('pet-info-star');
+    const actions = modalBox && modalBox.querySelector('.pet-info-actions');
+    if (actions) {
+      actions.style.position = 'relative';
+      actions.style.zIndex = '30';
+      actions.style.pointerEvents = 'auto';
+    }
+    if (starBtn) {
+      starBtn.classList.add('tut-star-pulse');
+      starBtn.style.position = 'relative';
+      starBtn.style.zIndex = '31';
+      starBtn.style.pointerEvents = 'auto';
+      starBtn.disabled = false;
+    }
+    setTutBattleHint('🌑 請點亮起的「⭐ 升星」');
+    return;
+  }
+
+  if (petModal) {
+    petModal.classList.remove('tut-star-mode');
+    const oldV = petModal.querySelector('.tut-petinfo-veil');
+    if (oldV) oldV.remove();
+  }
+
+  // 已在隊伍頁就不要再 showScreen（會觸發 renderTeam → 再 apply → 無限迴圈）
+  const teamEl = document.getElementById('team');
+  const alreadyTeam = teamEl && teamEl.classList.contains('active');
+  if (!alreadyTeam) {
+        showScreen('team');
+  }
+  const scr = document.getElementById('team');
+  if (scr) scr.classList.add('tut-star-team');
+
+  // 只做視覺：亮目標、暗其他
+  let litN = 0;
+  document.querySelectorAll('#owned-list .pet-card, #team-list .pet-card').forEach(card => {
+    card.classList.remove('tut-pet-card', 'tut-dim-card');
+    const dataIdx = card.getAttribute('data-owned-idx');
+    if (dataIdx != null && Number(dataIdx) === Number(idx)) {
+      card.classList.add('tut-pet-card');
+      litN++;
+    } else {
+      card.classList.add('tut-dim-card');
+    }
+  });
+
+  setTutBattleHint('🌑 請點亮起的「' + ((p && p.emoji) || '🦭') + ((p && p.name) || '水波豹') + '」');
+  // 避免同一狀態刷屏：只在結果變化時打 log
+  const sig = litN + '@' + idx;
+  if (window._lastTutStarSig !== sig) {
+    window._lastTutStarSig = sig;
+      }
+}
+
+function clearTeamStarVeil() {
+  const scr = document.getElementById('team');
+  if (scr) {
+    scr.classList.remove('tut-star-team');
+    scr.querySelectorAll('.tut-star-veil').forEach(el => el.remove());
+  }
+  document.querySelectorAll('.pet-card').forEach(c => {
+    c.classList.remove('tut-pet-card', 'tut-dim-card');
+  });
+}
+
+function clearStarTutorialSpotlight() {
+  clearTeamStarVeil();
+  document.querySelectorAll('.tut-star-veil').forEach(el => el.remove());
+  const petModal = document.getElementById('pet-info-modal');
+  if (petModal) {
+    petModal.classList.remove('tut-star-mode');
+    const v = petModal.querySelector('.tut-petinfo-veil');
+    if (v) v.remove();
+  }
+  const starBtn = document.getElementById('pet-info-star');
+  if (starBtn) {
+    starBtn.classList.remove('tut-star-pulse');
+    starBtn.style.zIndex = '';
+    starBtn.style.pointerEvents = '';
+  }
+  setTutBattleHint('');
+}
+
+function completeTutorialAll() {
+    S.tutorialDone = true;
+  S.tutorialStep = 0;
+  S._tutStarPetIdx = null;
+  if (typeof clearStarTutorialSpotlight === 'function') clearStarTutorialSpotlight();
+  saveGame();
+  showTutModal({
+    stepLabel: '新手教學完成',
+    emoji: '🎉',
+    title: '你學會了！',
+    msg: '已完成：戰鬥、收服、升星！\n\n之後可以自由探索島嶼：\n🗺️ 點地圖地點 → 探索遇敵\n🐾 隊伍調整出戰順序\n⭐ 碎片升星　✨ 進化\n⚔️ 善用屬性相剋\n\n右上角「❓ 說明」可隨時再看。',
+    btnText: '開始自由冒險！',
+    onNext: () => {
+      closeTutModal();
+      showScreen('map');
+      addLog('map-log', '🎓 新手教學完成！點擊島上地點開始探索吧～');
+      if (typeof updateRedDots === 'function') updateRedDots();
+    }
+  });
+}
+
+/** 名稱確定後啟動教學（僅新號） */
+function maybeStartTutorialAfterName() {
+  if (S.tutorialDone) return;
+  if (!S.nameSet) return;
+  if (S.wins > 0 || (S.owned && S.owned.length > 1)) {
+    S.tutorialDone = true;
+    return;
+  }
+  // 延遲讓 name-modal 關閉動畫結束
+  setTimeout(() => startNewbieTutorial(), 350);
 }
 
 function addLog(boxId, text) {
@@ -2338,7 +3091,6 @@ function showScreen(id) {
   if(id==='codex') renderCodex();
 }
 
-
 /* ---------------- Supabase 登入 / 雲端存檔 ---------------- */
 let currentUser = null;
 let currentUserId = null;
@@ -2369,7 +3121,10 @@ function getSaveData() {
       treasures: S.treasures || {},
       treasureFrags: S.treasureFrags || {},
       gameTimeBaseReal: S.gameTimeBaseReal,
-      gameTimeBaseMin: S.gameTimeBaseMin
+      gameTimeBaseMin: S.gameTimeBaseMin,
+      tutorialDone: !!S.tutorialDone,
+      tutorialStep: S.tutorialStep || 0,
+      tutorialTargetDone: !!S.tutorialTargetDone
     },
     farm: (window.FarmGame ? window.FarmGame.getState() : null)
   };
@@ -2400,6 +3155,14 @@ function loadGameData(saved) {
     S.treasureFrags = d.treasureFrags || {};
     if (d.gameTimeBaseReal != null) S.gameTimeBaseReal = d.gameTimeBaseReal;
     if (d.gameTimeBaseMin != null) S.gameTimeBaseMin = d.gameTimeBaseMin;
+    S.tutorialDone = !!d.tutorialDone;
+    S.tutorialStep = d.tutorialStep || 0;
+    S.tutorialTargetDone = !!d.tutorialTargetDone;
+    // 舊存檔若已有多隻寵物或勝場，視為已完成教學
+    if (!S.tutorialDone && ((S.owned && S.owned.length > 1) || (S.wins || 0) > 0)) {
+      S.tutorialDone = true;
+      S.tutorialStep = 0;
+    }
     // 舊存檔自動解鎖珊瑚鍛造坊
     if (Array.isArray(S.unlocked) && S.unlocked.indexOf('coral_forge') < 0) {
       S.unlocked.push('coral_forge');
@@ -2455,11 +3218,13 @@ async function enterGame(username, userId, savedData) {
     addLog('map-log','目前：Lv.' + S.level + '　勝場 ' + S.wins + '　寵物 ' + S.owned.length + ' 隻');
   } else {
     S.owned = createStarterPets();
-    S.team = [0, 1];
+    S.team = [0];
+    S.tutorialDone = false;
+    S.tutorialStep = 0;
     updateHeader();
     renderIsland();
-    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了 Lv.4 白2★ 水波豹 與 Lv.4 白1★ 火爆熊！');
-    addLog('map-log','點擊島上的地點開始探索吧～');
+    addLog('map-log','🏝️ 歡迎來到波波島！你獲得了 Lv.5 白2★ 水波豹！');
+    addLog('map-log','完成取名後會開始新手戰鬥教學～');
   }
 
   // 綁定 UI（只綁一次）
@@ -2469,6 +3234,14 @@ async function enterGame(username, userId, savedData) {
     openNameModal(false);
   } else {
     addLog('map-log','歡迎回來，' + S.trainerEmoji + S.trainerName + '！');
+    // 已取名但教學未完成 → 繼續強制教學
+    if (!S.tutorialDone && typeof startNewbieTutorial === 'function') {
+      setTimeout(() => {
+        if (S.tutorialStep === 4) beginStarTutorial();
+        else if (S.tutorialStep >= 2 && !S.battling) beginTutorialBattle();
+        else startNewbieTutorial();
+      }, 400);
+    }
   }
 
   if (autosaveTimer) clearInterval(autosaveTimer);
@@ -2555,18 +3328,29 @@ function enterAsGuest() {
 
   if (!loaded) {
     S.owned = createStarterPets();
-    S.team = [0, 1];
+    S.team = [0];
     S.trainerName = '';
     S.trainerEmoji = '🧑‍🌾';
     S.nameSet = false;
+    S.tutorialDone = false;
+    S.tutorialStep = 0;
     updateHeader();
     renderIsland();
-    addLog('map-log','👤 訪客模式：你獲得了 Lv.4 白2★ 水波豹 與 Lv.4 白1★ 火爆熊！（進度僅存本機）');
+    addLog('map-log','👤 訪客模式：你獲得了 Lv.5 白2★ 水波豹！（進度僅存本機）');
   }
 
   bindGameHandlers();
   if (!S.nameSet || !S.trainerName) openNameModal(false);
-  else addLog('map-log','歡迎，' + S.trainerEmoji + S.trainerName + '！（訪客）');
+  else {
+    addLog('map-log','歡迎，' + S.trainerEmoji + S.trainerName + '！（訪客）');
+    if (!S.tutorialDone && typeof startNewbieTutorial === 'function') {
+      setTimeout(() => {
+        if (S.tutorialStep === 4) beginStarTutorial();
+        else if (S.tutorialStep >= 2 && !S.battling) beginTutorialBattle();
+        else startNewbieTutorial();
+      }, 400);
+    }
+  }
 
   // 訪客自動存到 localStorage
   if (autosaveTimer) clearInterval(autosaveTimer);
@@ -2576,7 +3360,6 @@ function enterAsGuest() {
     } catch (e) {}
   }, 8000);
 }
-
 
 function attachLoginHandlers() {
   $('login-btn').addEventListener('click', doLogin);
@@ -2607,24 +3390,33 @@ function bindGameHandlers() {
   };
   $('evo-confirm').onclick = ()=> confirmEvolve();
   $('evo-cancel').onclick = ()=> { $('evo-modal').classList.add('hidden'); _evoIdx=null; };
-  $('pet-info-close').onclick = ()=> $('pet-info-modal').classList.add('hidden');
+  $('pet-info-close').onclick = () => {
+    if (!S.tutorialDone && S.tutorialStep === 4) {
+      setTutBattleHint('⭐ 教學中請先完成升星！');
+      return;
+    }
+    $('pet-info-modal').classList.add('hidden');
+    if (!S.tutorialDone && S.tutorialStep === 4 && typeof applyStarTutorialSpotlight === 'function') {
+      setTimeout(() => applyStarTutorialSpotlight(), 50);
+    }
+  };
   const lvupClose = $('lvup-close');
   if (lvupClose) lvupClose.onclick = () => {
     $('levelup-modal').classList.add('hidden');
     if (typeof renderTeam === 'function') renderTeam();
     if (typeof updateRedDots === 'function') updateRedDots();
+    // 先執行關閉回呼（教學完成／戰鬥升級佇列）
+    if (typeof window._onLevelUpClosed === 'function') {
+      const cb = window._onLevelUpClosed;
+      window._onLevelUpClosed = null;
+      cb();
+      return;
+    }
     // 若從寵物資訊觸發升星／進化，關閉後回到寵物資訊
     if (window._reopenPetInfoIdx != null && typeof openPetInfo === 'function') {
       const idx = window._reopenPetInfoIdx;
       window._reopenPetInfoIdx = null;
       openPetInfo(idx);
-      return;
-    }
-    // 戰鬥後升級佇列
-    if (typeof window._onLevelUpClosed === 'function') {
-      const cb = window._onLevelUpClosed;
-      window._onLevelUpClosed = null;
-      cb();
     }
   };
   const petStarBtn = $('pet-info-star');
@@ -2695,6 +3487,7 @@ function bindGameHandlers() {
     updateHeader();
     saveGame();
     addLog('map-log','🏝️ 歡迎 ' + S.trainerEmoji + S.trainerName + ' 來到波波島！');
+    if (typeof maybeStartTutorialAfterName === 'function') maybeStartTutorialAfterName();
   };
 }
 
@@ -2735,8 +3528,18 @@ function renderIsland() {
   if (typeof updateRedDots === 'function') updateRedDots();
 }
 
-
 function openZone(z) {
+  if (!S.tutorialDone && S.tutorialStep > 0 && S.tutorialStep <= 4) {
+    if (S.tutorialStep === 4) {
+      addLog('map-log', '📘 請先完成升星教學！到「隊伍」點寵物按升星。');
+      beginStarTutorial();
+      return;
+    }
+    addLog('map-log', '📘 請先完成新手教學戰鬥！');
+    if (S.tutorialStep === 1) startNewbieTutorial();
+    else if (S.tutorialStep === 2 && !S.battling) beginTutorialBattle();
+    return;
+  }
   S.currentZone = z;
   // 還原鍛造坊放大狀態
   const panel = document.querySelector('#zone .zone-panel');
@@ -2807,6 +3610,8 @@ function explore() {
             const [h0, h1] = b.spawnHours[z.id];
             if (hour < h0 || hour >= h1) rate = 0;
           }
+          // 玩家遠低於野生最低等級時不出現（避免過早撞到神話）
+          if (b.minWildLevel != null && S.level < Math.max(1, Number(b.minWildLevel) - 6)) rate = 0;
           if (rate > 0) weighted.push({ id: pId, weight: Math.max(0.001, rate * 1000) });
         });
         if (!weighted.length) { addLog('zone-log','什麼都沒發現…再試試看。'); return; }
@@ -2815,12 +3620,22 @@ function explore() {
       const base=getBase(pid);
       if (!base) { addLog('zone-log','什麼都沒發現…再試試看。'); return; }
       let lv = Math.max(1, S.level + rand(-1, 2));
-      if (base.minWildLevel) lv = Math.max(lv, base.minWildLevel);
+      // 神話等：野生等級不得低於 minWildLevel（例：神·火爆熊 ≥19）
+      if (base.minWildLevel != null) lv = Math.max(lv, Number(base.minWildLevel) || 1);
       S.wild=clonePet(base,lv);
-      if (base.evoStage != null && base.evoStage > 0) {
-        S.wild.evoStage = base.evoStage;
-        recalculatePetStats(S.wild, { restoreFullHp: true });
+      // 再次強制等級（避免 clone／同步被改掉）
+      if (base.minWildLevel != null) {
+        S.wild.level = Math.max(S.wild.level || 1, Number(base.minWildLevel) || 1);
       }
+      if (base.evoStage != null && base.evoStage > 0) {
+        S.wild.evoStage = Math.max(Number(S.wild.evoStage) || 0, Number(base.evoStage) || 0);
+      }
+      // 依等級允許的最高階段再夾一次（不低於圖鑑基礎階段）
+      if (typeof syncPetEvoStage === 'function') syncPetEvoStage(S.wild);
+      if (base.evoStage != null && base.evoStage > 0) {
+        S.wild.evoStage = Math.max(Number(S.wild.evoStage) || 0, Number(base.evoStage) || 0);
+      }
+      recalculatePetStats(S.wild, { restoreFullHp: true });
       S.wild.catchable = base.catchable !== false;
       S.wild._spawnMeta = spawnMeta;
       $('cap-emoji').innerHTML=petFaceHtml(S.wild,64);
@@ -2841,6 +3656,33 @@ function explore() {
   }, 120);
 }
 
+/**
+ * 收服成功率：以圖鑑 captureRate 為準（手稿）
+ * 例：火爆熊 32%、水波豹 64%、神·火爆熊 1.8%
+ * 目前無捕捉球；教學戰 100%
+ */
+function getPetCaptureRate(target, opts) {
+  opts = opts || {};
+  const base = target && target.id ? getBase(target.id) : null;
+  let rate = 0.35;
+  if (base && base.captureRate != null) {
+    rate = Number(base.captureRate);
+  } else if (target && target.captureRate != null) {
+    rate = Number(target.captureRate);
+  }
+  rate = Math.max(0.01, Math.min(0.95, rate));
+  if (!S.tutorialDone && S.tutorialStep >= 2) rate = 1;
+  return rate;
+}
+function getPostBattleCatchRate(target) {
+  return getPetCaptureRate(target, {});
+}
+function formatCatchRate(rate) {
+  const pct = (rate || 0) * 100;
+  if (pct < 10) return pct.toFixed(1) + '%';
+  return Math.round(pct) + '%';
+}
+
 function tryCatch() {
   if(!S.wild) return;
   if (S.wild.catchable === false) {
@@ -2848,18 +3690,18 @@ function tryCatch() {
     alert('此對象無法收服');
     return;
   }
-  let rate=0.35+(1-S.wild.hp/S.wild.maxHp)*0.4;
-  rate=Math.min(0.85,rate);
+  let rate = getPetCaptureRate(S.wild, {});
   if(roll(rate)){
     S.owned.push(S.wild);
     onPetCaught(S.wild);
-    addLog('zone-log','🎉 成功捕捉了 '+S.wild.emoji+S.wild.name+'！');
+    addLog('zone-log','🎉 成功捕捉了 '+S.wild.emoji+S.wild.name+'！（機率 '+formatCatchRate(rate)+'）');
     $('capture-modal').classList.add('hidden');
     checkUnlocks(); updateHeader(); saveGame(); S.wild=null;
     if (typeof updateRedDots === 'function') updateRedDots();
   } else {
-    addLog('zone-log',S.wild.name+' 掙脫了！');
-    $('cap-msg').textContent=S.wild.name+' 掙脫了！還要繼續嗎？\n❤️ '+Math.round(S.wild.hp)+'/'+Math.round(S.wild.maxHp);
+    addLog('zone-log',S.wild.name+' 掙脫了！（機率 '+formatCatchRate(rate)+'）');
+    $('cap-msg').textContent=S.wild.name+' 掙脫了！還要繼續嗎？\n❤️ '+Math.round(S.wild.hp)+'/'+Math.round(S.wild.maxHp)+
+      '\n收服率約 '+formatCatchRate(getPetCaptureRate(S.wild, {}));
   }
 }
 
@@ -2925,9 +3767,6 @@ function switchBattlePet(slot, freeSwitch) {
   }
 }
 
-
-
-
 function startWildBattle() {
   $('capture-modal').classList.add('hidden');
   // 記錄上場的隊伍索引（最多 3），戰鬥後全員領經驗
@@ -2982,20 +3821,80 @@ function startWildBattle() {
       mp: maxMpE, maxMp: maxMpE
     });
   }
-  S.battleEnemies = [makeEnemy(S.wild, S.wild.level)];
-  // 預留擴成 3：同種較低機率加援
-  if (Math.random() < 0.35) {
-    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) + rand(-1, 0)));
-    extra.catchable = false; // 援敵不可收服
-    S.battleEnemies.push(makeEnemy(extra));
+  // 野外戰鬥：1～3 隻，每隻獨立抽等級／星級（皆為正規野生，不是援敵）
+  const isTutBattle = !S.tutorialDone && S.tutorialStep >= 2 && S.wild && S.wild._tutorialEnemy;
+  const baseWild = getBase(S.wild && S.wild.id) || {};
+
+  function rollIndependentWildLevel() {
+    let lv = Math.max(1, (S.level || 1) + rand(-1, 2));
+    if (baseWild.minWildLevel != null) lv = Math.max(lv, Number(baseWild.minWildLevel) || 1);
+    return lv;
   }
-  if (Math.random() < 0.15 && S.battleEnemies.length < 3) {
-    const extra = clonePet(getBase(S.wild.id), Math.max(1, (S.wild.level||1) - 1));
-    extra.catchable = false;
-    S.battleEnemies.push(makeEnemy(extra));
+  function createIndependentWildPet() {
+    const lv = rollIndependentWildLevel();
+    const w = clonePet(baseWild, lv);
+    w.level = lv;
+    if (baseWild.evoStage != null && baseWild.evoStage > 0) {
+      w.evoStage = Math.max(Number(w.evoStage) || 0, Number(baseWild.evoStage) || 0);
+    }
+    if (typeof syncPetEvoStage === 'function') syncPetEvoStage(w);
+    if (baseWild.evoStage != null && baseWild.evoStage > 0) {
+      w.evoStage = Math.max(Number(w.evoStage) || 0, Number(baseWild.evoStage) || 0);
+    }
+    w.starLevel = randomEnemyStar(lv);
+    w._starRandomized = true;
+    w.catchable = baseWild.catchable !== false; // 正規野生，可收服
+    recalculatePetStats(w, { restoreFullHp: true });
+    return w;
+  }
+
+  // 數量：1 隻 50%／2 隻 35%／3 隻 15%（教學固定 1）
+  let enemyCount = 1;
+  if (!isTutBattle) {
+    const cr = Math.random();
+    if (cr < 0.50) enemyCount = 1;
+    else if (cr < 0.85) enemyCount = 2;
+    else enemyCount = 3;
+  }
+
+  S.battleEnemies = [];
+  if (isTutBattle) {
+    S.wild.starLevel = 0;
+    S.wild._starRandomized = true;
+    S.wild.catchable = true;
+    S.battleEnemies.push(makeEnemy(S.wild, S.wild.level));
+  } else {
+    // 第一隻：沿用探索時抽到的 S.wild，但星級獨立重骰（等級已在探索時算好）
+    if (S.wild) {
+      if (baseWild.minWildLevel != null) {
+        S.wild.level = Math.max(S.wild.level || 1, Number(baseWild.minWildLevel) || 1);
+      }
+      S.wild.starLevel = randomEnemyStar(S.wild.level || 1);
+      S.wild._starRandomized = true;
+      S.wild.catchable = baseWild.catchable !== false;
+      recalculatePetStats(S.wild, { restoreFullHp: true });
+      S.battleEnemies.push(makeEnemy(S.wild, S.wild.level));
+    }
+    // 其餘每隻完全獨立：等級、星級各自機率
+    while (S.battleEnemies.length < enemyCount) {
+      const w = createIndependentWildPet();
+      S.battleEnemies.push(makeEnemy(w, w.level));
+    }
   }
   while (S.battleEnemies.length < 3) S.battleEnemies.push(null);
   S.enemy = S.battleEnemies.find(e => e && e.hp > 0) || S.battleEnemies[0];
+  // 記錄本場所有可收服野生（供勝利後收服主目標仍用 S.wild）
+  S._battleWildList = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
+
+  // 教學戰：再次壓低敵方數值
+  if (isTutBattle && S.battleEnemies[0]) {
+    const e = S.battleEnemies[0];
+    e.maxHp = Math.max(35, Math.floor((e.maxHp || 50) * 0.45));
+    e.hp = e.maxHp;
+    e.attack = Math.max(8, Math.floor((e.attack || 30) * 0.35));
+    e.defense = Math.max(5, Math.floor((e.defense || 20) * 0.4));
+    e.starLevel = 0;
+  }
 
   S.battling = true; S.playerTurn = true;
   S.activeTeamSlot = 0;
@@ -3006,6 +3905,10 @@ function startWildBattle() {
   S.selectedTargets = {};
   S._pickingTargetFor = null;
   startBattleUI();
+  if (isTutBattle) {
+    addBLog('📘 教學戰：點技能 → 確認出招。水系打火系會有屬性加成！', 'sys');
+    addBLog('對手是 Lv.4 白1★ 火爆熊，這場一定打得過！', 'sys');
+  }
 }
 
 function startBattleUI() {
@@ -3015,6 +3918,10 @@ function startBattleUI() {
   const eNames = (S.battleEnemies || []).filter(Boolean).map(p => p.name).join('、');
   addBLog('戰鬥開始！' + aNames + ' vs ' + eNames, 'sys');
   addBLog('為每隻我方選擇技能，或使用道具跳過選技', 'sys');
+  const eCount = (S.battleEnemies || []).filter(Boolean).length;
+  if (eCount >= 2 && !S.tutorialTargetDone) {
+    addBLog('📘 敵人有 ' + eCount + ' 隻：選攻擊技後，請點敵方卡片指定目標', 'sys');
+  }
   S.selectedActions = {};
   renderBattleBoard();
   renderBattleItems();
@@ -3080,25 +3987,36 @@ function renderAllyCard(pet, slot) {
   if (!dead && S.playerTurn && S.battling) {
     const normalAtk = { id:'normal', name:'普通攻擊', emoji:'👊', mp:0, atkPercent:100 };
     const defendAct = { id:'defend', name:'防禦', emoji:'🛡️', mp:0 };
-    const skills = [normalAtk, defendAct].concat((pet.skills || []).filter(s => !s.passive)).slice(0, 6);
+    // 未解鎖技能不出現在戰鬥中
+    const learned = (pet.skills || []).filter(s => s && !s.passive && canUseSkill(pet, s));
+    const skills = [normalAtk, defendAct].concat(learned).slice(0, 6);
     const tgtIdx = S.selectedTargets && S.selectedTargets[slot];
     const tgtPet = (tgtIdx != null && S.battleEnemies) ? S.battleEnemies[tgtIdx] : null;
     let hint = '';
     if (phase === 'current') hint = '<div style="font-size:0.68rem;color:#e65100;font-weight:800;text-align:center;margin-bottom:3px">👉 建議先選這隻</div>';
     else if (phase === 'done') hint = '<div style="font-size:0.68rem;color:#2e7d32;font-weight:700;text-align:center;margin-bottom:3px">✓ 已選（可重選）</div>';
     else hint = '<div style="font-size:0.68rem;color:#666;text-align:center;margin-bottom:3px">可選技能</div>';
+    // 新手教學：只能選指定技能（背水一戰），其餘全暗
+    const tutLock = !S.tutorialDone && S.tutorialStep >= 2;
+    const tutSkillId = (typeof getTutorialSkillId === 'function') ? getTutorialSkillId(pet) : 'qingshui';
+    if (tutLock) {
+      hint = '<div style="font-size:0.72rem;color:#ffeb3b;font-weight:800;text-align:center;margin-bottom:3px;text-shadow:0 1px 2px #000">👉 請點亮起的技能</div>';
+    }
     skillsHtml = hint + '<div class="bc-skills">' + skills.map(sk => {
       const locked = sk.id !== 'normal' && sk.id !== 'defend' && !canUseSkill(pet, sk);
       const noMp = (sk.mp||0) > 0 && pet.mp != null && pet.mp < sk.mp;
       const buffActive = isSelfBuffSkill(sk) && pet._selfBuff && pet._selfBuff.turns > 0;
       const sel = chosen && chosen.id === sk.id ? ' selected' : '';
-      const dis = locked || noMp || buffActive ? ' disabled' : '';
+      const tutBlocked = tutLock && sk.id !== tutSkillId;
+      const dis = locked || noMp || buffActive || tutBlocked ? ' disabled' : '';
       let sub = (sk.id === 'normal' || sk.id === 'defend') ? '' : (sk.mp ? ' MP'+sk.mp : '');
       if (buffActive) sub = ' 增益中';
-      const extraCls = sk.id === 'defend' ? ' defend' : (sk.id === 'normal' ? ' normal' : '');
+      let extraCls = sk.id === 'defend' ? ' defend' : (sk.id === 'normal' ? ' normal' : '');
+      if (tutLock && sk.id === tutSkillId) extraCls += ' tut-only-skill';
+      if (tutBlocked) extraCls += ' tut-dim-skill';
       return '<button class="bc-sk' + extraCls + sel + '"' + dis +
         ' data-slot="' + slot + '" data-sk="' + sk.id + '"' +
-        (buffActive ? ' title="增益效果持續中"' : '') + '>' +
+        (buffActive ? ' title="增益效果持續中"' : (tutBlocked ? ' title="教學中請選亮起的技能"' : '')) + '>' +
         (sk.emoji||'') + sk.name + sub + '</button>';
     }).join('') +
     (chosen && isSupportSkill(chosen) ? '<div style="font-size:0.68rem;color:#2e7d32;margin-top:4px;text-align:center">✨ 增益／輔助（無需選目標）</div>' : '') +
@@ -3130,7 +4048,6 @@ function renderAllyCard(pet, slot) {
     skillsHtml +
   '</div>';
 }
-
 
 function renderEnemyCard(pet, slot) {
   if (!pet) {
@@ -3257,6 +4174,12 @@ function renderBattleBoard() {
         if (!S.selectedTargets) S.selectedTargets = {};
         S.selectedTargets[allySlot] = eSlot;
         S._pickingTargetFor = null;
+        if (!S.tutorialTargetDone && livingEnemies().length >= 1) {
+          S.tutorialTargetDone = true;
+          saveGame();
+          addBLog('📘 學會了！點敵方卡片就能指定攻擊目標。', 'sys');
+          setTutBattleHint('');
+        }
         const ap = S.battleAllies[allySlot];
         addBLog(((ap && ap.name) || '') + ' 目標 → ' + foe.name, 'sys');
         if (isSlotActionComplete(allySlot)) {
@@ -3274,7 +4197,12 @@ function renderBattleBoard() {
   }
   updateConfirmBtn();
   const fleeBtn = $('flee-battle-btn');
-  if (fleeBtn) fleeBtn.style.display = (S.battling && S.playerTurn) ? 'inline-block' : 'none';
+  if (fleeBtn) {
+    const showFlee = S.battling && S.playerTurn && (S.tutorialDone || S.tutorialStep < 2);
+    fleeBtn.style.display = showFlee ? 'inline-block' : 'none';
+  }
+  if (typeof applyTutorialSkillSpotlight === 'function') applyTutorialSkillSpotlight();
+  if (typeof applyTargetSelectSpotlight === 'function') applyTargetSelectSpotlight();
 }
 
 function renderPlayerTeamFighters() { renderBattleBoard(); }
@@ -3289,7 +4217,6 @@ function addBLog(t, cls) {
   box.appendChild(d);
   box.scrollTop = box.scrollHeight;
 }
-
 
 /** 是否為自我／隊伍增益類技能（持續期間不可重複點選） */
 function isSelfBuffSkill(sk) {
@@ -3312,11 +4239,171 @@ function isSupportSkill(sk) {
   return false;
 }
 
+/** 教學戰唯一可選技能：優先背水一戰（qingshui），否則第一個傷害技／普通攻擊 */
+function getTutorialSkillId(pet) {
+  const skills = (pet && pet.skills) || [];
+  if (skills.some(s => s && s.id === 'qingshui')) return 'qingshui';
+  const dmg = skills.find(s => s && !s.passive && (s.atkPercent != null || s.atkPercentMin != null || s.forcePercent != null));
+  if (dmg) return dmg.id;
+  return 'normal';
+}
+
+/** 教學戰 UI：全暗只留可選技能／確認鈕 */
+function applyTutorialSkillSpotlight() {
+  const wrap = document.querySelector('.battle-screen-wrap');
+  if (!wrap) return;
+  const tut = !S.tutorialDone && S.tutorialStep >= 2 && S.battling && S.playerTurn;
+  wrap.classList.toggle('tut-skill-lock', !!tut);
+
+  // 移除舊 veil
+  const oldVeil = wrap.querySelector('.tut-skill-veil');
+  if (oldVeil) oldVeil.remove();
+
+  const logPanel = wrap.querySelector('.battle-log-panel');
+  const enemyRow = wrap.querySelector('.battle-row-enemies');
+  const bottom = wrap.querySelector('.battle-bottom-bar');
+  const conf = document.getElementById('confirm-actions-btn');
+
+  if (!tut) {
+    wrap.querySelectorAll('.bcard.tut-focus-card').forEach(c => c.classList.remove('tut-focus-card'));
+    if (logPanel) logPanel.classList.remove('tut-dim-panel');
+    if (enemyRow) enemyRow.classList.remove('tut-dim-panel');
+    if (bottom) {
+      bottom.classList.remove('tut-dim-panel', 'tut-confirm-ready');
+    }
+    if (conf) conf.classList.remove('tut-only-confirm', 'tut-pulse');
+    return;
+  }
+
+  const ready = typeof allActionsSelected === 'function' && allActionsSelected();
+
+  if (ready) {
+    // 已選技能 → 照亮確認鈕
+    if (logPanel) logPanel.classList.add('tut-dim-panel');
+    if (enemyRow) enemyRow.classList.add('tut-dim-panel');
+    if (bottom) {
+      bottom.classList.remove('tut-dim-panel');
+      bottom.classList.add('tut-confirm-ready');
+    }
+    if (conf) {
+      conf.classList.add('tut-only-confirm', 'tut-pulse');
+      conf.style.display = 'inline-block';
+    }
+    wrap.querySelectorAll('.bcard.tut-focus-card').forEach(c => c.classList.remove('tut-focus-card'));
+    setTutBattleHint('✅ 已選好技能！請按亮起的「確認出招」');
+  } else {
+    // 未選 → 只亮我方卡片與指定技能
+    if (logPanel) logPanel.classList.add('tut-dim-panel');
+    if (enemyRow) enemyRow.classList.add('tut-dim-panel');
+    if (bottom) {
+      bottom.classList.add('tut-dim-panel');
+      bottom.classList.remove('tut-confirm-ready');
+    }
+    if (conf) conf.classList.remove('tut-only-confirm', 'tut-pulse');
+
+    // veil 擋住空白區，但技能鈕在更高 z-index
+    const veil = document.createElement('div');
+    veil.className = 'tut-skill-veil';
+    veil.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setTutBattleHint('👆 請點亮起的技能（其他技能教學中不可選）');
+    });
+    wrap.appendChild(veil);
+
+    const alliesBox = document.getElementById('battle-allies');
+    if (alliesBox) {
+      alliesBox.querySelectorAll('.bcard').forEach((card, i) => {
+        const pet = (S.battleAllies || [])[i];
+        if (pet && pet.hp > 0) card.classList.add('tut-focus-card');
+        else card.classList.remove('tut-focus-card');
+      });
+    }
+    const skName = (() => {
+      const p = (S.battleAllies || []).find(x => x && x.hp > 0);
+      const id = getTutorialSkillId(p);
+      const sk = (p && p.skills || []).find(x => x.id === id);
+      return sk ? ((sk.emoji || '') + sk.name) : '指定技能';
+    })();
+    setTutBattleHint('🌑 其他都先鎖住了——請點亮起的「' + skName + '」');
+  }
+}
+
+/** 首次多人戰：教玩家點敵方選目標 */
+function maybeTeachTargetSelect() {
+  if (S.tutorialTargetDone) return;
+  if (!S.battling || !S.playerTurn) return;
+  const foes = typeof livingEnemies === 'function' ? livingEnemies() : [];
+  if (foes.length < 2) return;
+  if (S._pickingTargetFor == null) return;
+
+  // 首次彈說明（只彈一次視窗，之後靠提示）
+  if (!S._targetTeachModalShown) {
+    S._targetTeachModalShown = true;
+    showTutModal({
+      stepLabel: '戰鬥技巧',
+      emoji: '🎯',
+      title: '點對手指定目標！',
+      msg: '這場有兩隻以上敵人。\\n\\n選好攻擊技能後，請直接點敵方卡片，決定要打誰。\\n\\n黃色框起來的就是可以點的對手。',
+      btnText: '知道了，去點對手！',
+      onNext: () => {
+        closeTutModal();
+        applyTargetSelectSpotlight();
+      }
+    });
+  } else {
+    applyTargetSelectSpotlight();
+  }
+}
+
+function applyTargetSelectSpotlight() {
+  const wrap = document.querySelector('.battle-screen-wrap');
+  if (!wrap) return;
+  const active = !S.tutorialTargetDone && S.battling && S.playerTurn && S._pickingTargetFor != null
+    && (typeof livingEnemies === 'function' ? livingEnemies().length >= 2 : false);
+
+  const enemyRow = wrap.querySelector('.battle-row-enemies');
+  const allyRow = wrap.querySelector('.battle-row-allies');
+  const logPanel = wrap.querySelector('.battle-log-panel');
+  const bottom = wrap.querySelector('.battle-bottom-bar');
+
+  if (!active) {
+    if (enemyRow) {
+      enemyRow.classList.remove('tut-target-row');
+      enemyRow.querySelectorAll('.tut-target-card').forEach(c => c.classList.remove('tut-target-card'));
+    }
+    if (allyRow) allyRow.classList.remove('tut-dim-allies');
+    return;
+  }
+
+  if (allyRow) allyRow.classList.add('tut-dim-allies');
+  if (logPanel) logPanel.classList.add('tut-dim-panel');
+  if (bottom) bottom.classList.add('tut-dim-panel');
+  if (enemyRow) {
+    enemyRow.classList.add('tut-target-row');
+    enemyRow.classList.remove('tut-dim-panel');
+    enemyRow.querySelectorAll('.enemy-card').forEach((card, i) => {
+      const e = S.battleEnemies && S.battleEnemies[i];
+      if (e && e.hp > 0) card.classList.add('tut-target-card');
+      else card.classList.remove('tut-target-card');
+    });
+  }
+  setTutBattleHint('🎯 點黃色框的對手，指定要攻擊的目標！');
+}
+
 function selectActionForSlot(slot, sk) {
   if (!S.playerTurn || !S.battling) return;
   // 任意存活我方可選／重選技能（含已選過的上一隻）
   const pet = S.battleAllies[slot];
   if (!pet || pet.hp <= 0) return;
+  // 教學戰：只能選指定技能
+  if (!S.tutorialDone && S.tutorialStep >= 2) {
+    const onlyId = getTutorialSkillId(pet);
+    if (sk.id !== onlyId) {
+      addBLog('📘 教學中請選擇亮起的技能「' + onlyId + '」', 'sys');
+      setTutBattleHint('👆 其他技能已鎖住，請點黃色框起來的技能');
+      return;
+    }
+  }
   if (sk.id !== 'normal' && sk.id !== 'defend' && !canUseSkill(pet, sk)) return;
   if ((sk.mp||0) > 0 && pet.mp != null && pet.mp < sk.mp) return;
   // 增益持續中不可再選同一類增益
@@ -3342,6 +4429,7 @@ function selectActionForSlot(slot, sk) {
     } else if (S.selectedTargets[slot] == null || !(S.battleEnemies[S.selectedTargets[slot]] && S.battleEnemies[S.selectedTargets[slot]].hp > 0)) {
       S._pickingTargetFor = slot;
       addBLog(pet.name + '：請點選要攻擊的敵方目標', 'sys');
+      if (typeof maybeTeachTargetSelect === 'function') maybeTeachTargetSelect();
     } else {
       // 重選技能時保留原目標（若仍存活）
       S._pickingTargetFor = null;
@@ -3355,6 +4443,11 @@ function selectActionForSlot(slot, sk) {
       addBLog('還可為「' + ((np && np.name) || ('我方'+(next+1))) + '」選擇技能（也可回去改上一隻）', 'sys');
     } else if (next < 0) {
       addBLog('全員指令已選好，請按「確認出招」！（仍可點技能重選）', 'sys');
+      if (!S.tutorialDone && S.tutorialStep >= 2) {
+        setTutBattleHint('✅ 技能已選好！請按下方橘色「確認出招」按鈕開始攻擊');
+        const conf = document.getElementById('confirm-actions-btn');
+        if (conf) conf.classList.add('tut-pulse');
+      }
     }
   }
   renderBattleBoard();
@@ -3811,10 +4904,18 @@ function showPop(target,text,type){
 }
 /** 屬性克制：攻擊方屬性 → 防守方屬性 → 倍率 */
 const TYPE_EFFECT = {
-  '水': { '火': 1.5, '電': 0.75 },
-  '火': { '水': 0.75, '電': 1.0 },
-  '電': { '水': 1.5, '火': 1.0 },
-  '神': { '火': 1.1, '水': 1.1, '電': 1.1 }
+  // 手稿相剋表 + 玩家指定：水克火 1.5、火打水 0.95
+  '水': { '水': 0.8, '火': 1.5, '土': 0.9, '電': 1.25, '風': 1.0, '光': 1.0, '草': 1.0, '毒': 1.0 },
+  '火': { '水': 0.95, '火': 0.8, '土': 0.9, '電': 1.0, '風': 1.5, '光': 1.0, '草': 1.25, '毒': 1.0 },
+  '土': { '水': 1.0, '火': 1.25, '土': 0.8, '電': 1.5, '風': 0.75, '光': 0.9, '草': 0.9, '毒': 1.0 },
+  '電': { '水': 1.5, '火': 1.0, '土': 0.75, '電': 0.8, '風': 0.75, '光': 1.0, '草': 0.9, '毒': 1.0 },
+  '風': { '水': 1.0, '火': 0.75, '土': 1.5, '電': 1.25, '風': 0.9, '光': 0.9, '草': 1.0, '毒': 0.9 },
+  '光': { '水': 1.0, '火': 1.0, '土': 1.0, '電': 1.0, '風': 0.9, '草': 0.8, '毒': 1.25, '暗': 1.25 },
+  '草': { '水': 1.25, '火': 0.75, '土': 1.0, '電': 1.0, '風': 0.9, '光': 0.9, '毒': 0.8, '草': 0.9 },
+  '毒': { '水': 1.0, '火': 1.0, '土': 0.9, '電': 1.0, '風': 1.25, '光': 0.75, '草': 1.25, '毒': 0.8 },
+  '暗': { '亮': 0.8, '神': 0.9, '暗': 0.8 },
+  '亮': { '暗': 1.25, '神': 0.9, '亮': 0.8 },
+  '神': { '火': 1.1, '水': 1.1, '電': 1.1, '土': 1.1, '風': 1.1, '暗': 1.25, '亮': 0.9, '神': 0.8 }
 };
 function getTypeMul(atkType, defType) {
   if (!atkType || !defType) return 1;
@@ -3880,14 +4981,23 @@ function calcAtk(atk,def,sk,isP){
   if (isP && S.eEffects && S.eEffects.slow) dmg = Math.floor(dmg * 1.2);
   if (isP && S.eEffects && S.eEffects.charm) dmg = Math.floor(dmg * 0.7);
   if (!isP && S.defBoost) { dmg = Math.floor(dmg * 0.5); S.defBoost = false; }
+  // 新手教學：我方傷害提高、敵方傷害大幅降低 → 必勝
+  if (!S.tutorialDone && S.tutorialStep >= 2) {
+    if (isP) dmg = Math.floor(dmg * 1.8);
+    else dmg = Math.max(1, Math.floor(dmg * 0.25));
+  }
   return { type: crit ? 'crit' : 'hit', dmg: Math.max(1, dmg), typeMul: typeMul };
 }
-
 
 function resolvePlayerActions() {
   if (!S.playerTurn || !S.battling) return;
   if (!allActionsSelected()) { addBLog('請為每隻存活寵物選擇技能，攻擊需指定敵方目標', 'sys'); return; }
   setBattleBtns(false);
+  if (!S.tutorialDone && S.tutorialStep >= 2) {
+    setTutBattleHint('⚔️ 出招中…水屬性打火屬性會有加成喔！');
+    const conf = document.getElementById('confirm-actions-btn');
+    if (conf) conf.classList.remove('tut-pulse');
+  }
   const order = [];
   (S.battleAllies || []).forEach((pet, slot) => {
     if (pet && pet.hp > 0 && S.selectedActions[slot]) order.push({ pet, sk: S.selectedActions[slot], slot });
@@ -4012,6 +5122,35 @@ function executeSkill(pl, sk, onDone, isEnemy){
       pl._shield = (pl._shield || 0) + amount;
     }
     addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！獲得護盾 ' + amount + '（吸收傷害）！', 'sys');
+    updateBattleHp();
+    __onDone();
+    return;
+  }
+
+  // 全隊增益（神奇衝浪板等）
+  if (sk.teamBuff) {
+    const turns = sk.teamBuff.turns || 2;
+    const bag = isEnemy ? (S.eSelfEffects = S.eSelfEffects || {}) : (S.pEffects = S.pEffects || {});
+    bag.buffTurns = Math.max(bag.buffTurns || 0, turns);
+    const parts = [];
+    if (sk.teamBuff.critBonus) {
+      bag.critBonus = (bag.critBonus || 0) + sk.teamBuff.critBonus;
+      bag.critTurns = Math.max(bag.critTurns || 0, turns);
+      parts.push('暴擊+' + Math.round(sk.teamBuff.critBonus * 100) + '%');
+    }
+    if (sk.teamBuff.dodgeBonus) {
+      bag.dodgeBonus = (bag.dodgeBonus || 0) + sk.teamBuff.dodgeBonus;
+      parts.push('閃避+' + Math.round(sk.teamBuff.dodgeBonus * 100) + '%');
+    }
+    if (sk.teamBuff.speedBonus) {
+      bag.speedBonus = (bag.speedBonus || 0) + sk.teamBuff.speedBonus;
+      parts.push('速度+' + sk.teamBuff.speedBonus);
+    }
+    if (sk.teamBuff.hitBonus) {
+      bag.hitBonus = (bag.hitBonus || 0) + sk.teamBuff.hitBonus;
+      parts.push('命中+' + Math.round(sk.teamBuff.hitBonus * 100) + '%');
+    }
+    addBLog(pl.name + ' 使用 ' + (sk.emoji||'') + sk.name + '！' + (isEnemy?'敵方':'我方') + '全員 ' + (parts.join('、')||'獲得增益') + '，持續 ' + turns + ' 回合！', 'sys');
     updateBattleHp();
     __onDone();
     return;
@@ -4164,15 +5303,26 @@ function executeSkill(pl, sk, onDone, isEnemy){
   const hasAttack = _skA.atkPercent != null || _skA.atkPercentMin != null || _skA.forcePercent != null ||
     _skA.baseAtkPercent != null || _skA.power != null || _skA.fixedHits || _skA.multiHit || _skA.multiHitChances;
   if (hasAttack) {
-    // 選定防守方
-    let defender;
-    if (isEnemy) {
-      defender = pickRandomAlly();
+    // 選定防守方（hitAllEnemies：敵方全體）
+    let defenders = [];
+    if (skUse.hitAllEnemies || sk.hitAllEnemies) {
+      if (isEnemy) {
+        defenders = (S.battleAllies || []).filter(p => p && p.hp > 0);
+      } else {
+        defenders = (S.battleEnemies || []).filter(e => e && e.hp > 0);
+      }
     } else {
-      // 優先使用玩家指定的目標
-      if (S.enemy && S.enemy.hp > 0) defender = S.enemy;
-      else defender = pickRandomEnemy() || S.enemy;
+      let defender;
+      if (isEnemy) {
+        defender = pickRandomAlly();
+      } else {
+        if (S.enemy && S.enemy.hp > 0) defender = S.enemy;
+        else defender = pickRandomEnemy() || S.enemy;
+      }
+      if (defender) defenders = [defender];
     }
+    // 兼容下方單一 defender 變數
+    let defender = defenders[0] || null;
     // 找出目標卡片 index，特效打在目標身上
     let targetSlot = null;
     let targetEl = null;
@@ -4272,6 +5422,69 @@ function executeSkill(pl, sk, onDone, isEnemy){
       }
     }
     if (hits > 1 && totalDmg > 0) addBLog('合計傷害 ' + totalDmg, 'sys');
+
+    // 三叉戟等：對其餘敵人也打同樣技能傷害
+    if ((skUse.hitAllEnemies || sk.hitAllEnemies) && defender) {
+      const others = (isEnemy ? (S.battleAllies||[]) : (S.battleEnemies||[])).filter(e => e && e.hp > 0 && e !== defender);
+      others.forEach(oth => {
+        const r2 = calcAtk(pl, oth, Object.assign({}, skUse, { fixedHits: 1 }), !isEnemy);
+        let d2 = r2.dmg;
+        if (oth._shield && oth._shield > 0) {
+          const ab = Math.min(oth._shield, d2); oth._shield -= ab; d2 -= ab;
+        }
+        oth.hp = Math.max(0, oth.hp - d2);
+        totalDmg += r2.dmg;
+        anyHit = true;
+        addBLog('🔱 同時擊中 ' + oth.name + '，造成 ' + r2.dmg + ' 傷害', isEnemy ? 'en' : 'p');
+      });
+    }
+
+    // 對其他敵人追加傷害（海·波濤大浪 splash / 三叉戟已在 defenders 列表時逐一打）
+    if ((skUse.splashOtherEnemies || sk.splashOtherEnemies) && defender) {
+      const splashPct = Number(skUse.splashOtherEnemies || sk.splashOtherEnemies) || 100;
+      const others = (isEnemy ? (S.battleAllies||[]) : (S.battleEnemies||[])).filter(e => e && e.hp > 0 && e !== defender);
+      others.forEach(oth => {
+        const hitSk = Object.assign({}, skUse, { atkPercent: splashPct, fixedHits: 1, atkPercentMin: null, atkPercentMax: null });
+        const r2 = calcAtk(pl, oth, hitSk, !isEnemy);
+        let d2 = r2.dmg;
+        if (oth._shield && oth._shield > 0) {
+          const ab = Math.min(oth._shield, d2); oth._shield -= ab; d2 -= ab;
+        }
+        oth.hp = Math.max(0, oth.hp - d2);
+        totalDmg += r2.dmg;
+        addBLog('🌊 餘波擊中 ' + oth.name + '，造成 ' + r2.dmg + ' 傷害', isEnemy ? 'en' : 'p');
+      });
+    }
+
+    // 自身回血（背水一戰）
+    if (anyHit && (skUse.selfHealPercentMin != null || sk.selfHealPercentMin != null)) {
+      const minP = skUse.selfHealPercentMin != null ? skUse.selfHealPercentMin : sk.selfHealPercentMin;
+      const maxP = skUse.selfHealPercentMax != null ? skUse.selfHealPercentMax : (sk.selfHealPercentMax != null ? sk.selfHealPercentMax : minP);
+      const pct = (minP + Math.random() * (maxP - minP)) / 100;
+      const healAmt = Math.max(1, Math.floor(pl.maxHp * pct));
+      const before = pl.hp;
+      pl.hp = Math.min(pl.maxHp, pl.hp + healAmt);
+      const actual = Math.round(pl.hp - before);
+      if (actual > 0) addBLog(pl.name + ' 回復了 ' + actual + ' 血量！', 'heal');
+    }
+
+    // 依造成傷害回復我方血量最低者
+    if (anyHit && totalDmg > 0 && (skUse.healLowestAllyFromDamage || sk.healLowestAllyFromDamage)) {
+      const ratio = Number(skUse.healLowestAllyFromDamage || sk.healLowestAllyFromDamage) || 0.18;
+      const allies = isEnemy
+        ? (S.battleEnemies || []).filter(p => p && p.hp > 0)
+        : (S.battleAllies || []).filter(p => p && p.hp > 0);
+      if (allies.length) {
+        allies.sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp));
+        const target = allies[0];
+        const healAmt = Math.max(1, Math.floor(totalDmg * ratio));
+        const before = target.hp;
+        target.hp = Math.min(target.maxHp, target.hp + healAmt);
+        const actual = Math.round(target.hp - before);
+        if (actual > 0) addBLog('💧 ' + target.name + ' 吸收水波回復 ' + actual + '！', 'heal');
+        if (!isEnemy && typeof syncAlliesHpToOwned === 'function') syncAlliesHpToOwned();
+      }
+    }
   }
 
   // 像素瓦解：敵方每回合命中率下降
@@ -4348,7 +5561,6 @@ function executeSkill(pl, sk, onDone, isEnemy){
   if (isEnemy && livingAllies().length === 0) { setTimeout(() => endBattle(false), 700); return; }
   __onDone();
 }
-
 
 function useItem(id){
   if(!S.playerTurn||!S.battling||!(S.items[id]>0)) return;
@@ -4469,9 +5681,13 @@ function enemyTurn(){
 
 function tickEffects(){ for(const k in S.eEffects){ S.eEffects[k]--; if(S.eEffects[k]<=0) delete S.eEffects[k]; } }
 
-
 function tryFleeBattle() {
   if (!S.battling || !S.playerTurn) return;
+  if (!S.tutorialDone && S.tutorialStep >= 2) {
+    addBLog('📘 教學戰鬥不能逃跑喔！請選擇技能並確認出招。', 'sys');
+    setTutBattleHint('👆 點寵物卡片上的技能 → 再按「✅ 確認出招」');
+    return;
+  }
   const foes = livingEnemies();
   const allies = livingAllies();
   if (!allies.length) return;
@@ -4500,7 +5716,6 @@ function tryFleeBattle() {
     }
   }, 400);
 }
-
 
 function snapshotPetCombatStats(p) {
   if (!p) return null;
@@ -4574,7 +5789,6 @@ function buildPetStatDeltaLines(before, after) {
   }
   return lines;
 }
-
 
 function petExpNeeded(lv) {
   return Math.max(1, (Number(lv) || 1) * 25);
@@ -4886,58 +6100,124 @@ function endBattle(win){
     }
     petLevelUpQueue.forEach(q => S._pendingLevelUpQueue.push(q));
     S._pendingLevelUp = null;
-    if(S.wild && S.wild.catchable !== false) winMsg+='\n🎾 獲得一次捕捉機會';
-    if(drops.lines.length) winMsg+='\n'+drops.lines.join('\n');
-    $('res-msg').textContent=winMsg;
+    // 本場可收服清單：只從本場敵方欄位取一次（最多 3，不重複加）
+    const catchCandidates = [];
+    const enemySrc = (Array.isArray(S.battleEnemies) && S.battleEnemies.some(Boolean))
+      ? S.battleEnemies
+      : (Array.isArray(S._battleWildList) ? S._battleWildList : (S.wild ? [S.wild] : []));
+    for (let i = 0; i < enemySrc.length && catchCandidates.length < 3; i++) {
+      const src = enemySrc[i];
+      if (!src || !src.id || src.catchable === false) continue;
+      catchCandidates.push({
+        id: src.id,
+        name: src.name,
+        emoji: src.emoji,
+        level: src.level || 1,
+        starLevel: src.starLevel || 0,
+        catchable: true,
+        slot: i
+      });
+    }
+    if (catchCandidates.length) {
+      const sampleRate = getPostBattleCatchRate(catchCandidates[0]);
+      winMsg += '\n🎾 可選擇 1 隻收服（成功率約 ' + formatCatchRate(sampleRate) + '）';
+    }
+    if (drops.lines.length) winMsg += '\n' + drops.lines.join('\n');
+    $('res-msg').textContent = winMsg;
 
-    // 戰鬥勝利後：可收服對象有「一次」捕捉機會
-    if (S.wild && S.wild.catchable !== false) {
-      const wildSnap = {
-        id: S.wild.id,
-        name: S.wild.name,
-        emoji: S.wild.emoji,
-        level: S.wild.level || 1,
-        catchable: true
-      };
-      S.pendingCatch = wildSnap;
-      S._postBattleCatchUsed = false;
-      const catchBtn = document.createElement('button');
-      catchBtn.className = 'btn btn-purple';
-      catchBtn.textContent = '🎾 捕捉 ' + (wildSnap.emoji || '') + wildSnap.name + '（僅一次）';
-      catchBtn.onclick = () => {
-        if (S._postBattleCatchUsed || !S.pendingCatch) return;
-        S._postBattleCatchUsed = true;
-        let rate = 0.55;
-        if ((S.items.ball || 0) > 0) { rate += 0.25; S.items.ball--; }
-        rate = Math.min(0.95, rate);
-        if (roll(rate)) {
-          const base = getBase(S.pendingCatch.id) || S.pendingCatch;
-          const caught = clonePet(base, S.pendingCatch.level || 1);
-          caught.level = S.pendingCatch.level || 1;
-          recalculatePetStats(caught, { restoreFullHp: true });
-          S.owned.push(caught);
-          onPetCaught(caught);
-          updateHeader();
-          saveGame();
-          if (typeof updateRedDots === 'function') updateRedDots();
-          $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name + '！';
-          catchBtn.disabled = true;
-          catchBtn.textContent = '已捕捉 ✓';
-        } else {
-          $('res-msg').textContent += '\n💨 ' + S.pendingCatch.name + ' 逃走了…（機會已用完）';
-          catchBtn.disabled = true;
-          catchBtn.textContent = '捕捉失敗';
+    S._postBattleCatchUsed = false;
+    S.pendingCatch = null;
+    S._catchCandidates = catchCandidates;
+
+    function doPostBattleCatch(target, btnEl, allCatchBtns) {
+      if (S._postBattleCatchUsed || !target) return;
+      S._postBattleCatchUsed = true;
+      S.pendingCatch = target;
+      let rate = getPetCaptureRate(target, {});
+      (allCatchBtns || []).forEach(b => { b.disabled = true; b.classList.remove('tut-pulse'); });
+      $('res-msg').textContent += '\n🎲 收服機率 ' + formatCatchRate(rate) + '（圖鑑）…';
+      if (roll(rate)) {
+        const base = getBase(target.id) || target;
+        const caught = clonePet(base, target.level || 1);
+        caught.level = target.level || 1;
+        caught.starLevel = Math.max(0, Number(target.starLevel) || 0);
+        if (!S.tutorialDone && caught.id === 'huobao_xiong') {
+          caught.starLevel = 0;
         }
-        S.pendingCatch = null;
-      };
-      actions.appendChild(catchBtn);
-    } else {
+        recalculatePetStats(caught, { restoreFullHp: true });
+        S.owned.push(caught);
+        onPetCaught(caught);
+        updateHeader();
+        saveGame();
+        if (typeof updateRedDots === 'function') updateRedDots();
+        const starTxt = (typeof renderStarsHtml === 'function')
+          ? renderStarsHtml(caught.starLevel || 0, { size: 14 })
+          : ('★' + (caught.starLevel || 0));
+        $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name +
+          ' Lv.' + caught.level + '！';
+        if (btnEl) btnEl.textContent = '已捕捉 ✓';
+        if (!S.tutorialDone && S.tutorialStep >= 2) {
+          const okLater = document.createElement('button');
+          okLater.className = 'btn btn-primary';
+          okLater.textContent = '太棒了，繼續！';
+          okLater.onclick = () => {
+            S.wild = null; S.pendingCatch = null; S._catchCandidates = null;
+            $('result-modal').classList.add('hidden');
+            if (typeof finishTutorialAfterCatch === 'function') finishTutorialAfterCatch();
+            else if (typeof runPostBattleFlow === 'function') runPostBattleFlow();
+            else showScreen('map');
+          };
+          actions.appendChild(okLater);
+        }
+      } else {
+        $('res-msg').textContent += '\n💨 ' + target.name + ' 逃走了…（機會已用完）';
+        if (btnEl) btnEl.textContent = '捕捉失敗';
+      }
       S.pendingCatch = null;
+    }
+
+    // 戰鬥勝利後：可選要收服哪一隻（僅一次）
+    const isTutCatch = !S.tutorialDone && S.tutorialStep >= 2;
+    const catchBtns = [];
+    if (catchCandidates.length) {
+      if (catchCandidates.length > 1) {
+        const lab = document.createElement('div');
+        lab.style.cssText = 'width:100%;text-align:center;font-size:0.82rem;font-weight:800;color:#6a1b9a;margin:4px 0';
+        lab.textContent = '選擇要收服的對象（只能選一隻）';
+        actions.appendChild(lab);
+      }
+      catchCandidates.forEach((cand, idx) => {
+        const catchBtn = document.createElement('button');
+        catchBtn.className = 'btn btn-purple';
+        const starLabel = (typeof getStarMeta === 'function')
+          ? getStarMeta(cand.starLevel || 0).label
+          : ((cand.starLevel || 0) + '★');
+        const showRate = getPostBattleCatchRate(cand);
+        catchBtn.textContent = '🎾 ' + (cand.emoji || '') + cand.name +
+          '　Lv.' + cand.level + '　' + starLabel +
+          '　成功率 ' + formatCatchRate(showRate) +
+          (isTutCatch ? '（教學・必成功）' : '');
+        if (isTutCatch && idx === 0) catchBtn.classList.add('tut-pulse');
+        catchBtn.onclick = () => doPostBattleCatch(cand, catchBtn, catchBtns);
+        catchBtns.push(catchBtn);
+        actions.appendChild(catchBtn);
+      });
+      // 供教學「必須先收服」判斷
+      S.pendingCatch = catchCandidates[0];
     }
 
     const okBtn = document.createElement('button');
     okBtn.className = 'btn btn-primary';
     okBtn.textContent = '確定';
+    // 教學中必須先收服，不給跳過
+    if (isTutCatch && catchCandidates.length) {
+      okBtn.style.display = 'none';
+      okBtn.disabled = true;
+      if (typeof onTutorialBattleWin === 'function') onTutorialBattleWin();
+      setTimeout(() => {
+        setTutBattleHint('🎾 點「收服」按鈕——教學戰鬥必定成功收服！');
+      }, 200);
+    }
     okBtn.onclick = () => {
       S.wild = null; S.pendingCatch = null;
       $('result-modal').classList.add('hidden');
@@ -4946,6 +6226,23 @@ function endBattle(win){
     };
     actions.appendChild(okBtn);
   } else {
+    // 教學戰敗北（理論上不該發生）：重來
+    if (!S.tutorialDone && S.tutorialStep >= 2) {
+      $('res-emoji').textContent = '📘';
+      $('res-title').textContent = '再試一次！';
+      $('res-msg').textContent = '教學戰鬥還沒結束——我們再來一次，記得選技能後按確認出招！';
+      actions.innerHTML = '';
+      const retry = document.createElement('button');
+      retry.className = 'btn btn-explore';
+      retry.textContent = '重新開始教學戰鬥';
+      retry.onclick = () => {
+        $('result-modal').classList.add('hidden');
+        beginTutorialBattle();
+      };
+      actions.appendChild(retry);
+      $('result-modal').classList.remove('hidden');
+      return;
+    }
     // 敗北也給少量經驗（依表的 25%）
     const expReward = calcBattleExpRewards(false);
     const expG = expReward.petExp;
@@ -5413,7 +6710,6 @@ function getDefenseFormulaBreakdown(p) {
   return { final: final, html: html };
 }
 
-
 /** 速度公式拆解 */
 function getSpeedFormulaBreakdown(p) {
   if (!p) return { final: 0, html: '' };
@@ -5447,7 +6743,6 @@ function getSpeedFormulaBreakdown(p) {
     '</div>';
   return { final: final, html: html };
 }
-
 
 /** 血量公式拆解 */
 function getHpFormulaBreakdown(p) {
@@ -5581,12 +6876,10 @@ function getCaptureFormulaBreakdown() {
   const html =
     '<div style="margin:4px 0 8px;padding:8px 10px;background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#6a1b9a">' +
     '<b style="color:#6a1b9a">🎾 捕捉／收服公式</b><br>' +
-    '<span style="font-weight:800">野外直接捕捉</span><br>' +
-    '成功率 = min(0.85, 0.35 + (1 − 剩餘HP比例)×0.4 + 捕捉球?0.2:0)<br>' +
-    '→ 血越少越好抓；使用捕捉球 +20%<br><br>' +
-    '<span style="font-weight:800">戰鬥勝利後收服</span><br>' +
-    '成功率 = min(0.95, 0.55 + 捕捉球?0.25:0)<br>' +
-    '→ 打倒後基礎 55%，有球可到約 80%' +
+    '<span style="font-weight:800">收服率</span><br>' +
+    '完全以圖鑑各寵物的 <b>captureRate</b> 為準（目前無捕捉球）<br>' +
+    '例：火爆熊 32%、水波豹 64%、神·火爆熊 1.8%、海·水波豹 2.7%<br>' +
+    '戰鬥勝利後收服與野外捕捉皆使用同一收服率' +
     '</div>';
   return { html: html };
 }
@@ -5637,9 +6930,122 @@ function toggleFormulaPanel() {
 }
 window.toggleFormulaPanel = toggleFormulaPanel;
 
+/** 技能效果文字（詳細） */
+function describeSkillLines(skill, pet) {
+  if (!skill) return ['無資料'];
+  const lines = [];
+  if (skill.passive) {
+    lines.push('類型：被動技能');
+    if (skill.effectDesc) lines.push(skill.effectDesc);
+  } else {
+    lines.push('消耗 MP：' + (skill.mp != null ? skill.mp : 0));
+  }
+  if (skill.atkPercent != null) lines.push('傷害：攻擊的 ' + skill.atkPercent + '%');
+  if (skill.atkPercentMin != null) {
+    const hits = skill.fixedHits || 1;
+    lines.push('傷害：每次 ' + skill.atkPercentMin + '~' + skill.atkPercentMax + '%（共 ' + hits + ' 次）');
+  }
+  if (skill.hitAtkPercents && skill.hitAtkPercents.length) {
+    lines.push('各段上限：' + skill.hitAtkPercents.join(' / ') + '%');
+  }
+  if (skill.forcePercent != null) lines.push('以武力換算傷害：武力 +' + skill.forcePercent + '% 相關');
+  if (skill.baseAtkPercent != null) {
+    lines.push('基礎傷害％：' + skill.baseAtkPercent + '%');
+    if (skill.forceScale) lines.push('每 ' + skill.forceScale + ' 武力再 +' + (skill.forceScaleBonus || 100) + '%');
+  }
+  if (skill.multiHitChances) lines.push('多段機率：' + skill.multiHitChances.map(c => Math.round(c * 100) + '%').join('、'));
+  if (skill.selfHealPercentMin != null) {
+    lines.push('並回復自身血量 ' + skill.selfHealPercentMin + '~' + skill.selfHealPercentMax + '%');
+  }
+  if (skill.teamHealPercentMin != null) {
+    lines.push('治療我方全員 ' + skill.teamHealPercentMin + (skill.teamHealPercentMax != skill.teamHealPercentMin ? '~' + skill.teamHealPercentMax : '') + '% 血量');
+  }
+  if (skill.healLowestAllyFromDamage != null) {
+    lines.push('將造成傷害的 ' + Math.round(skill.healLowestAllyFromDamage * 100) + '% 治療我方血量最低者');
+  }
+  if (skill.hitAllEnemies) lines.push('攻擊敵方全體');
+  if (skill.splashOtherEnemies != null) lines.push('其他敵人再受 ' + skill.splashOtherEnemies + '% 傷害');
+  if (skill.teamBuff) {
+    const b = skill.teamBuff;
+    const parts = [];
+    if (b.speedBonus) parts.push('速度+' + b.speedBonus);
+    if (b.critBonus) parts.push('暴擊+' + Math.round(b.critBonus * 100) + '%');
+    if (b.dodgeBonus) parts.push('閃避+' + Math.round(b.dodgeBonus * 100) + '%');
+    lines.push('我方增益（' + (b.turns || 1) + ' 回合）：' + (parts.join('、') || '有增益'));
+  }
+  if (skill.selfBuff) {
+    const b = skill.selfBuff;
+    const parts = [];
+    if (b.critBonus) parts.push('暴擊+' + Math.round(b.critBonus * 100) + '%');
+    if (b.critDmgMul) parts.push('暴擊傷害×' + b.critDmgMul);
+    if (b.turns) parts.push('持續 ' + b.turns + ' 回合');
+    lines.push('自身增益：' + parts.join('、'));
+  }
+  if (skill.selfShield && skill.selfShield.hpPercent) {
+    lines.push('自身護盾：相當於最大 HP 的 ' + skill.selfShield.hpPercent + '%');
+  }
+  if (skill.burnChance != null) {
+    lines.push('灼燒機率 ' + Math.round(skill.burnChance * 100) + '%（' + (skill.burnTurns || 1) + ' 回合）');
+  }
+  if (skill.stunChance != null) {
+    lines.push('麻痺／暈眩機率 ' + Math.round(skill.stunChance * 100) + '%（' + (skill.stunTurns || 1) + ' 回合）');
+  }
+  if (skill.enemyHitPenalty != null) {
+    lines.push('之後敵方每回合命中 -' + Math.round(skill.enemyHitPenalty * 100) + '%');
+  }
+  if (skill.effect === 'burn') lines.push('施加灼燒狀態');
+  if (skill.effectDesc) lines.push(skill.effectDesc);
+  if (pet) {
+    const locked = typeof canUseSkill === 'function' && !canUseSkill(pet, skill);
+    if (locked && typeof skillLockReason === 'function') {
+      const r = skillLockReason(pet, skill);
+      if (r) lines.push('🔒 未解鎖：' + r);
+    }
+  }
+  if (skill.evoReq != null && skill.evoReq > 0) {
+    const names = ['基礎','初始','中階','進階','終極','完美'];
+    lines.push('需要進化階段：' + (names[skill.evoReq] || ('階段' + skill.evoReq)));
+  }
+  if (skill.unlockLv != null && skill.unlockLv > 0) {
+    lines.push('需要等級：Lv.' + skill.unlockLv);
+  }
+  return lines.length ? lines : ['（尚無詳細說明）'];
+}
+
+function openSkillDetail(skill, pet) {
+  if (!skill) return;
+  const modal = document.getElementById('skill-detail-modal');
+  if (!modal) {
+    alert((skill.emoji || '') + skill.name + '\n' + describeSkillLines(skill, pet).join('\n'));
+    return;
+  }
+  const em = document.getElementById('skd-emoji');
+  const nm = document.getElementById('skd-name');
+  const sub = document.getElementById('skd-sub');
+  const body = document.getElementById('skd-body');
+  if (em) em.textContent = skill.emoji || '💥';
+  if (nm) nm.textContent = skill.name || '技能';
+  if (sub) {
+    const bits = [];
+    if (skill.mp != null && !skill.passive) bits.push('MP ' + skill.mp);
+    if (skill.passive) bits.push('被動');
+    if (pet && typeof canUseSkill === 'function' && !canUseSkill(pet, skill)) bits.push('未解鎖');
+    sub.textContent = bits.join(' · ') || '技能詳情';
+  }
+  if (body) {
+    body.innerHTML = describeSkillLines(skill, pet).map(l => '• ' + l).join('<br>');
+  }
+  modal.classList.remove('hidden');
+  const closeBtn = document.getElementById('skd-close');
+  if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
+  modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+}
+
 function openPetInfo(idx) {
-  const p = S.owned[idx];
-  if (!p) return;
+    const p = S.owned[idx];
+  if (!p) {
+        return;
+  }
   window._petInfoIdx = idx;
   recalculatePetStats(p);
   const stages = ['基礎', '初始進化', '中階進化', '進階進化', '終極進化', '完美進化'];
@@ -5733,28 +7139,26 @@ function openPetInfo(idx) {
   $('pet-info-skills').innerHTML = Array.from({ length: 4 }, (_, i) => {
     const skill = skills[i];
     if (!skill) {
-      return '<div class="info-slot">技能 ' + (i + 1) + '<br>尚未設定</div>';
+      return '<div class="info-slot">技能 ' + (i + 1) + '<br>空</div>';
     }
     const locked = !canUseSkill(p, skill);
-    const reason = locked ? (skillLockReason(p, skill) || '未解鎖') : '';
-    const mpTxt = skill.mp != null ? ('MP ' + skill.mp) : '';
-    let effectTxt = '';
-    if (skill.atkPercent != null) effectTxt = skill.atkPercent + '%傷害';
-    else if (skill.atkPercentMin != null) effectTxt = skill.atkPercentMin + '~' + skill.atkPercentMax + '%×' + (skill.fixedHits || 1);
-    else if (skill.forcePercent != null) effectTxt = '武+' + skill.forcePercent + '%';
-    else if (skill.baseAtkPercent != null) effectTxt = skill.baseAtkPercent + '%+';
-    else if (skill.teamHealPercentMin != null) effectTxt = '全隊補血';
-    else if (skill.teamCritBuff) effectTxt = '火焚';
-    else if (skill.selfBuff) effectTxt = '增益';
-    else if (skill.heal) effectTxt = '回復';
-    else if (skill.effect) effectTxt = '狀態';
-    const sub = [mpTxt, effectTxt, reason].filter(Boolean).join(' · ');
-    const style = locked ? 'opacity:0.45;filter:grayscale(0.4)' : '';
-    return '<div class="info-slot" style="' + style + '">' +
-      (skill.emoji || '💥') + ' <b>' + skill.name + '</b>' +
-      (sub ? '<br><span style="font-size:0.7rem;color:#666">' + sub + '</span>' : '') +
-      '</div>';
+    if (locked) {
+      // 未解鎖：不顯示名稱
+      return '<div class="info-slot locked" title="尚未解鎖" style="opacity:0.55;filter:grayscale(0.5);cursor:default">' +
+        '❓<br><b>？？？</b><br><span style="font-size:0.65rem;color:#999">未解鎖</span></div>';
+    }
+    // 已解鎖：只顯示名稱，點擊看詳細效果
+    return '<div class="info-slot skill-slot-btn" data-skill-idx="' + i + '" title="點擊查看效果">' +
+      (skill.emoji || '💥') + '<br><b>' + skill.name + '</b></div>';
   }).join('');
+  $('pet-info-skills').querySelectorAll('[data-skill-idx]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      const si = Number(el.dataset.skillIdx);
+      const sk = skills[si];
+      if (sk && canUseSkill(p, sk)) openSkillDetail(sk, p);
+    };
+  });
   const eq = Array.isArray(p.equippedTreasures) ? p.equippedTreasures : [];
   $('pet-info-treasures').innerHTML = Array.from({ length: 6 }, (_, i) => {
     const tid = eq[i];
@@ -5819,8 +7223,19 @@ function openPetInfo(idx) {
     const meta = getStarMeta(p.starLevel || 0);
     const canStar = !meta.isMax && getFragmentCount(p.id) >= (meta.nextCost || 999999);
     starBtn.innerHTML = canStar ? '⭐ 升星<span class="red-dot"></span>' : '⭐ 升星';
+    starBtn.classList.remove('tut-star-pulse');
+  }
+  // 升星教學：只允許目標寵物
+  if (!S.tutorialDone && S.tutorialStep === 4) {
+        if (Number(window._petInfoIdx) !== Number(S._tutStarPetIdx)) {
+            setTutBattleHint('👆 請點亮起的那一隻');
+      return;
+    }
   }
   $('pet-info-modal').classList.remove('hidden');
+    if (!S.tutorialDone && S.tutorialStep === 4) {
+    setTimeout(() => applyStarTutorialSpotlight(), 30);
+  }
 }
 
 function renderTeam(){
@@ -5847,6 +7262,14 @@ function renderTeam(){
     const have = getFragmentCount(base.id);
     ownedBox.appendChild(makeSummonCard(base, have, need));
   });
+  // 升星教學：僅在尚未高亮時補一次，避免 renderTeam↔apply 無限迴圈
+  if (!S.tutorialDone && S.tutorialStep === 4 && typeof applyStarTutorialSpotlight === 'function') {
+    const need = S._tutStarPetIdx;
+    const hasLit = document.querySelector('.pet-card.tut-pet-card[data-owned-idx="' + need + '"]');
+    if (!hasLit) {
+      setTimeout(() => applyStarTutorialSpotlight(), 40);
+    }
+  }
 }
 
 function makeSummonCard(base, have, need) {
@@ -5930,7 +7353,11 @@ function makePetCard(p,idx,inTeam){
   }
   const teamBtnEl = div.querySelector('[data-team]');
   teamBtnEl.onclick = (e) => { e.stopPropagation(); toggleTeam(idx); };
-  div.onclick = () => openPetInfo(idx);
+  div.setAttribute('data-owned-idx', String(idx));
+  div.style.cursor = 'pointer';
+  div.onclick = (e) => {
+        openPetInfo(idx);
+  };
   return div;
 }
 function toggleTeam(idx){
@@ -6033,7 +7460,6 @@ function renderCodex(){
   });
 }
 
-
 function hasAnyStageEvolve() {
   return (S.owned || []).some(p => canStageEvolve(p));
 }
@@ -6092,6 +7518,192 @@ function updateRedDots() {
 }
 
 attachLoginHandlers();
+
+/* ===== 新手引導／屬性相剋說明 ===== */
+const HELP_CONTENT = {
+  guide: `
+    <h3>🌱 歡迎來到波波島！</h3>
+    <p>這是一座可以探索、收服寵物、組隊戰鬥的冒險島。</p>
+    <ul>
+      <li>🗺️ <b>島嶼</b>：點地圖上的地點探索，會遇到野生寵物。</li>
+      <li>🐾 <b>隊伍</b>：最多帶 3 隻出戰，第一隻會先上場。</li>
+      <li>🎒 <b>背包</b>：查看金幣、碎片、寶物與道具。</li>
+    </ul>
+    <div class="tip">💡 新冒險者會先進行一場不可跳過的教學戰鬥（水波豹 vs 火爆熊），學會選技能與收服後，再自由探索島嶼。</div>
+    <h3>🏠 家與恢復</h3>
+    <ul>
+      <li>「家」可以休息，讓寵物回血／回 MP。</li>
+      <li>受傷的寵物在地圖上會有紅點提示可回血。</li>
+    </ul>
+    <h3>🕒 遊戲時間</h3>
+    <p>島上有早上／下午／晚上，部分地點（如陽光草原、貓島）出沒的寵物會依時段改變。</p>
+    <div class="tip">💡 右上角「❓ 說明」可隨時再打開本頁。</div>
+  `,
+  type: `
+    <h3>⚔️ 屬性相剋表</h3>
+    <p>攻擊方屬性（左）對防守方屬性（上）的傷害倍率。數字愈大愈有利。</p>
+    <div class="type-legend">
+      <span><i style="background:#c8e6c9"></i> ≥1.25 克制</span>
+      <span><i style="background:#fff3e0"></i> 同屬 0.8</span>
+      <span><i style="background:#ffcdd2"></i> ≤0.9 不利</span>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="type-table" id="type-chart-table">
+      <thead><tr><th>攻＼防</th><th>火</th><th>水</th><th>電</th><th>土</th><th>風</th><th>草</th><th>光</th><th>毒</th><th>神</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+    <h3>📌 目前常出場屬性重點</h3>
+    <ul>
+      <li>💧 <b>水</b> 克 🔥 火（×1.5）；電克水（×1.5）</li>
+      <li>🔥 <b>火</b> 打水略弱（×0.95）；火克風、草</li>
+      <li>⚡ <b>電</b> 克水；對土、風較不利</li>
+      <li>✨ <b>神</b> 對一般屬性略有加成（×1.1），同神互抗</li>
+    </ul>
+    <div class="tip">💡 同屬性互相攻擊通常只有 ×0.8（抗性）。組隊時盡量讓屬性能互相掩護弱點。</div>
+  `,
+  battle: `
+    <h3>🎮 戰鬥怎麼玩</h3>
+    <ul>
+      <li>每回合為我方每隻寵物選擇技能，再按「確認出招」。</li>
+      <li>速度較高的單位會較早行動。</li>
+      <li>技能消耗 MP；MP 不足時無法使用該技。</li>
+      <li>可對敵方點選指定攻擊目標。</li>
+    </ul>
+    <h3>🎾 收服寵物</h3>
+    <ul>
+      <li>野外可直接嘗試捕捉，血量愈低愈好抓。</li>
+      <li>戰鬥<b>勝利後</b>會再給一次收服機會（成功率較高）。</li>
+      <li>神話級寵物收服率很低，多靠碎片合成更穩。</li>
+    </ul>
+    <h3>🧩 碎片與戰利品</h3>
+    <p>勝利後會掉落寵物碎片、經驗、金幣；部分區域還會掉寶物碎片（如雷刀、水刀）。</p>
+    <div class="tip">💡 敗戰仍有少量經驗，可練習操作與熟悉技能。</div>
+  `,
+  grow: `
+    <h3>⭐ 升星</h3>
+    <p>收集同種寵物碎片可升星，提升基礎攻擊等能力。星階：白→綠→藍→紫→金→紅→閃金→閃彩。</p>
+    <h3>✨ 進化</h3>
+    <p>達到指定等級與武力／智力／魅力等條件後可階段進化，解鎖更強技能與數值倍率。</p>
+    <h3>🪸 寶物與鍛造</h3>
+    <ul>
+      <li>地圖「珊瑚鍛造坊」可用寶物碎片合成／升階寶物。</li>
+      <li>寶物可裝備在寵物身上（最多 6 格），提供武力、攻擊等加成。</li>
+      <li>部分寶物對特定寵物有額外效果（例如雷刀＋電電豬）。</li>
+    </ul>
+    <h3>♻️ 分解</h3>
+    <p>不需要的寵物可分解成碎片，用來幫主力升星。</p>
+    <div class="tip">💡 隊伍頁可點寵物卡片查看詳細數值、公式展開、升星與進化按鈕。</div>
+  `
+};
+
+const TYPE_CHART_ORDER = ['火','水','電','土','風','草','光','毒','神'];
+
+function mulClass(m) {
+  if (m == null || m === 1) return '';
+  if (m >= 1.25) return 'type-mul-good';
+  if (m <= 0.9) return 'type-mul-bad';
+  if (m < 1) return 'type-mul-same';
+  return 'type-mul-good';
+}
+function formatMul(m) {
+  if (m == null) return '1';
+  if (m === 1) return '·';
+  return String(m);
+}
+function fillTypeChartTable() {
+  const tb = document.querySelector('#type-chart-table tbody');
+  if (!tb || typeof TYPE_EFFECT === 'undefined') return;
+  tb.innerHTML = TYPE_CHART_ORDER.map(atk => {
+    const row = TYPE_EFFECT[atk] || {};
+    const cells = TYPE_CHART_ORDER.map(def => {
+      const m = row[def] != null ? row[def] : 1;
+      return '<td class="' + mulClass(m) + '">' + formatMul(m) + '</td>';
+    }).join('');
+    return '<tr><td class="type-name">' + atk + '</td>' + cells + '</tr>';
+  }).join('');
+}
+
+function showHelpTab(key) {
+  const body = document.getElementById('help-body');
+  if (!body) return;
+  body.innerHTML = HELP_CONTENT[key] || '';
+  document.querySelectorAll('#help-tabs .help-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.htab === key);
+  });
+  if (key === 'type') setTimeout(fillTypeChartTable, 0);
+}
+
+function openHelp(tab) {
+  showHelpTab(tab || 'guide');
+  const modal = document.getElementById('help-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+function closeHelp() {
+  const modal = document.getElementById('help-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function maybeShowNewbieGuide() {
+  try {
+    // 強制教學進行中不彈說明，避免重疊
+    if (!S.tutorialDone) return;
+    if (localStorage.getItem('bobodao_help_seen') === '1') return;
+    setTimeout(() => {
+      openHelp('guide');
+      try { localStorage.setItem('bobodao_help_seen', '1'); } catch (e) {}
+    }, 600);
+  } catch (e) {}
+}
+
+function attachHelpHandlers() {
+  const btn = document.getElementById('help-btn');
+  if (btn) btn.onclick = () => openHelp('guide');
+  const closeBtn = document.getElementById('help-close');
+  if (closeBtn) closeBtn.onclick = closeHelp;
+  document.querySelectorAll('#help-tabs .help-tab').forEach(t => {
+    t.onclick = () => showHelpTab(t.dataset.htab);
+  });
+  const modal = document.getElementById('help-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeHelp();
+    });
+  }
+}
+
+// 掛到進入遊戲流程
+(function hookNewbieGuide() {
+  const tryHook = () => {
+    if (typeof enterGame === 'function' && !enterGame._helpHooked) {
+      const orig = enterGame;
+      enterGame = async function() {
+        const r = await orig.apply(this, arguments);
+        maybeShowNewbieGuide();
+        return r;
+      };
+      enterGame._helpHooked = true;
+    }
+    if (typeof enterAsGuest === 'function' && !enterAsGuest._helpHooked) {
+      const origG = enterAsGuest;
+      enterAsGuest = function() {
+        const r = origG.apply(this, arguments);
+        maybeShowNewbieGuide();
+        return r;
+      };
+      enterAsGuest._helpHooked = true;
+    }
+  };
+  tryHook();
+  setTimeout(tryHook, 0);
+  setTimeout(tryHook, 500);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { attachHelpHandlers(); tryHook(); });
+  } else {
+    attachHelpHandlers();
+  }
+})();
+
 setInterval(() => { try { if (typeof updateHeader === 'function' && !$('login-overlay')?.classList.contains('hidden')===false) updateHeader(); if (S.currentZone && $('zone-panel') && !$('zone-panel').classList.contains('hidden')) { /* refresh desc clock */ const z=S.currentZone; if(z && (z.timeSpawns||z.id==='meadow')){ const clock=getGameClock(); $('zone-desc').textContent=z.desc+'　｜　🕒 '+clock.label; } } } catch(e){} }, 5000);
 
 /* 自動維持登入：重新整理不需再登入 */
