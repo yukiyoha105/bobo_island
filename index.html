@@ -239,6 +239,22 @@
     .hp-mini-fill { height: 100%; background: #66bb6a; border-radius: 4px; }
     .team-label { position: absolute; top: 3px; left: 3px; background: #ff7043; color: white; font-size: 0.6rem; padding: 1px 5px; border-radius: 6px; font-weight: 700; }
     .item-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; }
+    .history-card {
+      background: linear-gradient(145deg, #fffef9, #efebe9);
+      border: 2px solid #a1887f; border-radius: 14px;
+      padding: 12px 14px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.12s ease;
+    }
+    .history-card:active { transform: scale(0.98); }
+    .history-card .hc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .history-card .hc-result { font-weight: 900; color: #5d4037; font-size: 1rem; }
+    .history-card .hc-time { font-size: 0.78rem; color: #888; font-weight: 600; }
+    .history-card .hc-zone { font-size: 0.85rem; color: #6d4c41; margin-top: 4px; }
+    .history-card .hc-vs { font-size: 0.8rem; color: #777; margin-top: 4px; line-height: 1.35; }
+    .history-card .hc-more { font-size: 0.75rem; color: #2e7d32; font-weight: 700; margin-top: 6px; }
+
     .item-card { background: #e3f2fd; border-radius: 10px; padding: 10px; text-align: center; border: 2px solid #90caf9; }
     .item-card .emoji { font-size: 1.6rem; }
     .item-card .name { font-weight: 700; font-size: 0.85rem; }
@@ -295,14 +311,45 @@
     .bcard .bc-sk:disabled { opacity: 0.4; cursor: not-allowed; }
     .bcard .bc-triad { display: flex; justify-content: space-between; gap: 2px; font-size: 0.62rem; color: #6d4c41; margin-top: 2px; }
     .battle-log-panel {
-      background: #fafafa; border: 2px solid #bdbdbd; border-radius: 10px;
-      padding: 6px 10px; height: 88px; overflow-y: auto;
-      font-size: 0.78rem; line-height: 1.4;
+      background: linear-gradient(180deg, #fffef9 0%, #f5f5f5 100%);
+      border: 2px solid #a1887f; border-radius: 12px;
+      padding: 6px 8px 8px; height: 120px;
+      font-size: 0.78rem; line-height: 1.45;
+      display: flex; flex-direction: column;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
     }
     .battle-log-panel .title {
-      text-align: center; font-weight: 800; color: #5d4037; font-size: 0.8rem;
-      margin-bottom: 2px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-weight: 800; color: #5d4037; font-size: 0.82rem;
+      margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;
+      flex-shrink: 0;
     }
+    .battle-log-panel .title .blog-title-text { flex: 1; text-align: center; }
+    .blog-expand-btn {
+      border: none; background: #efebe9; color: #5d4037; font-family: inherit;
+      font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 999px;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .blog-expand-btn:active { transform: scale(0.96); }
+    #b-log {
+      flex: 1; overflow-y: auto; min-height: 0;
+      padding-right: 2px;
+    }
+    #b-log .e {
+      margin-bottom: 3px; padding: 2px 4px; border-radius: 4px;
+    }
+    #b-log .e:nth-child(odd) { background: rgba(0,0,0,0.03); }
+    /* 完整戰鬥日誌彈窗 */
+    #battle-log-modal .modal {
+      max-width: 440px; max-height: 80vh; display: flex; flex-direction: column;
+    }
+    #battle-log-full {
+      text-align: left; max-height: 55vh; overflow-y: auto;
+      background: #fafafa; border-radius: 12px; padding: 10px 12px;
+      border: 2px solid #eee; font-size: 0.85rem; line-height: 1.5;
+    }
+    #battle-log-full .e { margin-bottom: 4px; padding: 3px 4px; border-radius: 4px; }
+    #battle-log-full .e:nth-child(odd) { background: rgba(0,0,0,0.03); }
     .battle-bottom-bar {
       display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center;
     }
@@ -687,7 +734,7 @@
       .header { padding: 8px 10px; flex-shrink: 0; }
       .header h1 { font-size: 1.05rem; }
       .header-stats { width: 100%; flex-wrap: wrap; gap: 4px; font-size: 0.72rem; }
-      .nav-btn { padding: 12px 2px; min-height: 44px; font-size: 0.78rem; }
+      .nav-btn { padding: 12px 1px; min-height: 44px; font-size: 0.72rem; }
       .screen { padding: 8px; flex: 1; overflow-y: auto; min-height: 0; }
       .island-wrap { aspect-ratio: 1/1; max-width: 100%; }
       .pet-list, .item-list, .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -1068,6 +1115,7 @@
       <button class="nav-btn active" data-screen="map">🗺️ 島嶼</button>
       <button class="nav-btn" data-screen="team">🐾 隊伍</button>
       <button class="nav-btn" data-screen="codex">📖 圖鑑</button>
+      <button class="nav-btn" data-screen="history">📜 紀錄</button>
       <button class="nav-btn" data-screen="bag">🎒 背包</button>
     </div>
 
@@ -1106,8 +1154,15 @@
       <div class="pet-list" id="codex-owned-list"></div>
     </div>
 
+    <div id="history" class="screen">
+      <div class="section-title">📜 戰鬥紀錄 <span id="history-progress" style="font-weight:600;color:#666;font-size:0.85rem"></span></div>
+      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">保存最近 50 場戰鬥，點擊可看完整日誌</p>
+      <div id="history-list" class="history-list"></div>
+    </div>
+
     <div id="bag" class="screen">
       <div class="section-title">🎒 背包</div>
+      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">金幣、道具與寶物碎片</p>
       <div class="item-list" id="item-list"></div>
     </div>
 
@@ -1115,7 +1170,10 @@
       <div class="battle-screen-wrap">
         <div class="battle-row-allies" id="battle-allies"></div>
         <div class="battle-log-panel">
-          <div class="title">戰鬥訊息</div>
+          <div class="title">
+            <span class="blog-title-text">📜 戰鬥日誌</span>
+            <button type="button" class="blog-expand-btn" id="blog-expand-btn">展開</button>
+          </div>
           <div id="b-log"></div>
         </div>
         <div class="battle-row-enemies" id="battle-enemies"></div>
@@ -1127,7 +1185,16 @@
     </div>
   </div>
 
-  <div class="overlay hidden" id="login-overlay">
+    <div class="overlay hidden" id="battle-log-modal">
+    <div class="modal">
+      <div class="big">📜</div>
+      <h2>戰鬥日誌</h2>
+      <div id="battle-log-full"></div>
+      <button class="btn btn-primary" id="battle-log-close" style="margin-top:12px">關閉</button>
+    </div>
+  </div>
+
+<div class="overlay hidden" id="login-overlay">
     <div class="modal">
       <div class="big">🏝️</div>
       <h2>歡迎來到波波島</h2>
@@ -1445,9 +1512,9 @@ const ALL_PETS = [
     dropPetExp: [40, 70],
     dropPlayerExp: [80, 120],
     dropCoins: [90, 100],
-    // 20% 機率掉水刀碎片 10~20（在 rollBattleDrops 處理）
-    dropShuiDaoFrags: [10, 20],
-    dropShuiDaoChance: 0.20,
+    // 20% 機率掉冰刀碎片 10~20（在 rollBattleDrops 處理）
+    dropBingDaoFrags: [10, 20],
+    dropBingDaoChance: 0.20,
     skills: [
       // 基 0級 5MP：背水一戰 — 100~130% 傷害，並回復自身 30~40% 血量
       { id:'qingshui', name:'背水一戰', emoji:'💧', evoReq:0, unlockLv:0, mp:5,
@@ -1498,8 +1565,8 @@ const ALL_PETS = [
     dropPetExp: [180, 260],
     dropPlayerExp: [220, 326],
     dropCoins: [300, 420],
-    dropShuiDaoFrags: [21, 35],
-    dropShuiDaoChance: 0.30,
+    dropBingDaoFrags: [21, 35],
+    dropBingDaoChance: 0.30,
     skills: [
       // 基 0級 45MP：海洋之母的力量 — 治療我方 60% 血量
       { id:'haiyangzhimu', name:'海洋之母的力量', emoji:'🌊', evoReq:0, unlockLv:0, mp:45,
@@ -1634,7 +1701,7 @@ const ALL_PETS = [
 
 const ZONES = [
   /* 依截圖紅圈：標記落在各區域正中央；家在池塘右下方 */
-  {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以休息與整理隊伍。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
+  {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以整理隊伍與查看資訊。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
   {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。', unlock:0, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76},
   {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24},
@@ -1916,10 +1983,10 @@ const ALL_TREASURES = [
     }
   },
   {
-    id: 'shui_dao',
-    name: '水刀',
-    emoji: '🗡️',
-    desc: '水系寶刀。配戴後強化水系技能。',
+    id: 'bing_dao',
+    name: '冰刀',
+    emoji: '🧊',
+    desc: '寒冰寶刀。水波豹系列掉落碎片可合成。',
     grades: [
       { name:'白', cost:3,   bonuses:{ force:5 } },
       { name:'綠', cost:15,  bonuses:{ intel:2 } },
@@ -1935,21 +2002,6 @@ const ALL_TREASURES = [
       minLevel: 13,
       extraForce: 10
     }
-  },
-  {
-    id: 'bing_dao',
-    name: '冰刀',
-    emoji: '🧊',
-    desc: '寒冰寶刀。效果尚未開放。',
-    grades: [
-      { name:'白', cost:3,   bonuses:{} },
-      { name:'綠', cost:15,  bonuses:{} },
-      { name:'藍', cost:35,  bonuses:{} },
-      { name:'紫', cost:60,  bonuses:{} },
-      { name:'金', cost:80,  bonuses:{} },
-      { name:'紅', cost:100, bonuses:{} }
-    ],
-    craft: { frags: 3 }
   },
   {
     id: 'sha_jia',
@@ -2003,6 +2055,14 @@ function equipTreasureOnPet(petIdx, treasureId) {
     return false;
   }
   if (p.equippedTreasures.length >= 6) { alert('寶物格已滿'); return false; }
+  // 一個寶物同一時間只能給一隻寵物裝備：先從其他寵物卸下
+  (S.owned || []).forEach((op, oi) => {
+    if (!op || oi === petIdx || !op.equippedTreasures) return;
+    if (op.equippedTreasures.indexOf(treasureId) < 0) return;
+    op.equippedTreasures = op.equippedTreasures.filter(id => id !== treasureId);
+    if (typeof recalculatePetStats === 'function') recalculatePetStats(op);
+    if (typeof syncPetPowerBaseline === 'function') syncPetPowerBaseline(op);
+  });
   p.equippedTreasures.push(treasureId);
   if (p._lastPower == null) syncPetPowerBaseline(p);
   recalculatePetStats(p);
@@ -2229,17 +2289,17 @@ function rollBattleDropsForOne(win, wild) {
     }
   }
 
-  if (base && base.dropShuiDaoFrags && base.dropShuiDaoFrags.length >= 2) {
-    const chance = (base.dropShuiDaoChance != null) ? base.dropShuiDaoChance : 1;
+  if (base && base.dropBingDaoFrags && base.dropBingDaoFrags.length >= 2) {
+    const chance = (base.dropBingDaoChance != null) ? base.dropBingDaoChance : 1;
     if (Math.random() < chance) {
-      const n = rand(base.dropShuiDaoFrags[0], base.dropShuiDaoFrags[1]);
+      const n = rand(base.dropBingDaoFrags[0], base.dropBingDaoFrags[1]);
       if (n > 0) {
-        if (typeof addTreasureFragments === 'function') addTreasureFragments('shui_dao', n);
+        if (typeof addTreasureFragments === 'function') addTreasureFragments('bing_dao', n);
         else {
           if (!S.treasureFrags) S.treasureFrags = {};
-          S.treasureFrags.shui_dao = (S.treasureFrags.shui_dao || 0) + n;
+          S.treasureFrags.bing_dao = (S.treasureFrags.bing_dao || 0) + n;
         }
-        drops.lines.push('🗡️ 水刀碎片 ×' + n);
+        drops.lines.push('🧊 冰刀碎片 ×' + n);
       }
     }
   }
@@ -2442,7 +2502,11 @@ const S = {
   // 新手教學：0=未完成需引導 / 1=進行中 / 2=已完成
   tutorialDone: false,
   tutorialStep: 0,
-  tutorialTargetDone: false
+  tutorialTargetDone: false,
+  battleHistory: [],
+  _battleLog: [],
+  _battleMeta: null,
+  metWildCount: 0 // 遇過幾隻野生（前 15 隻收服率 +20%）
 };
 
 function expNeeded(lv){ return lv * 30; }
@@ -2566,9 +2630,27 @@ function calcCombatPower(p) {
   let power =
     hp * 0.4 + mp * 0.15 +
     atk * 2.2 + def * 1.6 + spd * 1.2 +
-    force * 1.5 + intel * 1.2 + charm * 1.0 +
+    force * 3.6 + intel * 3.2 + charm * 3.0 +
     lv * 8 + stage * 25 + star * 12 +
     crit * 180 + dodge * 150 + hit * 80;
+  // 已解鎖技能數會提升戰力（被動也算）
+  try {
+    const base = (typeof getBase === 'function') ? getBase(p.id) : null;
+    const skills = (p.skills && p.skills.length) ? p.skills : ((base && base.skills) || []);
+    let unlocked = 0;
+    skills.forEach(sk => {
+      if (!sk) return;
+      if (typeof canUseSkill === 'function') {
+        if (canUseSkill(p, sk)) unlocked++;
+      } else {
+        const needLv = sk.unlockLv != null ? sk.unlockLv : 0;
+        const needEvo = sk.evoReq != null ? sk.evoReq : 0;
+        if (lv >= needLv && stage >= needEvo) unlocked++;
+      }
+    });
+    // 每解鎖 1 個技能約 +3.5% 基礎戰力（遞減感用固定加成）
+    power += unlocked * 48;
+  } catch (e) {}
   const petType = (p.type || (typeof getBase === 'function' && getBase(p.id) && getBase(p.id).type) || '');
   if (petType === '神') power *= (1.18 + Math.min(0.12, stage * 0.02));
   return Math.round(power * 16);
@@ -2876,14 +2958,24 @@ function recalculatePetStats(p, options) {
 function petFaceHtml(p, size) {
   size = size || 48;
   const base = (p && p.id) ? (getBase(p.id) || p) : p;
-  // 所有寵物統一使用「寵物名.png」圖檔（與 index.html 同目錄即可）
-  const name = (base && base.name) || (p && p.name) || '';
-  const img = (base && base.img) || (p && p.img) || (name ? (name + '.png') : null);
+  // 一律使用「寵物名.png」（與 index.html 同目錄；戰鬥 A/B 後綴會去掉）
+  let name = (base && base.name) || (p && p.name) || '';
+  name = String(name).replace(/\s+[A-Z]$/, '');
   const em = (base && base.emoji) || (p && p.emoji) || '❓';
-  if (img) {
-    return '<img src="'+img+'" alt="'+name+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;vertical-align:middle" onerror="this.onerror=null;this.style.display=\'none\';if(this.nextSibling&&this.nextSibling.nodeType===3)return;this.insertAdjacentText(\'afterend\',\''+em+'\');">';
-  }
-  return em;
+  if (!name) return em;
+  const img = name + '.png';
+  return '<img src="'+img+'" alt="'+name+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;vertical-align:middle" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentText(\'afterend\',\''+em+'\');">';
+}
+
+/** 寶物圖：一律「寶物名.png」 */
+function treasureFaceHtml(t, size) {
+  size = size || 48;
+  const def = (t && t.id && typeof getTreasureDef === 'function') ? (getTreasureDef(t.id) || t) : t;
+  const name = (def && def.name) || (t && t.name) || '';
+  const em = (def && def.emoji) || (t && t.emoji) || '💎';
+  if (!name) return em;
+  const img = name + '.png';
+  return '<img src="'+img+'" alt="'+name+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;vertical-align:middle" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentText(\'afterend\',\''+em+'\');">';
 }
 
 const clonePet = (base,lv=1) => {
@@ -3305,6 +3397,7 @@ function showScreen(id) {
   if(id==='team') renderTeam();
   if(id==='bag') renderBag();
   if(id==='codex') renderCodex();
+  if(id==='history') renderBattleHistoryScreen();
 }
 
 /* ---------------- Supabase 登入 / 雲端存檔 ---------------- */
@@ -3341,7 +3434,9 @@ function getSaveData() {
       gameTimeBaseMin: S.gameTimeBaseMin,
       tutorialDone: !!S.tutorialDone,
       tutorialStep: S.tutorialStep || 0,
-      tutorialTargetDone: !!S.tutorialTargetDone
+      tutorialTargetDone: !!S.tutorialTargetDone,
+      battleHistory: Array.isArray(S.battleHistory) ? S.battleHistory.slice(0, 50) : [],
+      metWildCount: Math.max(0, Number(S.metWildCount) || 0)
     },
     farm: (window.FarmGame ? window.FarmGame.getState() : null)
   };
@@ -3377,6 +3472,17 @@ function loadGameData(saved) {
     S.tutorialDone = !!d.tutorialDone;
     S.tutorialStep = d.tutorialStep || 0;
     S.tutorialTargetDone = !!d.tutorialTargetDone;
+    S.battleHistory = Array.isArray(d.battleHistory) ? d.battleHistory.slice(0, 50) : [];
+    S.metWildCount = Math.max(0, Number(d.metWildCount) || 0);
+    // 舊「水刀」碎片 → 冰刀
+    if (S.treasureFrags && S.treasureFrags.shui_dao) {
+      S.treasureFrags.bing_dao = (S.treasureFrags.bing_dao || 0) + (S.treasureFrags.shui_dao || 0);
+      delete S.treasureFrags.shui_dao;
+    }
+    if (S.treasures && S.treasures.shui_dao) {
+      if (!S.treasures.bing_dao) S.treasures.bing_dao = S.treasures.shui_dao;
+      delete S.treasures.shui_dao;
+    }
     // 舊存檔若已有多隻寵物或勝場，視為已完成教學
     if (!S.tutorialDone && ((S.owned && S.owned.length > 1) || (S.wins || 0) > 0)) {
       S.tutorialDone = true;
@@ -3595,6 +3701,7 @@ window.addEventListener('beforeunload', () => { if (currentUserId) persistCurren
 
 let _handlersBound = false;
 function bindGameHandlers() {
+  if (typeof bindBattleLogUI === 'function') bindBattleLogUI();
   if (_handlersBound) return;
   _handlersBound = true;
   document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -3781,11 +3888,7 @@ function openZone(z) {
   if (zd) { zd.style.display = ''; zd.textContent = z.desc + extra; }
   const actions = $('zone-actions');
   actions.innerHTML = '';
-  if(z.rest){
-    const b=document.createElement('button'); b.className='btn btn-explore'; b.textContent='😴 休息回復';
-    b.onclick=()=>{ S.owned.forEach(p=>{ p.hp=p.maxHp; if (p.maxMp!=null) p.mp=p.maxMp; }); saveGame(); addLog('zone-log','所有寵物恢復精神了！❤️💙 HP／MP 全滿'); };
-    actions.appendChild(b);
-  }
+  // 家裡不再需要手動休息（戰鬥結束會自動回滿 HP／MP）
   if(z.shop){
     const b=document.createElement('button'); b.className='btn btn-shop'; b.textContent='🛒 商店';
     b.onclick=()=>openShop(); actions.appendChild(b);
@@ -3896,9 +3999,21 @@ function getPetCaptureRate(target, opts) {
   } else if (target && target.captureRate != null) {
     rate = Number(target.captureRate);
   }
+  // 新手前 15 隻遇到的野生：收服率 +20%（相對原本）
+  const met = Math.max(0, Number(S.metWildCount) || 0);
+  if (met > 0 && met <= 15) {
+    rate = rate * 1.20;
+  }
   rate = Math.max(0.01, Math.min(0.95, rate));
   if (!S.tutorialDone && S.tutorialStep >= 2) rate = 1;
   return rate;
+}
+
+/** 累加遇敵次數（每隻野生各算 1） */
+function noteWildEncounter(n) {
+  const add = Math.max(0, Number(n) || 0);
+  if (!add) return;
+  S.metWildCount = Math.max(0, Number(S.metWildCount) || 0) + add;
 }
 function getPostBattleCatchRate(target) {
   return getPetCaptureRate(target, {});
@@ -3998,7 +4113,7 @@ function startWildBattle() {
   // 記錄上場的隊伍索引（最多 3），戰鬥後全員領經驗
   S._battleTeamIdxs = (S.team || []).filter(i => S.owned[i] && S.owned[i].hp > 0).slice(0, 3);
   const live = S._battleTeamIdxs.map(i => S.owned[i]);
-  if (!live.length) { addLog('zone-log','⚠️ 出戰寵物沒體力了，請回廣場休息！'); return; }
+  if (!live.length) { addLog('zone-log','⚠️ 出戰寵物沒體力了，（戰鬥後會自動回滿）'); return; }
   recalculatePetStats(S.wild);
   S.battleAllies = live.map((p, i) => {
     const f = buildFighterFromOwned(p);
@@ -4117,9 +4232,18 @@ function startWildBattle() {
     }
   }
   while (S.battleEnemies.length < 3) S.battleEnemies.push(null);
+  // 同名敵加 A/B/C 後綴
+  if (typeof applyDuplicateEnemyLabels === 'function') applyDuplicateEnemyLabels(S.battleEnemies);
+  // 戰鬥用名稱寫入 name（收服用 _battleRewardPets 仍是原名）
+  (S.battleEnemies || []).forEach(e => {
+    if (e && e.displayName) e.name = e.displayName;
+  });
   S.enemy = S.battleEnemies.find(e => e && e.hp > 0) || S.battleEnemies[0];
   // 記錄本場所有可收服野生（供勝利後收服主目標仍用 S.wild）
   S._battleWildList = (S.battleEnemies || []).filter(e => e && e.catchable !== false);
+  // 新手遇敵計數（每隻算 1）
+  const metN = (S.battleEnemies || []).filter(e => e && e.id).length;
+  if (typeof noteWildEncounter === 'function') noteWildEncounter(metN);
 
   // 教學戰：再次壓低敵方數值
   if (isTutBattle && S.battleEnemies[0]) {
@@ -4148,11 +4272,19 @@ function startWildBattle() {
 
 function startBattleUI() {
   renderBattleBoard();
-  $('b-log').innerHTML = '';
+  if (typeof clearBattleLog === 'function') clearBattleLog(); else { const _bl=$('b-log'); if(_bl) _bl.innerHTML=''; }
+  if (typeof bindBattleLogUI === 'function') bindBattleLogUI();
   const aNames = (S.battleAllies || []).filter(Boolean).map(p => p.name).join('、');
   const eNames = (S.battleEnemies || []).filter(Boolean).map(p => p.name).join('、');
   addBLog('戰鬥開始！' + aNames + ' vs ' + eNames, 'sys');
   addBLog('為每隻我方選擇技能，或使用道具跳過選技', 'sys');
+  S._battleMeta = {
+    startedAt: Date.now(),
+    zoneName: (S.currentZone && S.currentZone.name) ? S.currentZone.name : '未知地點',
+    zoneEmoji: (S.currentZone && S.currentZone.emoji) ? S.currentZone.emoji : '🗺️',
+    allies: aNames,
+    enemies: eNames
+  };
   const eCount = (S.battleEnemies || []).filter(Boolean).length;
   if (eCount >= 2 && !S.tutorialTargetDone) {
     addBLog('📘 敵人有 ' + eCount + ' 隻：選攻擊技後，請點敵方卡片指定目標', 'sys');
@@ -4284,6 +4416,33 @@ function renderAllyCard(pet, slot) {
   '</div>';
 }
 
+/** 戰鬥顯示名（同名敵加 A/B/C） */
+function battlePetName(pet) {
+  if (!pet) return '';
+  return pet.displayName || pet.name || '';
+}
+
+/** 同場相同寵物加後綴 A B C */
+function applyDuplicateEnemyLabels(enemies) {
+  const list = enemies || [];
+  const counts = {};
+  list.forEach(e => {
+    if (!e || !e.id) return;
+    counts[e.id] = (counts[e.id] || 0) + 1;
+  });
+  const seen = {};
+  list.forEach(e => {
+    if (!e || !e.id) return;
+    if (counts[e.id] > 1) {
+      seen[e.id] = (seen[e.id] || 0) + 1;
+      const letter = String.fromCharCode(64 + seen[e.id]); // A, B, C...
+      e.displayName = (e.name || '寵物') + ' ' + letter;
+    } else {
+      e.displayName = e.name || '';
+    }
+  });
+}
+
 function renderEnemyCard(pet, slot) {
   if (!pet) {
     return '<div class="bcard enemy-card empty"><div class="bc-name">敵方' + (slot+1) + '</div><div style="text-align:center;color:#999;padding:16px 0">空</div></div>';
@@ -4297,7 +4456,7 @@ function renderEnemyCard(pet, slot) {
   const cp = calcCombatPower(pet);
   const starHtml = renderStarsHtml(pet.starLevel || 0, { size: 12 });
   return '<div class="bcard enemy-card' + extraCls + '" id="enemy-card-' + slot + '" data-enemy-slot="' + slot + '">' +
-    '<div class="bc-name">敵方' + (slot+1) + '　' + pet.name + '</div>' +
+    '<div class="bc-name">敵方' + (slot+1) + '　' + battlePetName(pet) + '</div>' +
     '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#b71c1c;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
     '<div class="bc-face">' + petFaceHtml(pet, 40) + '</div>' +
     '<div style="text-align:center;font-size:0.72rem;font-weight:800;color:#c62828;margin:1px 0">⚔️ ' + cp.toLocaleString() + '</div>' +
@@ -4443,14 +4602,253 @@ function renderBattleBoard() {
 function renderPlayerTeamFighters() { renderBattleBoard(); }
 function updateBattleHp() { renderBattleBoard(); }
 
+/** 操作提示／教學文字：不寫入戰鬥日誌 */
+function isBattleLogTip(t, cls) {
+  if (cls === 'tip' || cls === 'hint') return true;
+  const s = String(t || '');
+  if (!s) return true;
+  // 教學／操作引導
+  if (/^📘/.test(s)) return true;
+  if (/請(為|先|點選|選擇)|還可為|全員指令|指令已選|由左到右|跳過選技|選攻擊技後|學會了！|此技能不需要|無法戰鬥！/.test(s)) return true;
+  if (/準備防禦！|準備使用|改為使用|目標 →|教學戰鬥不能逃跑|一定打得過/.test(s)) return true;
+  if (/為每隻我方選擇技能|選技能並確認|點寵物卡片上的技能/.test(s)) return true;
+  return false;
+}
+
 function addBLog(t, cls) {
+  // 提示類不寫入日誌（畫面與存檔都不記）
+  if (isBattleLogTip(t, cls)) return;
+
+  if (!S._battleLog) S._battleLog = [];
+  const entry = { text: String(t), cls: cls || '', t: Date.now() };
+  S._battleLog.push(entry);
+  if (S._battleLog.length > 200) S._battleLog = S._battleLog.slice(-200);
+
   const box = $('b-log');
   if (!box) return;
   const d = document.createElement('div');
   d.className = 'e ' + (cls || '');
   d.textContent = t;
   box.appendChild(d);
+  while (box.children.length > 40) box.removeChild(box.firstChild);
   box.scrollTop = box.scrollHeight;
+}
+
+function clearBattleLog() {
+  S._battleLog = [];
+  const box = $('b-log');
+  if (box) box.innerHTML = '';
+}
+
+/** 戰鬥紀錄只保留「出招／傷害／治療」等實戰內容，不存操作提示 */
+function isCombatLogEntry(e) {
+  if (!e || !e.text) return false;
+  const t = String(e.text);
+  const cls = e.cls || '';
+  // 明確排除操作／教學提示
+  if (/請先|請為|請按|請點|還可為|指令已選|準備使用|準備防禦|目標\s*→|戰鬥開始|為每隻|依速度出招|教學|學會了|點敵方|確認出招|成功率|嘗試逃走|成功逃走|逃走失敗|改為使用|還要繼續|無法戰鬥|換上 /.test(t)) {
+    return false;
+  }
+  if (/增益效果還在|增益「|衝浪板／命中|暴擊增益結束|灼燒效果結束|配戴雷刀|被動效果/.test(t)) {
+    return false;
+  }
+  // 保留：出招、傷害、暴擊、治療、灼燒傷害、狀態命中（與戰鬥結果直接相關）
+  if (cls === 'p' || cls === 'en' || cls === 'crit' || cls === 'heal' || cls === 'miss' || cls === 'lucky') {
+    return true;
+  }
+  if (/使用 .+|造成 \d+ 傷害|合計傷害|CRITICAL|回復 \d+|灼燒 \d+ 傷害|第\d+下|被灼燒|陷入灼燒|被麻痺|護盾|同時擊中|餘波擊中|無法行動|屬性相剋|屬性不佳/.test(t)) {
+    return true;
+  }
+  return false;
+}
+
+function archiveBattleLog(result) {
+  try {
+    const logs = (S._battleLog || [])
+      .filter(isCombatLogEntry)
+      .map(e => ({ text: e.text, cls: e.cls || '' }));
+    if (!logs.length && !S._battleMeta) return;
+    const meta = S._battleMeta || {};
+    const rec = {
+      id: 'b' + Date.now() + '_' + Math.floor(Math.random() * 9999),
+      result: result || 'unknown',
+      startedAt: meta.startedAt || Date.now(),
+      endedAt: Date.now(),
+      zoneName: meta.zoneName || '',
+      zoneEmoji: meta.zoneEmoji || '🗺️',
+      allies: meta.allies || '',
+      enemies: meta.enemies || '',
+      logs: logs
+    };
+    if (!Array.isArray(S.battleHistory)) S.battleHistory = [];
+    S.battleHistory.unshift(rec);
+    if (S.battleHistory.length > 50) S.battleHistory = S.battleHistory.slice(0, 50);
+    S._battleMeta = null;
+    S._battleLog = [];
+    if (typeof saveGame === 'function') saveGame();
+  } catch (e) { console.warn('archiveBattleLog', e); }
+}
+
+function formatBattleTime(ts) {
+  if (!ts) return '';
+  try {
+    const d = new Date(ts);
+    const p = n => (n < 10 ? '0' : '') + n;
+    return d.getFullYear() + '/' + p(d.getMonth()+1) + '/' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  } catch (e) { return ''; }
+}
+
+function resultLabel(r) {
+  if (r === 'win') return '🎉 勝利';
+  if (r === 'lose') return '😿 敗北';
+  if (r === 'flee') return '🏃 逃走';
+  return '📜 戰鬥';
+}
+
+function renderBattleHistoryScreen() {
+  const box = $('history-list');
+  const prog = $('history-progress');
+  if (!box) return;
+  const list = Array.isArray(S.battleHistory) ? S.battleHistory : [];
+  if (prog) prog.textContent = '（' + list.length + ' / 50）';
+  if (!list.length) {
+    box.innerHTML = '<p style="text-align:center;color:#888;padding:24px 8px">還沒有戰鬥紀錄<br><span style="font-size:0.85rem">打一場戰鬥後就會出現在這裡</span></p>';
+    return;
+  }
+  box.innerHTML = list.map((rec, i) => {
+    const t = typeof formatBattleTime === 'function' ? formatBattleTime(rec.endedAt || rec.startedAt) : '';
+    const z = (rec.zoneEmoji || '') + (rec.zoneName || '');
+    const summary = (rec.allies || '我方') + ' vs ' + (rec.enemies || '敵方');
+    const res = typeof resultLabel === 'function' ? resultLabel(rec.result) : (rec.result || '');
+    const nlog = (rec.logs && rec.logs.length) || 0;
+    return '<div class="history-card" data-bh-i="' + i + '">' +
+      '<div class="hc-top"><span class="hc-result">' + res + '</span><span class="hc-time">' + t + '</span></div>' +
+      '<div class="hc-zone">' + z + '</div>' +
+      '<div class="hc-vs">' + (typeof escapeHtml === 'function' ? escapeHtml(summary) : summary) + '</div>' +
+      '<div class="hc-more">查看完整日誌（' + nlog + ' 則）›</div>' +
+    '</div>';
+  }).join('');
+  box.querySelectorAll('.history-card').forEach(el => {
+    el.onclick = () => {
+      const i = Number(el.getAttribute('data-bh-i'));
+      if (typeof openBattleHistoryDetail === 'function') openBattleHistoryDetail(i);
+    };
+  });
+}
+
+function openBattleHistoryList() {
+  const full = $('battle-log-full');
+  const ov = $('battle-log-modal');
+  const title = ov && ov.querySelector('h2');
+  if (!full || !ov) return;
+  if (title) title.textContent = '戰鬥紀錄（最近 50 場）';
+  const list = Array.isArray(S.battleHistory) ? S.battleHistory : [];
+  if (!list.length) {
+    full.innerHTML = '<div style="text-align:center;color:#888;padding:16px">還沒有戰鬥紀錄</div>';
+  } else {
+    full.innerHTML = list.map((rec, i) => {
+      const t = formatBattleTime(rec.endedAt || rec.startedAt);
+      const z = (rec.zoneEmoji || '') + (rec.zoneName || '');
+      const summary = (rec.allies || '我方') + ' vs ' + (rec.enemies || '敵方');
+      return '<div class="bh-item" data-bh-i="' + i + '" style="cursor:pointer;padding:10px 8px;border-bottom:1px solid #eee">' +
+        '<div style="font-weight:800;color:#5d4037">' + resultLabel(rec.result) +
+        ' <span style="font-weight:600;color:#888;font-size:0.8rem">' + t + '</span></div>' +
+        '<div style="font-size:0.8rem;color:#666;margin-top:2px">' + z + '</div>' +
+        '<div style="font-size:0.78rem;color:#888;margin-top:2px">' + escapeHtml(summary) +
+        '　·　' + ((rec.logs && rec.logs.length) || 0) + ' 則日誌</div></div>';
+    }).join('');
+    full.querySelectorAll('.bh-item').forEach(el => {
+      el.onclick = () => openBattleHistoryDetail(Number(el.getAttribute('data-bh-i')));
+    });
+  }
+  ov.classList.remove('hidden');
+  full.scrollTop = 0;
+}
+
+function openBattleHistoryDetail(index) {
+  const full = $('battle-log-full');
+  const ov = $('battle-log-modal');
+  const title = ov && ov.querySelector('h2');
+  if (!full || !ov) return;
+  const rec = (S.battleHistory || [])[index];
+  if (!rec) return;
+  if (title) title.textContent = resultLabel(rec.result) + ' · 詳細日誌';
+  const head =
+    '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #ccc;font-size:0.82rem;color:#555">' +
+      '<div>' + formatBattleTime(rec.endedAt || rec.startedAt) + '　' + (rec.zoneEmoji||'') + (rec.zoneName||'') + '</div>' +
+      '<div style="margin-top:4px">' + escapeHtml((rec.allies||'') + ' vs ' + (rec.enemies||'')) + '</div>' +
+      '<button type="button" class="blog-expand-btn" id="bh-back-btn" style="margin-top:8px">← 返回列表</button>' +
+    '</div>';
+  const body = (rec.logs || []).map(e =>
+    '<div class="e ' + (e.cls || '') + '">' + escapeHtml(e.text) + '</div>'
+  ).join('') || '<div style="color:#888;text-align:center">無日誌內容</div>';
+  full.innerHTML = head + body;
+  const back = $('bh-back-btn');
+  if (back) back.onclick = () => {
+    const ov = $('battle-log-modal');
+    if (ov) ov.classList.add('hidden');
+    // 若在紀錄頁就重整列表；否則開列表彈窗
+    if ($('history') && $('history').classList.contains('active') && typeof renderBattleHistoryScreen === 'function') {
+      renderBattleHistoryScreen();
+    } else if (typeof openBattleHistoryList === 'function') {
+      openBattleHistoryList();
+    }
+  };
+  ov.classList.remove('hidden');
+  full.scrollTop = 0;
+}
+
+function openBattleLogModal() {
+  const full = $('battle-log-full');
+  const ov = $('battle-log-modal');
+  const title = ov && ov.querySelector('h2');
+  if (!full || !ov) return;
+  if (title) title.textContent = '本場戰鬥日誌';
+  const list = S._battleLog || [];
+  if (!list.length) {
+    full.innerHTML = '<div class="e sys" style="text-align:center;color:#888">尚無日誌</div>';
+  } else {
+    full.innerHTML = list.map(e =>
+      '<div class="e ' + (e.cls || '') + '">' + escapeHtml(e.text) + '</div>'
+    ).join('');
+  }
+  ov.classList.remove('hidden');
+  setTimeout(() => { full.scrollTop = full.scrollHeight; }, 30);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function bindBattleLogUI() {
+  const exp = $('blog-expand-btn');
+  if (exp && !exp._bound) {
+    exp._bound = true;
+    exp.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openBattleLogModal();
+    };
+  }
+  const closeBtn = $('battle-log-close');
+  if (closeBtn && !closeBtn._bound) {
+    closeBtn._bound = true;
+    closeBtn.onclick = () => {
+      const ov = $('battle-log-modal');
+      if (ov) ov.classList.add('hidden');
+    };
+  }
+  const ov = $('battle-log-modal');
+  if (ov && !ov._bound) {
+    ov._bound = true;
+    ov.onclick = (e) => {
+      if (e.target === ov) ov.classList.add('hidden');
+    };
+  }
 }
 
 /** 是否為自我／隊伍增益類技能（持續期間不可重複點選） */
@@ -4767,9 +5165,7 @@ function setBattleBtns(on) {
       p._selfBuff.turns--;
       if (p._selfBuff.turns <= 0) p._selfBuff = null;
     });
-    // 回合開始回復 MP
-    regenBattleMp(S.battleAllies, '我方');
-    regenBattleMp(S.battleEnemies, '敵方');
+    // 戰鬥中不回復 MP（只能靠技能／道具）
     S.selectedActions = {};
     S.selectedTargets = {};
     S._pickingTargetFor = null;
@@ -4795,6 +5191,17 @@ function syncAlliesHpToOwned() {
       if (p.mp != null) S.owned[p.ownedIdx].mp = p.mp;
     }
   });
+}
+
+/** 戰鬥結束後：全部寵物 HP／MP 回滿（戰鬥中 MP 不回） */
+function restoreAllPetsAfterBattle() {
+  (S.owned || []).forEach(p => {
+    if (!p) return;
+    if (p.maxHp != null) p.hp = p.maxHp;
+    if (p.maxMp != null) p.mp = p.maxMp;
+  });
+  if (typeof saveGame === 'function') saveGame();
+  if (typeof updateHeader === 'function') updateHeader();
 }
 
 function livingEnemies() {
@@ -5335,7 +5742,11 @@ function resolvePlayerActions() {
     syncAlliesHpToOwned();
     if (livingEnemies().length === 0) { setTimeout(() => endBattle(true), 400); return; }
     if (livingAllies().length === 0) { setTimeout(() => endBattle(false), 400); return; }
-    // 敵方自身增益倒數（沿用 enemyTurn 開頭邏輯的精簡版）
+    // 回合結束：先結算灼燒
+    if (typeof processBurnDamage === 'function') processBurnDamage();
+    if (livingEnemies().length === 0) { setTimeout(() => endBattle(true), 500); return; }
+    if (livingAllies().length === 0) { setTimeout(() => endBattle(false), 500); return; }
+    // 敵方自身增益倒數
     if (typeof tickEnemySelfEffects === 'function') tickEnemySelfEffects();
     else if (S.eSelfEffects) {
       if (S.eSelfEffects.critTurns) {
@@ -5707,15 +6118,16 @@ function executeSkill(pl, sk, onDone, isEnemy){
 
   // 純上狀態（真知灼見：必中灼燒）— 敵我同等
   if (sk.effect === 'burn' && sk.atkPercent == null && !sk.power) {
+    const bTurns = sk.burnTurns != null ? sk.burnTurns : 2;
     if (roll(sk.burnChance != null ? sk.burnChance : 1)) {
       if (isEnemy) {
-        // 敵人對我方上灼燒（簡化：隨機一隻持續扣血用 pBurn）
         if (!S.pBurn) S.pBurn = {};
-        S.pBurn.turns = Math.max(S.pBurn.turns || 0, 2);
-        addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！我方陷入灼燒！', 'sys');
+        S.pBurn.turns = Math.max(S.pBurn.turns || 0, bTurns);
+        addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！🔥 我方陷入灼燒（' + bTurns + ' 回合）！', 'sys');
       } else {
-        S.eEffects.burn = Math.max(S.eEffects.burn || 0, 2);
-        addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！敵方陷入灼燒！', 'sys');
+        if (!S.eEffects) S.eEffects = {};
+        S.eEffects.burn = Math.max(S.eEffects.burn || 0, bTurns);
+        addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！🔥 敵方陷入灼燒（' + bTurns + ' 回合）！', 'sys');
       }
     } else {
       addBLog(sk.name + ' 沒能附加灼燒…', 'miss');
@@ -5981,10 +6393,12 @@ function executeSkill(pl, sk, onDone, isEnemy){
     if (isEnemy) {
       if (!S.pBurn) S.pBurn = {};
       S.pBurn.turns = Math.max(S.pBurn.turns || 0, turns);
-      addBLog('我方被灼燒了！（' + turns + ' 回合）', 'sys');
+      addBLog('🔥 我方被灼燒了！每回合損失約 3~5% 當前血量（' + turns + ' 回合）', 'sys');
     } else {
+      if (!S.eEffects) S.eEffects = {};
       S.eEffects.burn = Math.max(S.eEffects.burn || 0, turns);
-      addBLog(S.enemy.name + ' 被灼燒了！（' + turns + ' 回合）', 'sys');
+      const tname = (S.enemy && S.enemy.name) ? S.enemy.name : '敵方';
+      addBLog('🔥 ' + tname + ' 被灼燒了！每回合損失約 3~5% 當前血量（' + turns + ' 回合）', 'sys');
     }
   }
   // 麻痺（天雷轟）：目標休息一回合
@@ -6089,26 +6503,10 @@ function enemyTurn(){
     }
   }
 
-  // 灼燒傷害：對所有仍存活的敵方各結算一次（不可因單一 S.enemy 死亡就整場勝利）
-  if (S.eEffects && S.eEffects.burn > 0) {
-    (S.battleEnemies || []).forEach((en, ei) => {
-      if (!en || en.hp <= 0) return;
-      // 灼燒：每回合扣「當前血量」3%~5%
-      const pct = 0.03 + Math.random() * 0.02;
-      const burnDmg = Math.max(1, Math.floor(en.hp * pct));
-      en.hp = Math.max(0, en.hp - burnDmg);
-      addBLog('🔥 ' + en.name + ' 受到灼燒 ' + burnDmg + ' 傷害（約 ' + Math.round(pct * 100) + '%）！', 'sys');
-      try {
-        const card = document.getElementById('enemy-card-' + ei);
-        if (card) {
-          // 簡易飄字：沿用更新後血量條
-        }
-      } catch (e) {}
-    });
-    updateBattleHp();
-    // 必須全部敵人都倒下才算勝利
-    if (livingEnemies().length === 0) { setTimeout(() => endBattle(true), 500); return; }
-  }
+  // 灼燒（敵我）在敵方回合開始時結算一次（逃跑失敗等路徑）
+  if (typeof processBurnDamage === 'function') processBurnDamage();
+  if (livingEnemies().length === 0) { setTimeout(() => endBattle(true), 500); return; }
+  if (livingAllies().length === 0) { setTimeout(() => endBattle(false), 500); return; }
 
   // 所有存活敵方依速度行動
   const foes = livingEnemies().slice().sort((a,b) => (b.speed||0) - (a.speed||0));
@@ -6149,7 +6547,67 @@ function enemyTurn(){
   actEnemy(0);
 }
 
-function tickEffects(){ for(const k in S.eEffects){ S.eEffects[k]--; if(S.eEffects[k]<=0) delete S.eEffects[k]; } }
+/** 灼燒傷害結算（敵我都算）：每回合扣當前 HP 約 3%~5% */
+function processBurnDamage() {
+  let any = false;
+  // 敵方灼燒
+  if (S.eEffects && S.eEffects.burn > 0) {
+    (S.battleEnemies || []).forEach((en, ei) => {
+      if (!en || en.hp <= 0) return;
+      const pct = 0.03 + Math.random() * 0.02;
+      const burnDmg = Math.max(1, Math.floor(en.hp * pct));
+      en.hp = Math.max(0, en.hp - burnDmg);
+      any = true;
+      addBLog('🔥 ' + en.name + ' 受到灼燒 ' + burnDmg + ' 傷害（約 ' + Math.round(pct * 100) + '%）！', 'sys');
+      try {
+        showPop('e', '-' + burnDmg, 'd');
+      } catch (e) {}
+    });
+  }
+  // 我方灼燒
+  if (S.pBurn && S.pBurn.turns > 0) {
+    (S.battleAllies || []).forEach((al, ai) => {
+      if (!al || al.hp <= 0) return;
+      const pct = 0.03 + Math.random() * 0.02;
+      const burnDmg = Math.max(1, Math.floor(al.hp * pct));
+      al.hp = Math.max(0, al.hp - burnDmg);
+      any = true;
+      addBLog('🔥 ' + al.name + ' 受到灼燒 ' + burnDmg + ' 傷害（約 ' + Math.round(pct * 100) + '%）！', 'sys');
+      try {
+        showPop('p', '-' + burnDmg, 'd');
+      } catch (e) {}
+    });
+  }
+  if (any) {
+    updateBattleHp();
+    syncAlliesHpToOwned();
+  }
+  // 回合數倒數（傷害後再扣）
+  if (S.eEffects && S.eEffects.burn > 0) {
+    S.eEffects.burn--;
+    if (S.eEffects.burn <= 0) {
+      delete S.eEffects.burn;
+      addBLog('敵方灼燒效果結束了', 'sys');
+    }
+  }
+  if (S.pBurn && S.pBurn.turns > 0) {
+    S.pBurn.turns--;
+    if (S.pBurn.turns <= 0) {
+      S.pBurn = null;
+      addBLog('我方灼燒效果結束了', 'sys');
+    }
+  }
+  return any;
+}
+
+function tickEffects(){
+  for (const k in S.eEffects) {
+    // burn 由 processBurnDamage 自行倒數，避免扣兩次
+    if (k === 'burn') continue;
+    S.eEffects[k]--;
+    if (S.eEffects[k] <= 0) delete S.eEffects[k];
+  }
+}
 
 function tryFleeBattle() {
   if (!S.battling || !S.playerTurn) return;
@@ -6171,7 +6629,9 @@ function tryFleeBattle() {
   setTimeout(() => {
     if (roll(rate)) {
       addBLog('成功逃走了！', 'sys');
+      if (typeof archiveBattleLog === 'function') archiveBattleLog('flee');
       S.battling = false;
+      if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
       S.wild = null;
       S.selectedActions = {};
       S.selectedTargets = {};
@@ -6469,7 +6929,10 @@ function showLevelUpScreen(info) {
 function endBattle(win){
   S.battling=false;
   setBattleBtns(false);
+  if (typeof archiveBattleLog === 'function') archiveBattleLog(win ? 'win' : 'lose');
   syncAlliesHpToOwned();
+  // 戰鬥結束後全體寵物 HP／MP 回滿（不必回家休息）
+  if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
   const idx=S.team[0];
   if(S.owned[idx] && S.player) S.owned[idx].hp=Math.max(0,S.owned[idx].hp);
 
@@ -6930,7 +7393,7 @@ function openForge() {
 
     card.innerHTML =
       '<div style="text-align:center">' +
-        '<div class="emoji">' + def.emoji + '</div>' +
+        '<div class="emoji">' + treasureFaceHtml(def, 48) + '</div>' +
         '<div class="name">' + def.name + '</div>' +
         '<div class="desc" style="margin-bottom:4px">' + def.desc + '</div>' +
       '</div>' +
@@ -7670,7 +8133,7 @@ function openPetInfo(idx) {
       const g = getTreasureGrade(tid);
       const gName = (def.grades[g] && def.grades[g].name) || '';
       return '<div class="info-slot" style="cursor:pointer;border-style:solid" data-unequip="'+tid+'">' +
-        (def.emoji||'⚔️') + '<br>' + def.name + (gName ? ('·'+gName) : '') + '</div>';
+        treasureFaceHtml(def, 28) + '<br>' + def.name + (gName ? ('·'+gName) : '') + '</div>';
     }
     return '<div class="info-slot">寶物格 ' + (i + 1) + '<br>空</div>';
   }).join('');
@@ -7703,7 +8166,7 @@ function openPetInfo(idx) {
         const gName = t.grades[g].name;
         const on = eq.indexOf(t.id) >= 0;
         return '<button class="btn btn-shop" style="padding:4px 10px;font-size:0.75rem;margin:2px'+(on?';opacity:0.5':'')+'" data-equip="'+t.id+'" '+(on?'disabled':'')+'>' +
-          t.emoji + ' ' + t.name + '·' + gName + '</button>';
+          treasureFaceHtml(t, 22) + ' ' + t.name + '·' + gName + '</button>';
       }).join('');
     equipBar.querySelectorAll('[data-equip]').forEach(btn => {
       btn.onclick = () => {
@@ -7899,7 +8362,7 @@ function renderBag(){
     has = true;
     const d = document.createElement('div'); d.className = 'item-card';
     d.style.borderColor = '#81c784';
-    d.innerHTML = '<div class="emoji">' + (base.emoji || '🧩') + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">用於升星／召喚</div>';
+    d.innerHTML = '<div class="emoji">' + petFaceHtml(base, 40) + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">用於升星／召喚</div>';
     box.appendChild(d);
   });
 
@@ -7912,7 +8375,7 @@ function renderBag(){
     const gName = g >= 0 ? ((def.grades[g] || {}).name || '') + '階' : '未製作';
     const d = document.createElement('div'); d.className = 'item-card';
     d.style.borderColor = '#ce93d8';
-    d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '碎片</div><div class="count">×' + fr + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + gName + '　用於升階</div>';
+    d.innerHTML = '<div class="emoji">' + treasureFaceHtml(def, 40) + '</div><div class="name">' + def.name + '碎片</div><div class="count">×' + fr + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + gName + '　用於升階</div>';
     box.appendChild(d);
   });
 
@@ -7926,7 +8389,7 @@ function renderBag(){
     const bon = formatTreasureBonuses(getTreasureBonuses(def.id));
     const d = document.createElement('div'); d.className = 'item-card';
     d.style.borderColor = color;
-    d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count" style="color:' + color + '">' + gName + '階</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (bon || '已擁有') + '</div>';
+    d.innerHTML = '<div class="emoji">' + treasureFaceHtml(def, 40) + '</div><div class="name">' + def.name + '</div><div class="count" style="color:' + color + '">' + gName + '階</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (bon || '已擁有') + '</div>';
     box.appendChild(d);
   });
 
@@ -8205,7 +8668,7 @@ const HELP_CONTENT = {
       <li>神話級寵物收服率很低，多靠碎片合成更穩。</li>
     </ul>
     <h3>🧩 碎片與戰利品</h3>
-    <p>勝利後會掉落寵物碎片、經驗、金幣；部分區域還會掉寶物碎片（如雷刀、水刀）。</p>
+    <p>勝利後會掉落寵物碎片、經驗、金幣；部分區域還會掉寶物碎片（如雷刀、冰刀）。</p>
     <div class="tip">💡 敗戰仍有少量經驗，可練習操作與熟悉技能。</div>
   `,
   grow: `
