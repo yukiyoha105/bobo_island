@@ -399,6 +399,32 @@
     .bc-sk.defend { background: linear-gradient(135deg,#90caf9,#42a5f5) !important; color:#0d47a1; }
     .bc-sk.flee-hint { opacity: 0.85; }
     .enemy-card.selectable { cursor: pointer; outline: 2px dashed #ef6c00; outline-offset: 2px; }
+    .enemy-card.high-level-foe {
+      outline: 3px solid #d50000;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(213,0,0,0.18), 0 0 16px rgba(255,82,82,0.35);
+      animation: highLvPulse 1.2s ease-in-out infinite;
+    }
+    @keyframes highLvPulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(213,0,0,0.18), 0 0 12px rgba(255,82,82,0.3); }
+      50% { box-shadow: 0 0 0 5px rgba(213,0,0,0.28), 0 0 20px rgba(255,23,68,0.45); }
+    }
+    #battle-high-level-alert {
+      display: none;
+      margin: 0 0 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #b71c1c, #e53935, #ff6f00);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.92rem;
+      text-align: center;
+      border: 2px solid #ffcdd2;
+      animation: highLvPulse 1.2s ease-in-out infinite;
+      letter-spacing: 0.02em;
+    }
+    #battle-high-level-alert.show { display: block; }
+
     .enemy-card.selectable:hover { outline-color: #e53935; transform: scale(1.03); }
     .enemy-card.targeted { outline: 3px solid #e53935; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(229,57,53,0.25); }
     .battle-bottom-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -562,6 +588,7 @@
     .overlay.hidden { display: none; }
     /* 升級／升星／進化畫面永遠蓋在其他彈窗之上 */
     #levelup-modal { z-index: 300; }
+    #star-bonus-modal { z-index: 500; }
 
     .levelup-modal { background: linear-gradient(180deg,#fff8e1 0%,#ffffff 55%); border: 3px solid #ffb300; max-width: 420px; }
     .levelup-modal .big { font-size: 4rem; animation: popIn 0.45s ease; }
@@ -606,6 +633,48 @@
     @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
 
     .modal { background: white; border-radius: 18px; padding: 24px 20px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 16px 40px rgba(0,0,0,0.2); }
+    #result-modal .modal {
+      max-width: min(520px, 94vw);
+      width: 94vw;
+      padding: 22px 18px 18px;
+      text-align: left;
+    }
+    #result-modal .modal .big { text-align: center; }
+    #result-modal .modal h2 { text-align: center; }
+    #result-modal #res-msg {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #444;
+      max-height: min(52vh, 420px);
+      overflow-y: auto;
+      margin: 8px 0 12px;
+    }
+    #result-modal .res-sec {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fafafa;
+      border: 1px solid #eee;
+    }
+    #result-modal .res-sec-title {
+      font-weight: 900;
+      color: #e65100;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+    #result-modal .res-line { margin: 2px 0; }
+    #result-modal .res-loot-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 3px 0;
+      border-bottom: 1px dashed #eee;
+      font-weight: 700;
+    }
+    #result-modal .res-loot-item:last-child { border-bottom: none; }
+    #result-modal .res-muted { color: #888; font-weight: 600; font-size: 0.8rem; }
+    #result-modal #res-actions { text-align: center; }
+
     .power-toast {
       position: fixed; left: 50%; top: 18%; transform: translateX(-50%) translateY(-8px);
       z-index: 9999; pointer-events: none;
@@ -1142,7 +1211,8 @@
     </div>
 
     <div id="team" class="screen">
-      <div class="section-title">🐾 出戰隊伍（最多 3 隻，第一隻上場）</div>
+      <div class="section-title">🐾 出戰名單（最多 6 隻）</div>
+      <p style="text-align:center;font-size:0.78rem;color:#888;margin:-6px 0 8px">前 3 隻開戰上場，後 3 隻候補；戰鬥中可一次換多人（換幾隻下就要換幾隻上；陣亡可直接補）</p>
       <div class="pet-list" id="team-list"></div>
       <div class="section-title" style="margin-top:14px">✅ 已擁有的寵物（點擊查看／加入隊伍）</div>
       <div class="pet-list" id="owned-list"></div>
@@ -1150,8 +1220,11 @@
 
     <div id="codex" class="screen">
       <div class="section-title">📖 寵物圖鑑 <span id="codex-progress" style="font-weight:600;color:#666;font-size:0.85rem"></span></div>
-      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">只顯示你擁有的寵物，點擊可查看詳情</p>
+      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">已擁有可查看詳情；換成碎片後或尚未擁有的，湊齊碎片可再次合成</p>
+      <div class="section-title" style="font-size:0.95rem;margin-top:6px">✅ 已擁有</div>
       <div class="pet-list" id="codex-owned-list"></div>
+      <div class="section-title" style="font-size:0.95rem;margin-top:14px">✨ 可合成／未擁有</div>
+      <div class="pet-list" id="codex-summon-list"></div>
     </div>
 
     <div id="history" class="screen">
@@ -1179,7 +1252,22 @@
         <div class="battle-row-enemies" id="battle-enemies"></div>
         <div class="battle-bottom-bar">
           <div id="item-btns" class="act-grid" style="flex:1"></div>
+          <button type="button" class="btn btn-shop" id="battle-switch-btn" style="display:none">🔄 換人</button>
           <button class="btn btn-primary" id="confirm-actions-btn" style="display:none">✅ 確認出招</button>
+        </div>
+        <div class="overlay hidden" id="battle-switch-modal">
+          <div class="modal" style="max-width:min(440px,94vw);text-align:left">
+            <div class="big" style="text-align:center">🔄</div>
+            <h2 style="text-align:center">戰鬥換人</h2>
+            <p id="bsw-msg" style="font-size:0.85rem;color:#555;text-align:center">可一次換多人：選幾隻下場就要選幾隻上場。<br>若有陣亡空位，可直接補人（不必先換下）。<br>確認後本回合結束，輪到敵方。</p>
+            <div id="bsw-status" style="text-align:center;font-weight:800;color:#6a1b9a;font-size:0.9rem;margin:6px 0">換下 0　／　換上 0</div>
+            <div class="res-sec-title" style="margin-top:8px">上場中（點選要換下；💀 空位可補人）</div>
+            <div id="bsw-field" style="display:flex;flex-direction:column;gap:6px;margin:6px 0"></div>
+            <div class="res-sec-title">候補（點選要換上）</div>
+            <div id="bsw-bench" style="display:flex;flex-direction:column;gap:6px;margin:6px 0"></div>
+            <button type="button" class="btn btn-primary" id="bsw-confirm" style="width:100%;margin-top:10px" disabled>✅ 確認換人</button>
+            <button type="button" class="btn btn-back" id="bsw-cancel" style="width:100%;margin-top:8px">取消</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1247,6 +1335,21 @@
     </div>
   </div>
 
+  <div class="overlay hidden" id="lineup-modal">
+    <div class="modal" style="max-width:min(480px,94vw);text-align:left">
+      <div class="big" style="text-align:center">🎯</div>
+      <h2 style="text-align:center">選擇上場三隻</h2>
+      <p id="lineup-msg" style="font-size:0.85rem;color:#555;text-align:center;margin-bottom:8px">
+        點選要上場的寵物（最多 3 隻，順序＝欄位順序）。<br>
+        其餘出戰名單會自動當候補。可組同屬性觸發羈絆！
+      </p>
+      <div id="lineup-status" style="text-align:center;font-weight:800;color:#6a1b9a;margin-bottom:8px">已選 0 / 3</div>
+      <div id="lineup-list" style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:10px"></div>
+      <button type="button" class="btn btn-pink" id="lineup-confirm" style="width:100%" disabled>✅ 確認出戰</button>
+      <button type="button" class="btn btn-back" id="lineup-cancel" style="width:100%;margin-top:8px">返回</button>
+    </div>
+  </div>
+
   <div class="overlay hidden" id="player-modal">
     <div class="modal">
       <div class="big" id="pl-emoji">🧑‍🌾</div>
@@ -1274,6 +1377,36 @@
     </div>
   </div>
 
+
+  <div class="overlay hidden" id="pet-nickname-modal">
+    <div class="modal">
+      <div class="big" id="pn-emoji">🐾</div>
+      <h2>幫牠取名字？</h2>
+      <p id="pn-msg">收服成功！可以幫這隻寵物取一個暱稱（最多 8 字）。</p>
+      <input id="pn-input" maxlength="8" placeholder="輸入暱稱（最多8字）" style="width:90%;padding:10px 12px;border:2px solid #81c784;border-radius:12px;font-family:inherit;font-size:1rem;margin:8px 0 14px;text-align:center" />
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-explore" id="pn-confirm">確認取名</button>
+        <button class="btn btn-back" id="pn-keep">保持原名</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="overlay hidden" id="star-bonus-modal" style="z-index:500">
+    <div class="modal">
+      <div class="big" id="sb-emoji">⭐</div>
+      <h2>星階提升加成！</h2>
+      <p id="sb-msg" style="white-space:pre-line">升到新的星階色了！請選擇一項永久加成：</p>
+      <div id="sb-power-now" style="margin:6px 0 4px;font-weight:800;color:#e65100;font-size:0.95rem">⚔️ 目前戰力：—</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0">
+        <button class="btn btn-pink" id="sb-force" style="width:100%;line-height:1.35">💪 武力 +10<br><span id="sb-force-cp" style="font-size:0.78rem;font-weight:700;opacity:0.95"></span></button>
+        <button class="btn btn-primary" id="sb-intel" style="width:100%;line-height:1.35">🧠 智力 +10<br><span id="sb-intel-cp" style="font-size:0.78rem;font-weight:700;opacity:0.95"></span></button>
+        <button class="btn btn-purple" id="sb-charm" style="width:100%;line-height:1.35">✨ 魅力 +10<br><span id="sb-charm-cp" style="font-size:0.78rem;font-weight:700;opacity:0.95"></span></button>
+      </div>
+      <p style="font-size:0.78rem;color:#888;margin:0">此加成永久有效，之後無法更改。按鈕上會預覽戰力變化。</p>
+    </div>
+  </div>
+
   <div class="overlay hidden" id="pet-info-modal">
     <div class="modal pet-info-modal">
       <div class="pet-info-scroll" id="pet-info-scroll">
@@ -1295,7 +1428,8 @@
       <div class="pet-info-actions" id="pet-info-actions">
         <button type="button" class="btn btn-purple" id="pet-info-evo" style="position:relative;display:none">✨ 進化</button>
         <button type="button" class="btn btn-shop" id="pet-info-star" style="position:relative">⭐ 升星</button>
-        <button type="button" class="btn btn-pink" id="pet-info-dismantle">♻️ 分解</button>
+        <button type="button" class="btn btn-explore" id="pet-info-star-bonus" style="position:relative;display:none">🎁 領取星階加成</button>
+        <button type="button" class="btn btn-pink" id="pet-info-dismantle">♻️ 換成碎片</button>
         <button type="button" class="btn btn-primary" id="pet-info-close">關閉</button>
       </div>
     </div>
@@ -1416,7 +1550,13 @@ const ALL_PETS = [
       { to:2, level:19, force:105 },
       { to:3, level:29, force:108 },
       { to:4, level:37, charm:103 },
-      { to:5, level:49, charm:106 }
+      { to:5, level:49, charm:106 },
+      { to:6, level:60, force:112, atk:55 },
+      { to:7, level:75, force:120, charm:112, atk:70 },
+      { to:8, level:100, force:130, charm:118, atk:90, def:55 },
+      { to:9, level:115, force:140, charm:125, atk:110, speed:40 },
+      { to:10, level:130, force:152, charm:132, atk:130, def:70, speed:48 },
+      { to:11, level:160, force:168, charm:145, atk:160, def:85, speed:58 }
     ],
     dropFrags: [1, 4],
     dropPetExp: [15, 20],
@@ -1459,7 +1599,13 @@ const ALL_PETS = [
     evoReqs: [
       { to:3, level:29, force:108 },
       { to:4, level:37, charm:103 },
-      { to:5, level:49, charm:106 }
+      { to:5, level:49, charm:106 },
+      { to:6, level:60, force:120, atk:65 },
+      { to:7, level:75, force:132, charm:120, atk:85 },
+      { to:8, level:100, force:148, charm:130, atk:110, def:70 },
+      { to:9, level:115, force:160, charm:140, atk:135, speed:50 },
+      { to:10, level:130, force:175, charm:152, atk:165, def:90, speed:60 },
+      { to:11, level:160, force:190, charm:165, atk:200, def:110, speed:75 }
     ],
     dropFrags: [16, 28], // 火爆熊碎片
     dropSelfFrags: [0, 1], // 神·火爆熊碎片
@@ -1506,7 +1652,13 @@ const ALL_PETS = [
       { to:2, level:19 },
       { to:3, level:29, intel:125 },
       { to:4, level:37, charm:123 },
-      { to:5, level:49, speed:35 }
+      { to:5, level:49, speed:35 },
+      { to:6, level:60, intel:140, charm:135, speed:45 },
+      { to:7, level:75, intel:155, charm:148, speed:55, atk:90 },
+      { to:8, level:100, intel:170, charm:160, speed:68, atk:110, def:60 },
+      { to:9, level:115, intel:180, charm:168, speed:78, atk:125, def:72 },
+      { to:10, level:130, intel:190, charm:176, speed:88, atk:140, def:85 },
+      { to:11, level:160, intel:200, charm:185, speed:98, atk:155, def:95 }
     ],
     dropFrags: [1, 4],
     dropPetExp: [40, 70],
@@ -1567,6 +1719,17 @@ const ALL_PETS = [
     dropCoins: [300, 420],
     dropBingDaoFrags: [21, 35],
     dropBingDaoChance: 0.30,
+    evoReqs: [
+      { to:3, level:29, intel:135 },
+      { to:4, level:37, charm:135 },
+      { to:5, level:49, speed:42 },
+      { to:6, level:60, intel:155, charm:150, speed:55 },
+      { to:7, level:75, intel:175, charm:168, speed:70, atk:110 },
+      { to:8, level:100, intel:195, charm:185, speed:88, atk:135, def:75 },
+      { to:9, level:115, intel:210, charm:200, speed:100, atk:155, def:90 },
+      { to:10, level:130, intel:225, charm:215, speed:112, atk:170, def:105 },
+      { to:11, level:160, intel:240, charm:230, speed:125, atk:190, def:120 }
+    ],
     skills: [
       // 基 0級 45MP：海洋之母的力量 — 治療我方 60% 血量
       { id:'haiyangzhimu', name:'海洋之母的力量', emoji:'🌊', evoReq:0, unlockLv:0, mp:45,
@@ -1614,7 +1777,13 @@ const ALL_PETS = [
       { to:2, level:19, def:60 },
       { to:3, level:29, force:116 },
       { to:4, level:37, charm:114 },
-      { to:5, level:49, intel:100 }
+      { to:5, level:49, intel:100 },
+      { to:6, level:60, force:130, def:80, intel:112 },
+      { to:7, level:75, force:145, charm:130, def:95, intel:125 },
+      { to:8, level:100, force:162, charm:145, intel:138, atk:115, def:115 },
+      { to:9, level:115, force:175, charm:155, intel:145, atk:130, def:130, speed:55 },
+      { to:10, level:130, force:186, charm:163, intel:152, atk:145, def:142, speed:70 },
+      { to:11, level:160, force:198, charm:172, intel:160, atk:160, def:155, speed:88 }
     ],
     // 戰利品手稿
     dropFrags: [1, 3],
@@ -1665,7 +1834,13 @@ const ALL_PETS = [
     evoReqs: [
       { to:3, level:29, force:128 },
       { to:4, level:37, def:70 },
-      { to:5, level:49, intel:106 }
+      { to:5, level:49, intel:106 },
+      { to:6, level:60, force:145, def:90, intel:120 },
+      { to:7, level:75, force:165, def:110, intel:135, atk:120 },
+      { to:8, level:100, force:185, def:130, intel:155, atk:145, charm:120 },
+      { to:9, level:115, force:200, def:145, intel:170, atk:160, speed:65, charm:130 },
+      { to:10, level:130, force:218, def:160, intel:185, atk:178, speed:78, charm:140 },
+      { to:11, level:160, force:235, def:175, intel:200, atk:195, speed:90, charm:150 }
     ],
     // 戰利品：16~24 電電豬碎片、1~2 自己的碎片
     dropFrags: [16, 24],
@@ -1706,7 +1881,7 @@ const ZONES = [
   {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24},
   {id:'volcano',  name:'火山',      emoji:'🌋', desc:'島中央偏右的火山，隨時可能噴發。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40},
-  {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
+  {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！有 25% 機率遇到等級很高的野生。', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
   {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao','hai_shuibo_bao'], x:62, y:65},
   {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82}
 ];
@@ -1803,12 +1978,33 @@ function pickZoneEncounter(zone) {
   return { id: picked.id, spawnMeta: null };
 }
 
+/** 野生等級：一般約玩家±1~2；彩虹山脈 25% 出現很高級 */
+function rollWildLevelForZone(base, zone) {
+  zone = zone || S.currentZone;
+  let lv = Math.max(1, (S.level || 1) + rand(-1, 2));
+  if (base && base.minWildLevel != null) {
+    lv = Math.max(lv, Number(base.minWildLevel) || 1);
+  }
+  const pl = Math.max(1, Number(S.level) || 1);
+  // 全地圖都有機率出現「偏高一級」的野生；彩虹更高
+  // 玩家等級越高，高等遭遇機率略增（例：39 級更容易遇高的）
+  let highChance = 0.08 + Math.min(0.12, Math.floor(pl / 10) * 0.02);
+  if (zone && zone.id === 'rainbow') highChance = 0.38 + Math.min(0.12, Math.floor(pl / 12) * 0.02);
+  else if (zone && (zone.danger || 0) >= 3) highChance += 0.06;
+  if (Math.random() < highChance) {
+    // 高等：玩家+5~+18（彩虹可更高）
+    const pad = (zone && zone.id === 'rainbow') ? rand(10, 28) : rand(5, 16);
+    const high = Math.max(pl + pad, Math.floor(pl * 1.15) + rand(0, 6));
+    lv = Math.max(lv, high);
+  }
+  return lv;
+}
+
 function createWildPetFromEncounter(enc) {
   if (!enc || !enc.id) return null;
   const base = getBase(enc.id);
   if (!base) return null;
-  let lv = Math.max(1, (S.level || 1) + rand(-1, 2));
-  if (base.minWildLevel != null) lv = Math.max(lv, Number(base.minWildLevel) || 1);
+  let lv = rollWildLevelForZone(base, S.currentZone);
   const w = clonePet(base, lv);
   w.level = lv;
   if (base.minWildLevel != null) {
@@ -2026,6 +2222,113 @@ const TREASURE_GRADE_COLORS = {
   '紫': '#8e24aa', '金': '#f9a825', '紅': '#e53935'
 };
 
+
+/** 寵物顯示名稱：有暱稱則「暱稱（種類名）」，否則種類名 */
+function getPetDisplayName(pet) {
+  if (!pet) return '';
+  const species = pet.name || '';
+  const nick = (pet.nickname || '').trim();
+  if (nick) return nick + '（' + species + '）';
+  return species;
+}
+
+/** 收服成功後彈出取名視窗（僅一次）；完成後呼叫 onDone */
+let _pendingNicknameCb = null;
+function offerPetNickname(pet, onDone) {
+  _pendingNicknameCb = typeof onDone === 'function' ? onDone : null;
+  if (!pet) {
+    if (_pendingNicknameCb) { const cb = _pendingNicknameCb; _pendingNicknameCb = null; cb(); }
+    return;
+  }
+  // 已取過名、或合成／開局寵不可再取名
+  if (pet.namedOnce) {
+    if (_pendingNicknameCb) { const cb = _pendingNicknameCb; _pendingNicknameCb = null; cb(); }
+    return;
+  }
+  const modal = $('pet-nickname-modal');
+  if (!modal) {
+    pet.namedOnce = true;
+    if (_pendingNicknameCb) { const cb = _pendingNicknameCb; _pendingNicknameCb = null; cb(); }
+    return;
+  }
+  $('pn-emoji').innerHTML = (typeof petFaceHtml === 'function') ? petFaceHtml(pet, 64) : (pet.emoji || '🐾');
+  $('pn-msg').textContent = '成功收服「' + (pet.name || '寵物') + '」！\n可以幫牠取一個暱稱（最多 8 字），或保持原名。';
+  const input = $('pn-input');
+  if (input) { input.value = ''; input.focus(); }
+  modal.classList.remove('hidden');
+}
+
+function finishPetNickname(keepOriginal) {
+  const modal = $('pet-nickname-modal');
+  try {
+    // 從 owned 找最新一隻尚未 namedOnce 的（剛收服的）
+    let pet = null;
+    for (let i = (S.owned || []).length - 1; i >= 0; i--) {
+      const p = S.owned[i];
+      if (p && !p.namedOnce) { pet = p; break; }
+    }
+    if (pet) {
+      if (!keepOriginal) {
+        const raw = (($('pn-input') && $('pn-input').value) || '').trim().slice(0, 8);
+        if (raw) pet.nickname = raw;
+      }
+      pet.namedOnce = true;
+    }
+  } catch (e) { console.error('finishPetNickname assign', e); }
+  if (modal) modal.classList.add('hidden');
+  try { if (typeof saveGame === 'function') saveGame(); } catch (e) {}
+  try { if (typeof updateHeader === 'function') updateHeader(); } catch (e) {}
+  // 教學戰鬥結果畫面還開著時，先不要 renderTeam，避免畫面狀態錯亂
+  try {
+    const resOpen = $('result-modal') && !$('result-modal').classList.contains('hidden');
+    if (!resOpen && typeof renderTeam === 'function') renderTeam();
+  } catch (e) {}
+  const cb = _pendingNicknameCb;
+  _pendingNicknameCb = null;
+  if (cb) {
+    try { cb(); } catch (e) {
+      console.error('nickname callback', e);
+      if (!S.tutorialDone && typeof finishTutorialAfterCatch === 'function') {
+        try { finishTutorialAfterCatch(); } catch (e2) { console.error(e2); }
+      }
+    }
+  }
+}
+
+function bindPetNicknameModal() {
+  const confirmBtn = $('pn-confirm');
+  const keepBtn = $('pn-keep');
+  if (confirmBtn) confirmBtn.onclick = () => finishPetNickname(false);
+  if (keepBtn) keepBtn.onclick = () => finishPetNickname(true);
+  const input = $('pn-input');
+  if (input) {
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); finishPetNickname(false); }
+    };
+  }
+}
+
+/** 火爆熊碎片 → 神·火爆熊碎片：每 10 片換 1 片 */
+function exchangeHuobaoFragsToShen() {
+  const have = getFragmentCount('huobao_xiong');
+  const times = Math.floor(have / 10);
+  if (times <= 0) {
+    alert('需要至少 10 片火爆熊碎片才能兌換（目前 ' + have + '）');
+    return;
+  }
+  const cost = times * 10;
+  const gain = times;
+  if (!confirm('確定用 🔥 火爆熊碎片 ×' + cost + ' 兌換 ✨ 神·火爆熊碎片 ×' + gain + '？')) return;
+  if (!S.fragments) S.fragments = {};
+  S.fragments['huobao_xiong'] = have - cost;
+  S.fragments['shen_huobao_xiong'] = (S.fragments['shen_huobao_xiong'] || 0) + gain;
+  saveGame();
+  alert('🔄 兌換成功！\n扣除火爆熊碎片 ×' + cost + '\n獲得神·火爆熊碎片 ×' + gain + '\n（目前神·火爆熊碎片：' + getFragmentCount('shen_huobao_xiong') + '）');
+  if (typeof renderBag === 'function') renderBag();
+  if (typeof updateRedDots === 'function') updateRedDots();
+}
+
+
 function onPetCaught(pet) {
   if (!pet) return;
   if (pet.id) markDiscovered(pet.id);
@@ -2063,21 +2366,30 @@ function equipTreasureOnPet(petIdx, treasureId) {
     if (typeof recalculatePetStats === 'function') recalculatePetStats(op);
     if (typeof syncPetPowerBaseline === 'function') syncPetPowerBaseline(op);
   });
+  const before = (typeof snapshotPetCombatStats === 'function') ? snapshotPetCombatStats(p) : null;
   p.equippedTreasures.push(treasureId);
   if (p._lastPower == null) syncPetPowerBaseline(p);
   recalculatePetStats(p);
-  notifyIfPowerUp(p, '裝備寶物');
   saveGame();
+  if (before && typeof showEquipStatChangeScreen === 'function') {
+    showEquipStatChangeScreen(p, before, '裝備寶物');
+  } else {
+    notifyIfPowerUp(p, '裝備寶物');
+  }
   return true;
 }
 function unequipTreasureOnPet(petIdx, treasureId) {
   const p = S.owned[petIdx];
   if (!p || !p.equippedTreasures) return false;
+  const before = (typeof snapshotPetCombatStats === 'function') ? snapshotPetCombatStats(p) : null;
   p.equippedTreasures = p.equippedTreasures.filter(id => id !== treasureId);
   recalculatePetStats(p);
-  // 卸下可能掉戰力：只更新基準，不通知
-  syncPetPowerBaseline(p);
   saveGame();
+  if (before && typeof showEquipStatChangeScreen === 'function') {
+    showEquipStatChangeScreen(p, before, '卸下寶物');
+  } else {
+    syncPetPowerBaseline(p);
+  }
   return true;
 }
 
@@ -2171,7 +2483,7 @@ const AVATARS = ['🧑‍🌾','👧','👦','🧙','🦸','🧝','🧛','🧔',
 /* ===== 星級系統：碎片需求 ===== */
 const STAR_COLORS = ['白','綠','藍','紫','金','紅','閃金','閃彩'];
 const STAR_COLOR_HEX = [
-  '#ffe082',  // 白階改淡黃色
+  '#b0b0b0',  // 白階：中性灰（不過白也不過深）
   '#66bb6a',  // 綠
   '#42a5f5',  // 藍
   '#ab47bc',  // 紫
@@ -2325,32 +2637,333 @@ function rollBattleDropsForOne(win, wild) {
   return drops;
 }
 
-/** 戰鬥掉落：本場每隻敵各自結算後合併 */
+/** 從掉落文字解析「名稱 ×數量」（盡量合併同類） */
+function parseDropLineToKey(line) {
+  if (!line) return null;
+  // 例：🧩 水波豹 碎片 ×24（持有 51） / ⚔️ 雷刀碎片 ×3 / 🍯 花蜜 ×1
+  const m = String(line).match(/^(.*?)\s*[×xX]\s*(\d+)/);
+  if (!m) return { key: line.trim(), name: line.trim(), amount: 1, hold: null };
+  let name = m[1].replace(/（持有\s*\d+）/g, '').trim();
+  const amount = parseInt(m[2], 10) || 1;
+  const holdM = String(line).match(/持有\s*(\d+)/);
+  const hold = holdM ? parseInt(holdM[1], 10) : null;
+  return { key: name, name: name, amount: amount, hold: hold };
+}
+
+/** 戰鬥掉落：本場合併成一份戰利品清單（同類加總） */
 function rollBattleDrops(win) {
-  const drops = { fragments: 0, fragName: '', lines: [], coins: 0 };
+  const drops = { fragments: 0, fragName: '', lines: [], coins: 0, items: [] };
   if (!win) return drops;
   const targets = getBattleRewardTargets();
   if (!targets.length) return drops;
-  targets.forEach((w, i) => {
+  const bag = Object.create(null); // key -> { name, amount, hold }
+  targets.forEach((w) => {
     const one = rollBattleDropsForOne(true, w);
-    const tag = (w.emoji || '') + (w.name || '') || ('敵' + (i + 1));
-    if (one.lines && one.lines.length) {
-      drops.lines.push('—' + tag + '—');
-      one.lines.forEach(l => drops.lines.push(l));
-    }
     drops.fragments += (one.fragments || 0);
+    (one.lines || []).forEach(line => {
+      // 跳過純分隔
+      if (/^—.*—$/.test(line)) return;
+      const parsed = parseDropLineToKey(line);
+      if (!parsed) return;
+      if (!bag[parsed.key]) bag[parsed.key] = { name: parsed.name, amount: 0, hold: null };
+      bag[parsed.key].amount += parsed.amount;
+      if (parsed.hold != null) bag[parsed.key].hold = parsed.hold; // 以最後持有為準
+    });
+  });
+  Object.keys(bag).forEach(k => {
+    const it = bag[k];
+    drops.items.push(it);
+    let s = it.name + ' ×' + it.amount;
+    if (it.hold != null) s += '（持有 ' + it.hold + '）';
+    drops.lines.push(s);
+  });
+  // 量大的排前面
+  drops.items.sort((a, b) => b.amount - a.amount);
+  drops.lines = drops.items.map(it => {
+    let s = it.name + ' ×' + it.amount;
+    if (it.hold != null) s += '（持有 ' + it.hold + '）';
+    return s;
   });
   return drops;
 }
 
-function tryUpgradeStar(idx) {
-    const p = S.owned[idx];
-  if (!p) {
-        return false;
+function appendResultCatchNote(text) {
+  const el = $('res-msg');
+  if (!el) return;
+  let box = el.querySelector('.res-catch-live');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'res-sec res-catch-live';
+    box.innerHTML = '<div class="res-sec-title">🎾 收服結果</div>';
+    el.appendChild(box);
   }
+  const line = document.createElement('div');
+  line.className = 'res-line';
+  line.textContent = text;
+  box.appendChild(line);
+}
+
+/** 組成精簡的勝利結算 HTML */
+function buildVictoryResultHtml(opts) {
+  opts = opts || {};
+  const sec = (title, body) =>
+    '<div class="res-sec"><div class="res-sec-title">' + title + '</div>' + body + '</div>';
+  let html = '';
+  // 摘要
+  html += sec('📋 本場摘要',
+    '<div class="res-line">打倒 <b>' + (opts.enemyN || 1) + '</b> 隻　勝場 <b>' + (opts.wins || 0) + '</b></div>' +
+    '<div class="res-line">💰 金幣 <b>+' + (opts.coins || 0) + '</b>　⭐ 玩家經驗 <b>+' + (opts.playerExp || 0) + '</b>　🐾 寵物經驗 <b>+' + (opts.petExp || 0) + '</b></div>' +
+    '<div class="res-line res-muted">玩家等級 Lv.' + (opts.playerLevel || 1) + '　（上場經驗 1 倍、候補 1/4）</div>'
+  );
+  // 升級
+  const upLines = [];
+  if (opts.playerLevelUp) upLines.push('<div class="res-line">🎊 ' + opts.playerLevelUp + '</div>');
+  if (opts.petLevelUps && opts.petLevelUps.length) {
+    upLines.push('<div class="res-line">🐾 ' + opts.petLevelUps.join('、') + '</div>');
+  }
+  if (opts.evoMsg) upLines.push('<div class="res-line">✨ ' + opts.evoMsg + '</div>');
+  if (upLines.length) html += sec('📈 升級／進化', upLines.join(''));
+  // 戰利品（合併）
+  const loot = opts.lootItems || [];
+  if (loot.length) {
+    const rows = loot.map(it => {
+      const hold = (it.hold != null) ? '<span class="res-muted">持有 ' + it.hold + '</span>' : '';
+      return '<div class="res-loot-item"><span>' + it.name + '</span><span>×' + it.amount + ' ' + hold + '</span></div>';
+    }).join('');
+    html += sec('🎁 戰利品（已合併）', rows);
+  } else {
+    html += sec('🎁 戰利品', '<div class="res-muted">本場無額外掉落</div>');
+  }
+  // 收服提示
+  if (opts.catchHint) {
+    html += sec('🎾 收服', '<div class="res-line">' + opts.catchHint + '</div>');
+  }
+  return html;
+}
+
+
+
+/** 是否跨了星階「色」（白→綠、綠→藍…） */
+function isStarColorTierUp(fromStar, toStar) {
+  const from = getStarMeta(fromStar);
+  const to = getStarMeta(toStar);
+  return (to.colorIndex || 0) > (from.colorIndex || 0);
+}
+
+/** 依目前星級，理論上已跨過幾個星階色（白→綠算 1 次） */
+function getStarTierBonusEligibleCount(pet) {
+  if (!pet) return 0;
+  const meta = getStarMeta(pet.starLevel || 0);
+  return Math.max(0, Number(meta.colorIndex) || 0);
+}
+
+/** 已領取幾次星階色三圍加成 */
+function getStarTierBonusClaimedCount(pet) {
+  if (!pet) return 0;
+  if (Array.isArray(pet.starTierBonuses)) return pet.starTierBonuses.length;
+  return Math.max(0, Number(pet.starTierBonusClaimed) || 0);
+}
+
+/** 尚可補領／待選的次數 */
+function getStarTierBonusPendingCount(pet) {
+  return Math.max(0, getStarTierBonusEligibleCount(pet) - getStarTierBonusClaimedCount(pet));
+}
+
+function ensureStarTierBonusList(pet) {
+  if (!pet) return [];
+  if (!Array.isArray(pet.starTierBonuses)) {
+    const n = Math.max(0, Number(pet.starTierBonusClaimed) || 0);
+    pet.starTierBonuses = [];
+    // 舊欄位只有次數、沒有細項時，不回填具體屬性（數值已在 force/intel/charm 上）
+    for (let i = 0; i < n; i++) pet.starTierBonuses.push('unknown');
+  }
+  return pet.starTierBonuses;
+}
+
+let _pendingStarBonus = null; // { idx, pet, continueFn, mode }
+
+
+/** 預覽：若某三圍 +10，戰力會變成多少（不寫入寵物） */
+function previewStarBonusPower(pet, stat) {
+  if (!pet || typeof calcCombatPower !== 'function') return { before: 0, after: 0, delta: 0 };
+  // 深拷貝必要欄位，避免污染原寵
+  const snap = {
+    id: pet.id, name: pet.name, emoji: pet.emoji, type: pet.type,
+    force: pet.force, intel: pet.intel, charm: pet.charm,
+    baseAtk: pet.baseAtk, baseDef: pet.baseDef, baseHp: pet.baseHp,
+    baseCrit: pet.baseCrit, baseDodge: pet.baseDodge, baseHit: pet.baseHit,
+    baseSpeed: pet.baseSpeed, baseMp: pet.baseMp,
+    evoStage: pet.evoStage, starLevel: pet.starLevel, level: pet.level,
+    treasureAtk: pet.treasureAtk, treasureDef: pet.treasureDef, treasureHp: pet.treasureHp,
+    enhancementLevel: pet.enhancementLevel, equippedTreasures: (pet.equippedTreasures || []).slice(),
+    skills: pet.skills, maxHp: pet.maxHp, maxMp: pet.maxMp,
+    attack: pet.attack, defense: pet.defense, speed: pet.speed,
+    crit: pet.crit, dodge: pet.dodge, hit: pet.hit,
+    _treasureForce: pet._treasureForce, _treasureIntel: pet._treasureIntel, _treasureCharm: pet._treasureCharm
+  };
+  const before = calcCombatPower(pet);
+  if (stat === 'force') snap.force = (Number(snap.force) || 0) + 10;
+  else if (stat === 'intel') snap.intel = (Number(snap.intel) || 0) + 10;
+  else if (stat === 'charm') snap.charm = (Number(snap.charm) || 0) + 10;
+  if (typeof recalculatePetStats === 'function') recalculatePetStats(snap);
+  const after = calcCombatPower(snap);
+  return { before: before, after: after, delta: after - before };
+}
+
+function formatStarBonusPowerLabel(delta, after) {
+  const d = Number(delta) || 0;
+  const sign = d >= 0 ? '+' : '';
+  return '⚔️ 戰力 ' + sign + d.toLocaleString() + ' → ' + (Number(after) || 0).toLocaleString();
+}
+
+/** 開啟選加成視窗（升星跨色 or 補領） */
+function openStarTierBonusPicker(idx, pet, opts) {
+  opts = opts || {};
+  const modal = $('star-bonus-modal');
+  if (!pet) {
+    if (typeof opts.continueFn === 'function') opts.continueFn();
+    return;
+  }
+  if (!modal) {
+    // 沒有 UI：預設武力
+    pet.force = (Number(pet.force) || 0) + 10;
+    ensureStarTierBonusList(pet).push('force');
+    pet.starTierBonusClaimed = pet.starTierBonuses.length;
+    if (typeof recalculatePetStats === 'function') recalculatePetStats(pet);
+    if (typeof opts.continueFn === 'function') opts.continueFn('force');
+    return;
+  }
+  _pendingStarBonus = { idx: idx, pet: pet, continueFn: opts.continueFn, mode: opts.mode || 'upgrade' };
+  const left = getStarTierBonusPendingCount(pet);
+  const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pet) : pet.name);
+  $('sb-emoji').innerHTML = (typeof petFaceHtml === 'function') ? petFaceHtml(pet, 64) : (pet.emoji || '⭐');
+  if (opts.mode === 'claim' || opts.fromLabel == null) {
+    $('sb-msg').textContent = name + ' 還有 ' + left + ' 次未領取的星階色加成！\n請選擇一項永久加成（三選一）：';
+  } else {
+    $('sb-msg').textContent = name + ' 由「' + opts.fromLabel + '」升到「' + opts.toLabel + '」！\n請選擇一項永久加成（三選一）：';
+  }
+  // 顯示目前戰力 + 三選一預覽
+  if (typeof recalculatePetStats === 'function') recalculatePetStats(pet);
+  const nowCp = (typeof calcCombatPower === 'function') ? calcCombatPower(pet) : 0;
+  const nowEl = $('sb-power-now');
+  if (nowEl) nowEl.textContent = '⚔️ 目前戰力：' + nowCp.toLocaleString();
+  ['force', 'intel', 'charm'].forEach(function(st) {
+    const el = $('sb-' + st + '-cp');
+    if (!el) return;
+    const prev = (typeof previewStarBonusPower === 'function') ? previewStarBonusPower(pet, st) : { delta: 0, after: nowCp };
+    el.textContent = formatStarBonusPowerLabel(prev.delta, prev.after);
+  });
+  // 確保蓋在其他彈窗之上
+  modal.style.zIndex = '500';
+  modal.classList.remove('hidden');
+}
+
+/** 跨色升星時選三圍 +10；選完後呼叫 continueFn */
+function offerStarTierBonus(idx, pet, fromStar, toStar, continueFn) {
+  if (!isStarColorTierUp(fromStar, toStar)) {
+    if (typeof continueFn === 'function') continueFn();
+    return;
+  }
+  const fromM = getStarMeta(fromStar);
+  const toM = getStarMeta(toStar);
+  openStarTierBonusPicker(idx, pet, {
+    mode: 'upgrade',
+    fromLabel: fromM.label,
+    toLabel: toM.label,
+    continueFn: continueFn
+  });
+}
+
+/** 補領過去已跨色但尚未選擇的加成（可連續領多次） */
+function claimPendingStarTierBonuses(idx) {
+  const pet = S.owned[idx];
+  if (!pet) return false;
+  const pending = getStarTierBonusPendingCount(pet);
+  if (pending <= 0) {
+    alert('目前沒有可補領的星階色加成。');
+    return false;
+  }
+  const claimOne = function() {
+    if (getStarTierBonusPendingCount(pet) <= 0) {
+      if (typeof renderTeam === 'function') renderTeam();
+      if (typeof openPetInfo === 'function') openPetInfo(idx);
+      if (typeof updateRedDots === 'function') updateRedDots();
+      return;
+    }
+    openStarTierBonusPicker(idx, pet, {
+      mode: 'claim',
+      continueFn: function(stat) {
+        // 還有剩餘就繼續彈
+        if (getStarTierBonusPendingCount(pet) > 0) {
+          setTimeout(claimOne, 80);
+        } else {
+          if (typeof renderTeam === 'function') renderTeam();
+          if (typeof openPetInfo === 'function') openPetInfo(idx);
+          if (typeof updateRedDots === 'function') updateRedDots();
+          const labels = { force: '武力', intel: '智力', charm: '魅力' };
+          // 最後一次已在 apply 時存檔；這裡只提示總結可省略
+        }
+      }
+    });
+  };
+  claimOne();
+  return true;
+}
+
+function applyStarTierBonus(stat) {
+  const pending = _pendingStarBonus;
+  _pendingStarBonus = null;
+  const modal = $('star-bonus-modal');
+  if (modal) modal.classList.add('hidden');
+  if (!pending || !pending.pet) return;
+  const pet = pending.pet;
+  // 安全：不可超領
+  if (getStarTierBonusPendingCount(pet) <= 0 && pending.mode !== 'upgrade') {
+    if (typeof pending.continueFn === 'function') pending.continueFn(null);
+    return;
+  }
+  if (typeof recalculatePetStats === 'function') recalculatePetStats(pet);
+  const beforeCp = (typeof calcCombatPower === 'function') ? calcCombatPower(pet) : 0;
+  if (pet._lastPower == null && typeof syncPetPowerBaseline === 'function') syncPetPowerBaseline(pet);
+
+  if (stat === 'force') pet.force = (Number(pet.force) || 0) + 10;
+  else if (stat === 'intel') pet.intel = (Number(pet.intel) || 0) + 10;
+  else if (stat === 'charm') pet.charm = (Number(pet.charm) || 0) + 10;
+  ensureStarTierBonusList(pet).push(stat);
+  pet.starTierBonusClaimed = pet.starTierBonuses.length;
+  if (typeof recalculatePetStats === 'function') recalculatePetStats(pet);
+  const afterCp = (typeof calcCombatPower === 'function') ? calcCombatPower(pet) : beforeCp;
+  const delta = afterCp - beforeCp;
+  pet._lastPower = afterCp;
+  if (typeof saveGame === 'function') saveGame();
+
+  // 立刻跳出戰力加成提示
+  if (typeof showPowerToast === 'function' && delta !== 0) {
+    const labels = { force: '武力', intel: '智力', charm: '魅力' };
+    const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pet) : (pet.name || '寵物'));
+    const sign = delta >= 0 ? '+' : '';
+    showPowerToast(
+      '⚔️ 星階色加成（' + (labels[stat] || '') + ' +10）<br>' +
+      '<span style="font-size:0.85rem;color:#666">' + (pet.emoji || '') + name + '</span><br>' +
+      '<span class="pt-delta">' + sign + delta.toLocaleString() + '</span>' +
+      '　→　<b>' + afterCp.toLocaleString() + '</b>'
+    );
+  }
+  if (typeof pending.continueFn === 'function') pending.continueFn(stat);
+}
+
+function bindStarBonusModal() {
+  const f = $('sb-force'), i = $('sb-intel'), c = $('sb-charm');
+  if (f) f.onclick = () => applyStarTierBonus('force');
+  if (i) i.onclick = () => applyStarTierBonus('intel');
+  if (c) c.onclick = () => applyStarTierBonus('charm');
+}
+function tryUpgradeStar(idx) {
+  const p = S.owned[idx];
+  if (!p) return false;
   // 教學中只能升指定寵物
   if (!S.tutorialDone && S.tutorialStep === 4 && S._tutStarPetIdx != null && idx !== S._tutStarPetIdx) {
-        alert('📘 教學中請先為標示的那隻寵物升星！');
+    alert('📘 教學中請先為標示的那隻寵物升星！');
     return false;
   }
   const meta = getStarMeta(p.starLevel || 0);
@@ -2370,43 +2983,56 @@ function tryUpgradeStar(idx) {
   S.fragments[p.id] = have - need;
   p.starLevel = fromStar + 1;
   recalculatePetStats(p);
-  // 戰力通知延後到升星畫面關閉後
   saveGame();
-  const next = getStarMeta(p.starLevel);
-  const after = snapshotPetCombatStats(p);
-  const statLines = buildPetStatDeltaLines(before, after);
-  if (typeof renderTeam === 'function') renderTeam();
-  updateHeader();
-  if (typeof updateRedDots === 'function') updateRedDots();
-  const isTutStar = !S.tutorialDone && S.tutorialStep === 4;
-    // 教學升星成功：不要再打開寵物資訊（否則會擋住 completeTutorial）
-  if (!isTutStar) {
-    window._reopenPetInfoIdx = idx;
+
+  const finishStarUp = function(bonusStat) {
+    // 若剛選了跨色三圍加成，重新算 after 與 delta
+    recalculatePetStats(p);
+    const next = getStarMeta(p.starLevel);
+    const after = snapshotPetCombatStats(p);
+    let statLines = buildPetStatDeltaLines(before, after);
+    if (bonusStat === 'force') statLines = (statLines || []).concat(['💪 武力 +10（星階色加成）']);
+    else if (bonusStat === 'intel') statLines = (statLines || []).concat(['🧠 智力 +10（星階色加成）']);
+    else if (bonusStat === 'charm') statLines = (statLines || []).concat(['✨ 魅力 +10（星階色加成）']);
+    if (typeof renderTeam === 'function') renderTeam();
+    updateHeader();
+    if (typeof updateRedDots === 'function') updateRedDots();
+    const isTutStar = !S.tutorialDone && S.tutorialStep === 4;
+    if (!isTutStar) {
+      window._reopenPetInfoIdx = idx;
+    } else {
+      window._reopenPetInfoIdx = null;
+      if (typeof clearStarTutorialSpotlight === 'function') clearStarTutorialSpotlight();
+      S.tutorialStep = 5;
+    }
+    showLevelUpScreen({
+      kind: 'star',
+      name: (typeof getPetDisplayName === 'function' ? getPetDisplayName(p) : p.name),
+      emoji: p.emoji || '⭐',
+      fromLabel: getStarMeta(fromStar).label,
+      toLabel: next.label,
+      remainingFrags: getFragmentCount(p.id),
+      statLines: statLines,
+      powerPetIdx: idx,
+      powerReason: '升星'
+    });
+    if (isTutStar) {
+      window._onLevelUpClosed = function() {
+        if (typeof completeTutorialAll === 'function') completeTutorialAll();
+      };
+    }
+  };
+
+  // 白→綠、綠→藍… 跨色時可選三圍其一 +10
+  if (typeof isStarColorTierUp === 'function' && isStarColorTierUp(fromStar, p.starLevel)) {
+    offerStarTierBonus(idx, p, fromStar, p.starLevel, finishStarUp);
   } else {
-    window._reopenPetInfoIdx = null;
-    if (typeof clearStarTutorialSpotlight === 'function') clearStarTutorialSpotlight();
-    S.tutorialStep = 5;
-      }
-  showLevelUpScreen({
-    kind: 'star',
-    name: p.name,
-    emoji: p.emoji || '⭐',
-    fromLabel: getStarMeta(fromStar).label,
-    toLabel: next.label,
-    remainingFrags: getFragmentCount(p.id),
-    statLines: statLines,
-    powerPetIdx: idx,
-    powerReason: '升星'
-  });
-  if (isTutStar) {
-    window._onLevelUpClosed = function() {
-      if (typeof completeTutorialAll === 'function') completeTutorialAll();
-    };
+    finishStarUp(null);
   }
   return true;
 }
 
-/** 分解寵物 → 碎片；至少保留 1 隻 */
+/** 寵物換成碎片；至少保留 1 隻 */
 function calcDismantleFragments(p) {
   if (!p) return 1;
   const lv = Math.max(1, Number(p.level) || 1);
@@ -2449,16 +3075,16 @@ function tryDismantlePet(idx) {
   const p = S.owned[idx];
   if (!p) return false;
   if (S.owned.length <= 1) {
-    alert('至少要留下 1 隻寵物，無法分解！');
+    alert('至少要留下 1 隻寵物，無法換成碎片！');
     return false;
   }
   const gain = calcDismantleFragments(p);
   const starLabel = getStarMeta(p.starLevel || 0).label;
-  const msg = '確定要分解「' + (p.emoji || '') + p.name + '」嗎？\n' +
+  const msg = '確定要把「' + (p.emoji || '') + p.name + '」換成碎片嗎？\n' +
     'Lv.' + p.level + '　' + starLabel + '\n\n' +
     '將獲得 🧩 ' + p.name + ' 碎片 ×' + gain + '\n' +
-    '（分解後無法復原）';
-  appConfirm({ emoji: '♻️', title: '分解寵物', message: msg, okText: '確定分解', cancelText: '取消' }).then(function(ok) {
+    '（換成碎片後寵物會消失，無法復原）';
+  appConfirm({ emoji: '♻️', title: '換成碎片', message: msg, okText: '確定兌換', cancelText: '取消' }).then(function(ok) {
     if (!ok) return;
     doDismantlePetConfirmed(idx, p, gain);
   });
@@ -2480,7 +3106,7 @@ function doDismantlePetConfirmed(idx, p, gain) {
   updateHeader();
   if (typeof renderTeam === 'function') renderTeam();
   saveGame();
-  alert('♻️ 已分解 ' + emoji + name + '\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
+  alert('♻️ 已將 ' + emoji + name + ' 換成碎片\n獲得 🧩 碎片 ×' + gain + '（持有 ' + getFragmentCount(p.id) + '）');
   return true;
 }
 
@@ -2534,55 +3160,261 @@ function syncDiscoveredFromOwned() {
   });
 }
 
-const EVO_STAGE_NAMES = ['基礎','初始進化','中階進化','進階進化','終極進化','完美進化'];
-/** 依等級對應進化階段：0~12基 / 13~18初 / 19~28中 / 29~36進 / 37~48終 / 49+完 */
+const EVO_STAGE_NAMES = [
+  '基礎', '初始進化', '中階進化', '進階進化', '終極進化', '完美進化',
+  '極限進化', '無限進化', '恆星進化', '星系進化', '黑洞進化', '宇宙進化'
+];
+/** 各階段最低等級（to stage → need level） */
+const EVO_STAGE_NEED_LV = {
+  1: 13, 2: 19, 3: 29, 4: 37, 5: 49,
+  6: 60, 7: 75, 8: 100, 9: 115, 10: 130, 11: 160
+};
+const EVO_STAGE_MAX = EVO_STAGE_NAMES.length - 1; // 11 宇宙進化
+
+/** 依等級對應「最高可進化到」的階段 */
 function evoStageFromLevel(level) {
   const lv = Math.max(0, Math.floor(Number(level) || 0));
-  if (lv >= 49) return 5;
+  if (lv >= 160) return 11; // 宇宙
+  if (lv >= 130) return 10; // 黑洞
+  if (lv >= 115) return 9;  // 星系
+  if (lv >= 100) return 8;  // 恆星
+  if (lv >= 75) return 7;   // 無限
+  if (lv >= 60) return 6;   // 極限
+  if (lv >= 49) return 5;   // 完美
   if (lv >= 37) return 4;
   if (lv >= 29) return 3;
   if (lv >= 19) return 2;
   if (lv >= 13) return 1;
   return 0;
 }
-/** 目前等級「最高可進化到」的階段（不自動升，需按進化按鈕） */
+/** 目前等級「最高可進化到」的階段（僅依等級表；實際進化還要過 evoReqs） */
 function maxEvoStageForPet(p) {
   return evoStageFromLevel(p && p.level != null ? p.level : 1);
 }
-/** 是否可手動進化到下一階段 */
+
+/** 取得進化到 toStage 的圖鑑條件（level／武力／智力／魅力／防禦／速度…） */
+function getEvoReqForStage(p, toStage) {
+  const base = (p && p.id && typeof getBase === 'function') ? getBase(p.id) : null;
+  const list = (base && Array.isArray(base.evoReqs)) ? base.evoReqs : null;
+  if (!list || !list.length) return null;
+  const t = Math.max(0, Number(toStage) || 0);
+  for (let i = 0; i < list.length; i++) {
+    const r = list[i];
+    if (r && Number(r.to) === t) return r;
+  }
+  return null;
+}
+
+/** 讀取寵物目前用於進化判定的數值 */
+function getPetEvoStatValue(p, key) {
+  if (!p) return 0;
+  if (typeof recalculatePetStats === 'function') recalculatePetStats(p);
+  const n = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+  switch (key) {
+    case 'level': return Math.max(1, n(p.level) || 1);
+    case 'force': return n(p.force) + n(p._treasureForce);
+    case 'intel': return n(p.intel) + n(p._treasureIntel);
+    case 'charm': return n(p.charm) + n(p._treasureCharm);
+    case 'def':
+    case 'defense': return n(p.defense);
+    case 'atk':
+    case 'attack': return n(p.attack);
+    case 'speed': return n(p.speed);
+    case 'hp':
+    case 'maxHp': return n(p.maxHp);
+    case 'mp':
+    case 'maxMp': return n(p.maxMp);
+    case 'star':
+    case 'starLevel': return n(p.starLevel);
+    default: return n(p[key]);
+  }
+}
+
+const EVO_REQ_LABELS = {
+  level: '等級', force: '武力', intel: '智力', charm: '魅力',
+  def: '防禦', defense: '防禦', atk: '攻擊', attack: '攻擊',
+  speed: '速度', hp: '最大血量', maxHp: '最大血量', mp: '最大魔力', maxMp: '最大魔力',
+  star: '星級', starLevel: '星級'
+};
+
+/** 格式化單一階段條件（不含 to） */
+function formatEvoReqBits(req) {
+  if (!req) return '';
+  const bits = [];
+  const order = ['level','force','intel','charm','atk','attack','def','defense','speed','hp','maxHp','mp','maxMp','star','starLevel'];
+  const seen = {};
+  order.forEach(k => {
+    if (req[k] == null || !Number.isFinite(Number(req[k]))) return;
+    seen[k] = true;
+    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + req[k]);
+  });
+  Object.keys(req).forEach(k => {
+    if (k === 'to' || seen[k]) return;
+    if (req[k] == null || !Number.isFinite(Number(req[k]))) return;
+    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + req[k]);
+  });
+  return bits.join('、');
+}
+
+/** 圖鑑／說明用：列出寵物全部進化條件 */
+function formatPetEvoReqsHtml(baseOrPet, opts) {
+  opts = opts || {};
+  const base = (baseOrPet && baseOrPet.id && typeof getBase === 'function')
+    ? (getBase(baseOrPet.id) || baseOrPet) : baseOrPet;
+  if (!base) return '<div style="color:#888">無進化資料</div>';
+  const list = Array.isArray(base.evoReqs) ? base.evoReqs.slice() : [];
+  // 依 to 排序
+  list.sort((a,b) => (Number(a.to)||0) - (Number(b.to)||0));
+  if (!list.length) {
+    // 至少顯示共通等級門檻
+    const rows = [];
+    for (let s = 1; s <= (EVO_STAGE_MAX || 11); s++) {
+      const lv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[s]) || null;
+      const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[s]) || ('階段'+s);
+      rows.push('<div style="margin:2px 0">✨ <b>' + name + '</b>：等級≥' + (lv != null ? lv : '?') + '</div>');
+    }
+    return '<div style="font-size:0.82rem;line-height:1.55">' + rows.join('') + '</div>';
+  }
+  const startStage = Number(base.evoStage) || 0;
+  const rows = [];
+  list.forEach(r => {
+    const to = Number(r.to) || 0;
+    if (to <= startStage && opts.hidePastBase) return;
+    const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[to]) || ('階段'+to);
+    const bits = formatEvoReqBits(r);
+    // 確保等級有顯示（若 evoReqs 沒寫 level，補上共通門檻）
+    let line = bits;
+    if (!r.level && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
+      line = '等級≥' + EVO_STAGE_NEED_LV[to] + (bits ? '、' + bits : '');
+    }
+    rows.push('<div style="margin:3px 0;padding:4px 8px;background:rgba(232,245,233,0.65);border-radius:8px;border:1px solid #c8e6c9">' +
+      '<b style="color:#2e7d32">✨ ' + name + '</b><br><span style="color:#555">' + (line || '（僅等級）') + '</span></div>');
+  });
+  if (!rows.length) return '<div style="color:#888">已達最高進化階段</div>';
+  return '<div style="font-size:0.82rem;line-height:1.5">' + rows.join('') + '</div>';
+}
+
+/** 簡短一行：下一個進化條件（圖鑑卡片用） */
+function formatPetEvoBrief(base) {
+  if (!base) return '';
+  const list = Array.isArray(base.evoReqs) ? base.evoReqs.slice() : [];
+  list.sort((a,b) => (Number(a.to)||0) - (Number(b.to)||0));
+  if (!list.length) {
+    return '進化 Lv.13→…→160';
+  }
+  const first = list[0];
+  const last = list[list.length - 1];
+  const fn = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[Number(first.to)]) || '';
+  const ln = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[Number(last.to)]) || '';
+  const fl = first.level || (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[first.to]) || '?';
+  const ll = last.level || (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[last.to]) || '?';
+  return '進化 ' + fl + '→' + ll + (ln ? '（至'+ln.replace('進化','')+'）' : '');
+}
+
+
+
+/**
+ * 檢查是否滿足進化到下一階的全部條件
+ * 回傳 { ok, to, req, fails:[{key,need,have,label}] }
+ */
+function evaluateNextEvoReq(p) {
+  if (!p) return { ok: false, to: 0, req: null, fails: [{ key: 'pet', need: 1, have: 0, label: '寵物' }] };
+  const cur = Math.max(0, Number(p.evoStage) || 0);
+  const maxStage = (typeof EVO_STAGE_MAX === 'number') ? EVO_STAGE_MAX : 11;
+  if (cur >= maxStage) {
+    const maxName = EVO_STAGE_NAMES[maxStage] || '最終進化';
+    return { ok: false, to: maxStage, req: null, fails: [{ key: 'max', need: maxStage, have: cur, label: '已達' + maxName }] };
+  }
+  const to = cur + 1;
+  const maxByLv = maxEvoStageForPet(p);
+  if (to > maxByLv) {
+    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 13;
+    return {
+      ok: false, to: to, req: { to: to, level: needLv },
+      fails: [{ key: 'level', need: needLv, have: Math.max(1, Number(p.level) || 1), label: '等級' }]
+    };
+  }
+  let req = getEvoReqForStage(p, to);
+  if (!req) {
+    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 13;
+    req = { to: to, level: needLv };
+  }
+  const fails = [];
+  Object.keys(req).forEach(k => {
+    if (k === 'to') return;
+    const need = Number(req[k]);
+    if (!Number.isFinite(need)) return;
+    const have = getPetEvoStatValue(p, k);
+    if (have + 1e-9 < need) {
+      fails.push({ key: k, need: need, have: have, label: EVO_REQ_LABELS[k] || k });
+    }
+  });
+  return { ok: fails.length === 0, to: to, req: req, fails: fails };
+}
+
+/** 是否可手動進化到下一階段（等級＋圖鑑 evoReqs 三圍／防禦等） */
 function canStageEvolve(p) {
   if (!p) return false;
-  const cur = Math.max(0, Number(p.evoStage) || 0);
-  const max = maxEvoStageForPet(p);
-  return max > cur && cur < 5;
+  return evaluateNextEvoReq(p).ok;
 }
-/** 讀檔時：不自動升階；僅修正非法過高階段 */
+
+/** 下一段進化還缺什麼（給 UI 顯示） */
+function formatNextEvoReqHint(p) {
+  const ev = evaluateNextEvoReq(p);
+  if (ev.ok) {
+    const toName = EVO_STAGE_NAMES[ev.to] || ('階段' + ev.to);
+    return '可進化 → ' + toName;
+  }
+  if (!ev.fails || !ev.fails.length) return '目前無法進化';
+  if (ev.fails.some(f => f.key === 'max')) return '已達' + (EVO_STAGE_NAMES[EVO_STAGE_MAX] || '最終進化');
+  return '進化條件：' + ev.fails.map(f => {
+    const have = (typeof formatPetStat === 'function' && f.key !== 'level' && f.key !== 'star' && f.key !== 'starLevel')
+      ? formatPetStat(f.have) : String(Math.round(f.have));
+    return f.label + ' ' + have + '/' + f.need;
+  }).join('、');
+}
+
+/** 讀檔時：不自動升階；僅修正非法過高階段（仍只依等級上限壓回） */
 function syncPetEvoStage(p, { allowDowngrade = false } = {}) {
   if (!p) return 0;
   const max = maxEvoStageForPet(p);
   let cur = Math.max(0, Number(p.evoStage) || 0);
-  if (cur > max) cur = max; // 等級不夠時壓回
+  if (cur > max) cur = max;
   if (allowDowngrade) cur = Math.min(cur, max);
   p.evoStage = cur;
   return p.evoStage;
 }
 function doStageEvolve(idx) {
   const p = S.owned[idx];
-  if (!p || !canStageEvolve(p)) {
-    alert('目前無法進化（等級不足或已達此等級可進化的上限）');
+  const ev = evaluateNextEvoReq(p);
+  if (!p || !ev.ok) {
+    alert('目前無法進化\n' + formatNextEvoReqHint(p));
     return false;
   }
   const from = Math.max(0, Number(p.evoStage) || 0);
   const to = from + 1;
   const fromName = EVO_STAGE_NAMES[from] || ('階段'+from);
   const toName = EVO_STAGE_NAMES[to] || ('階段'+to);
-  const msg = '確定讓「' + (p.emoji||'') + p.name + '」進化？\n' + fromName + ' → ' + toName;
+  let condTxt = '';
+  if (ev.req) {
+    const bits = [];
+    Object.keys(ev.req).forEach(k => {
+      if (k === 'to') return;
+      const need = ev.req[k];
+      if (need == null) return;
+      bits.push((EVO_REQ_LABELS[k] || k) + '≥' + need);
+    });
+    if (bits.length) condTxt = '\n（已滿足：' + bits.join('、') + '）';
+  }
+  const disp = (typeof getPetDisplayName === 'function') ? getPetDisplayName(p) : p.name;
+  const msg = '確定讓「' + (p.emoji||'') + disp + '」進化？\n' + fromName + ' → ' + toName + condTxt;
   appConfirm({ emoji: '✨', title: '進化確認', message: msg, okText: '確認進化', cancelText: '取消' }).then(function(ok) {
     if (!ok) return;
     doStageEvolveConfirmed(idx, p, fromName, toName);
   });
   return true;
 }
+
 function doStageEvolveConfirmed(idx, p, fromName, toName) {
   const to = Math.max(0, Number(p.evoStage) || 0) + 1;
   const before = snapshotPetCombatStats(p);
@@ -2992,6 +3824,8 @@ const clonePet = (base,lv=1) => {
     treasureHp: base.treasureHp || 0,
     enhancementLevel: base.enhancementLevel || 0,
     starLevel: base.starLevel || 0,
+    nickname: '',
+    namedOnce: false,
     // 最大 HP 會在下方依核心公式重算。
     maxHp: 0,
     hp: 0, level: lv, exp: 0, mp: base.baseMp || 10,
@@ -3010,6 +3844,7 @@ function createStarterPets() {
   const water = clonePet(getBase('shuibo_bao'), 5);
   water.starLevel = 1; // 白2★
   water.exp = 0;
+  water.namedOnce = true; // 開局寵不算剛收服，不可取暱稱
   if (typeof syncPetEvoStage === 'function') syncPetEvoStage(water);
   recalculatePetStats(water, { restoreFullHp: true });
   return [water];
@@ -3121,9 +3956,14 @@ function onTutorialBattleWin() {
 }
 
 function finishTutorialAfterCatch() {
-    setTutBattleHint('');
+  try { setTutBattleHint(''); } catch (e) {}
+  // 關掉戰鬥結果窗，避免殘留
+  try {
+    const rm = document.getElementById('result-modal');
+    if (rm) rm.classList.add('hidden');
+  } catch (e) {}
   // 剛收服的火爆熊可加入隊伍（開局仍只有水波豹，火爆熊是教學戰收服的）
-  if (S.owned.length >= 2 && S.team.length < 3) {
+  if (S.owned && S.owned.length >= 2 && (S.team || []).length < 3) {
     const fireIdx = S.owned.findIndex(p => p && p.id === 'huobao_xiong');
     if (fireIdx >= 0 && S.team.indexOf(fireIdx) < 0) S.team.push(fireIdx);
   }
@@ -3160,7 +4000,7 @@ function beginStarTutorial() {
     S.tutorialStep = 4;
   saveGame();
   // 關掉可能擋住點擊的殘留視窗
-  ['result-modal','capture-modal','levelup-modal','tut-modal','app-confirm-modal','evo-modal'].forEach(id => {
+  ['result-modal','capture-modal','lineup-modal','levelup-modal','tut-modal','app-confirm-modal','evo-modal','pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.classList.add('hidden');
@@ -3457,7 +4297,13 @@ function loadGameData(saved) {
     if (!S.unlocked.includes(id)) S.unlocked.push(id);
   });
     S.owned = d.owned || [];
-    S.owned.forEach(p => { syncPetEvoStage(p); recalculatePetStats(p); });
+    S.owned.forEach(p => {
+      // 舊存檔已擁有的寵物視為已過取名時機，無法補改名
+      if (p && p.namedOnce == null) p.namedOnce = true;
+      if (p && p.nickname == null) p.nickname = '';
+      syncPetEvoStage(p);
+      recalculatePetStats(p);
+    });
     S.team = Array.isArray(d.team) ? d.team.filter(i => i >= 0 && i < S.owned.length) : [];
     if (S.owned.length && S.team.length === 0) S.team = [0];
     S.items = d.items || {hua_mi:0};
@@ -3707,9 +4553,11 @@ function bindGameHandlers() {
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
   });
-  $('cap-fight').onclick = ()=> startWildBattle();
+  $('cap-fight').onclick = ()=> openLineupModal();
   // 遇敵不可捕捉：$('cap-catch') 已移除
   $('cap-run').onclick = ()=>{ $('capture-modal').classList.add('hidden'); addLog('zone-log','你決定先離開…'); };
+  if (typeof bindPetNicknameModal === 'function') bindPetNicknameModal();
+  if (typeof bindStarBonusModal === 'function') bindStarBonusModal();
   $('player-chip').onclick = ()=> showPlayerProfile();
   $('pl-close').onclick = ()=> $('player-modal').classList.add('hidden');
   $('pl-rename').onclick = ()=> {
@@ -3756,6 +4604,11 @@ function bindGameHandlers() {
   if (petStarBtn) petStarBtn.onclick = () => {
     if (window._petInfoIdx == null) return;
     tryUpgradeStar(window._petInfoIdx);
+  };
+  const petStarBonusBtn = $('pet-info-star-bonus');
+  if (petStarBonusBtn) petStarBonusBtn.onclick = () => {
+    if (window._petInfoIdx == null) return;
+    claimPendingStarTierBonuses(window._petInfoIdx);
   };
   const petEvoBtn = $('pet-info-evo');
   if (petEvoBtn) petEvoBtn.onclick = () => {
@@ -3948,10 +4801,16 @@ function explore() {
       }
       const base=getBase(pid);
       if (!base) { addLog('zone-log','什麼都沒發現…再試試看。'); return; }
-      let lv = Math.max(1, S.level + rand(-1, 2));
+      let lv = (typeof rollWildLevelForZone === 'function')
+        ? rollWildLevelForZone(base, z)
+        : Math.max(1, S.level + rand(-1, 2));
       // 神話等：野生等級不得低於 minWildLevel（例：神·火爆熊 ≥19）
       if (base.minWildLevel != null) lv = Math.max(lv, Number(base.minWildLevel) || 1);
       S.wild=clonePet(base,lv); if (base && base.id) markDiscovered(base.id);
+      if (z && z.id === 'rainbow' && lv >= (S.level || 1) + 12) {
+        // 高等級提示在遭遇訊息
+        S.wild._rainbowHigh = true;
+      }
       // 再次強制等級（避免 clone／同步被改掉）
       if (base.minWildLevel != null) {
         S.wild.level = Math.max(S.wild.level || 1, Number(base.minWildLevel) || 1);
@@ -3970,6 +4829,20 @@ function explore() {
       $('cap-emoji').innerHTML=petFaceHtml(S.wild,64);
       // 未實裝寵物：外觀／名稱皆用實際 id（火爆熊），note 僅作機率表內部標註
       let capTxt = '野生的 '+S.wild.name+'（Lv.'+S.wild.level+'）出現了！\n❤️ '+Math.round(S.wild.hp)+' HP　💥 暴擊 '+(S.wild.crit*100).toFixed(0)+'%';
+      // 任一方敵寵相對我方基準高 8 級以上 → 高等級警報（不限彩虹）
+      (function(){
+        const baseline = Math.max(1, Number(S.level) || 1);
+        let teamMax = baseline;
+        (S.team || []).forEach(function(ti) {
+          const op = S.owned && S.owned[ti];
+          if (op) teamMax = Math.max(teamMax, Math.max(1, Number(op.level) || 1));
+        });
+        const lv = Math.max(1, Number(S.wild.level) || 1);
+        if (lv >= teamMax + 5 || S.wild._rainbowHigh || S.wild._highLevelAlert) {
+          S.wild._highLevelAlert = true;
+          capTxt = '⚠️ 高等級警報！（敵 Lv.' + lv + '／基準 Lv.' + teamMax + '）\n' + capTxt;
+        }
+      })();
       if (!S.wild.catchable) capTxt += '\n⚠️ 此對象無法收服';
       $('cap-msg').textContent = capTxt;
       $('capture-modal').classList.remove('hidden');
@@ -4033,12 +4906,14 @@ function tryCatch() {
   }
   let rate = getPetCaptureRate(S.wild, {});
   if(roll(rate)){
-    S.owned.push(S.wild);
-    onPetCaught(S.wild);
-    addLog('zone-log','🎉 成功捕捉了 '+S.wild.emoji+S.wild.name+'！（機率 '+formatCatchRate(rate)+'）');
+    const caught = S.wild;
+    S.owned.push(caught);
+    onPetCaught(caught);
+    addLog('zone-log','🎉 成功捕捉了 '+caught.emoji+caught.name+'！（機率 '+formatCatchRate(rate)+'）');
     $('capture-modal').classList.add('hidden');
     checkUnlocks(); updateHeader(); saveGame(); S.wild=null;
     if (typeof updateRedDots === 'function') updateRedDots();
+    offerPetNickname(caught, function(){});
   } else {
     addLog('zone-log',S.wild.name+' 掙脫了！（機率 '+formatCatchRate(rate)+'）');
     $('cap-msg').textContent=S.wild.name+' 掙脫了！還要繼續嗎？\n❤️ '+Math.round(S.wild.hp)+'/'+Math.round(S.wild.maxHp)+
@@ -4066,52 +4941,458 @@ function saveCurrentBattlerToOwned() {
   if (S.player.mp != null) S.owned[idx].mp = S.player.mp;
 }
 function renderSwitchBtns(forceChoose) {
-  const box = $("switch-btns");
-  if (!box) return;
-  box.innerHTML = "";
-  (S.team || []).forEach((ownedIdx, slot) => {
-    const pet = S.owned[ownedIdx];
-    if (!pet) return;
-    const b = document.createElement("button");
-    b.className = "act-btn act-skill";
-    const isActive = slot === S.activeTeamSlot;
-    const dead = pet.hp <= 0;
-    b.disabled = (!forceChoose && (!S.playerTurn || !S.battling)) || dead || isActive;
-    if (isActive) b.style.outline = "2px solid #ff7043";
-    if (dead) b.style.opacity = "0.4";
-    b.innerHTML = (pet.emoji||"🐾") + " " + pet.name +
-      "<span class=\"sub\">" + (dead ? "倒下" : ("HP "+Math.round(pet.hp))) + (isActive ? " ·戰鬥中" : "") + "</span>";
-    b.onclick = () => switchBattlePet(slot, !!forceChoose);
-    box.appendChild(b);
-  });
+  // 舊單一換人 UI 已改為 battle-switch-modal；保留函式避免外部呼叫報錯
+  updateBattleSwitchButton();
 }
-function switchBattlePet(slot, freeSwitch) {
-  if (!S.battling) return;
-  if (slot === S.activeTeamSlot) return;
-  const ownedIdx = S.team[slot];
-  const pet = S.owned[ownedIdx];
-  if (!pet || pet.hp <= 0) { addBLog("這隻寵物無法戰鬥！", "sys"); return; }
-  if (!freeSwitch && !S.playerTurn) return;
-  saveCurrentBattlerToOwned();
-  S.activeTeamSlot = slot;
-  S.player = buildFighterFromOwned(pet);
-  S.player.ownedIdx = ownedIdx;
-  if (S.battleAllies) S.battleAllies[slot] = S.player;
-  S.pEffects = {};
-  addBLog("換上 " + (pet.emoji||"") + pet.name + "！", "sys");
-  if (typeof startBattleUI === "function") startBattleUI(true);
-  if (!freeSwitch) {
-    setBattleBtns(false);
-    setTimeout(enemyTurn, 700);
-  } else {
-    setBattleBtns(true);
+function updateBattleSwitchButton() {
+  const btn = $('battle-switch-btn');
+  if (!btn) return;
+  const can = S.battling && S.playerTurn && hasBattleBenchAlive();
+  btn.style.display = can ? '' : 'none';
+  btn.disabled = !can;
+  if (!btn._bound) {
+    btn._bound = true;
+    btn.onclick = () => openBattleSwitchModal();
   }
 }
+function hasBattleBenchAlive() {
+  const bench = S._battleBenchIdxs || [];
+  return bench.some(i => S.owned[i] && S.owned[i].hp > 0);
+}
+function getBattleFieldOwnedIdxs() {
+  return (S._battleTeamIdxs || []).slice();
+}
+function openBattleSwitchModal() {
+  if (!S.battling || !S.playerTurn) return;
+  if (!hasBattleBenchAlive()) {
+    addBLog('沒有可換上的候補寵物', 'sys');
+    return;
+  }
+  const modal = $('battle-switch-modal');
+  if (!modal) return;
+  // 多選：換下欄位、換上 ownedIdx；陣亡空位用 fillSlots
+  S._bswOutSlots = [];
+  S._bswInOwned = [];
+  renderBattleSwitchModalLists();
+  modal.classList.remove('hidden');
+  const cancel = $('bsw-cancel');
+  if (cancel) cancel.onclick = () => closeBattleSwitchModal();
+  const conf = $('bsw-confirm');
+  if (conf) conf.onclick = () => confirmMultiBattleSwitch();
+}
+function closeBattleSwitchModal() {
+  const modal = $('battle-switch-modal');
+  if (modal) modal.classList.add('hidden');
+  S._bswOutSlots = [];
+  S._bswInOwned = [];
+  S._bswFieldSlot = null;
+}
+function countDeadOrEmptyFieldSlots() {
+  const fieldIdxs = getBattleFieldOwnedIdxs();
+  let n = 0;
+  for (let slot = 0; slot < (typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3); slot++) {
+    const pet = S.battleAllies && S.battleAllies[slot];
+    const ownedIdx = fieldIdxs[slot];
+    const owned = ownedIdx != null ? S.owned[ownedIdx] : null;
+    const hp = pet ? pet.hp : (owned ? owned.hp : 0);
+    if (!pet || hp <= 0) n++;
+  }
+  return n;
+}
+function updateBswStatus() {
+  const st = $('bsw-status');
+  const outN = (S._bswOutSlots || []).length;
+  const inN = (S._bswInOwned || []).length;
+  const deadN = countDeadOrEmptyFieldSlots();
+  // 可確認：換上數 = 換下數 + 要用來補的陣亡空位數（換上不可超過 換下+空位）
+  const needMin = outN; // 至少要等於換下
+  const needMax = outN + deadN;
+  let ok = inN > 0 && inN >= needMin && inN <= needMax && inN === outN + Math.min(deadN, Math.max(0, inN - outN));
+  // 簡化規則：換上數量必須等於「換下數量 + 補空位數量」
+  // 補空位數量 = min(deadN, inN - outN) 且 inN - outN >= 0
+  const fillN = Math.max(0, inN - outN);
+  ok = inN > 0 && fillN <= deadN && inN === outN + fillN;
+  if (st) {
+    st.innerHTML = '換下 <b>' + outN + '</b>　／　換上 <b>' + inN + '</b>' +
+      (deadN ? '　｜　空位 ' + deadN : '') +
+      (ok ? '<br><span style="color:#2e7d32">可以確認</span>' : '<br><span style="color:#c62828">換上數須＝換下數' + (deadN ? '＋補空位（最多' + deadN + '）' : '') + '</span>');
+  }
+  const conf = $('bsw-confirm');
+  if (conf) conf.disabled = !ok;
+}
+function renderBattleSwitchModalLists() {
+  const fieldBox = $('bsw-field');
+  const benchBox = $('bsw-bench');
+  if (!fieldBox || !benchBox) return;
+  if (!Array.isArray(S._bswOutSlots)) S._bswOutSlots = [];
+  if (!Array.isArray(S._bswInOwned)) S._bswInOwned = [];
+  fieldBox.innerHTML = '';
+  benchBox.innerHTML = '';
+  const fieldIdxs = getBattleFieldOwnedIdxs();
+  const maxSlots = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  for (let slot = 0; slot < maxSlots; slot++) {
+    const ownedIdx = fieldIdxs[slot];
+    const pet = S.battleAllies && S.battleAllies[slot];
+    const owned = ownedIdx != null ? S.owned[ownedIdx] : null;
+    const p = pet || owned;
+    const dead = !p || (pet ? pet.hp : (owned ? owned.hp : 0)) <= 0;
+    const selected = S._bswOutSlots.indexOf(slot) >= 0;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + (selected ? 'btn-primary' : (dead ? 'btn-back' : 'btn-back'));
+    b.style.width = '100%';
+    b.style.textAlign = 'left';
+    if (dead) {
+      b.style.opacity = '0.75';
+      b.style.border = '2px dashed #ef9a9a';
+      b.textContent = '💀 欄位' + (slot + 1) + '　（陣亡／空　可直接補人）';
+      b.disabled = true; // 陣亡不需選「換下」
+    } else {
+      const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(p) : p.name);
+      b.textContent = (selected ? '✅ ' : '⚔️ ') + (p.emoji || '') + name +
+        '　欄位' + (slot + 1) + '　HP ' + Math.round(pet ? pet.hp : owned.hp) +
+        (selected ? '　← 將換下' : '　點選換下');
+      b.onclick = () => {
+        const i = S._bswOutSlots.indexOf(slot);
+        if (i >= 0) S._bswOutSlots.splice(i, 1);
+        else S._bswOutSlots.push(slot);
+        renderBattleSwitchModalLists();
+      };
+    }
+    fieldBox.appendChild(b);
+  }
+  const bench = S._battleBenchIdxs || [];
+  if (!bench.length) {
+    benchBox.innerHTML = '<div style="color:#888;font-size:0.82rem">沒有候補</div>';
+  }
+  bench.forEach(ownedIdx => {
+    const pet = S.owned[ownedIdx];
+    if (!pet) return;
+    const dead = pet.hp <= 0;
+    const selected = S._bswInOwned.indexOf(ownedIdx) >= 0;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + (selected ? 'btn-primary' : 'btn-purple');
+    b.style.width = '100%';
+    b.style.textAlign = 'left';
+    b.disabled = dead;
+    const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pet) : pet.name);
+    b.textContent = (dead ? '💀 ' : (selected ? '✅ ' : '🔄 ')) + (pet.emoji || '') + name +
+      '　Lv.' + (pet.level || 1) + '　HP ' + Math.round(pet.hp) +
+      (selected ? '　← 將換上' : (dead ? '' : '　點選換上'));
+    if (!dead) {
+      b.onclick = () => {
+        const i = S._bswInOwned.indexOf(ownedIdx);
+        if (i >= 0) S._bswInOwned.splice(i, 1);
+        else S._bswInOwned.push(ownedIdx);
+        renderBattleSwitchModalLists();
+      };
+    }
+    benchBox.appendChild(b);
+  });
+  updateBswStatus();
+}
+/** 一次多換：換下 N 隻必須換上 N 隻；陣亡空位可額外補人 */
+function confirmMultiBattleSwitch() {
+  if (!S.battling || !S.playerTurn) return;
+  const outSlots = (S._bswOutSlots || []).slice();
+  const inOwned = (S._bswInOwned || []).slice();
+  const deadN = countDeadOrEmptyFieldSlots();
+  const outN = outSlots.length;
+  const inN = inOwned.length;
+  const fillN = Math.max(0, inN - outN);
+  if (inN <= 0 || fillN > deadN || inN !== outN + fillN) {
+    alert('換上數量必須等於「換下數量」；若有陣亡空位，可再多補空位數量的人。\n目前：換下 ' + outN + '、換上 ' + inN + '、空位 ' + deadN);
+    return;
+  }
+  // 先處理 1:1 對換（依選擇順序）
+  const pairs = Math.min(outN, inN);
+  for (let i = 0; i < pairs; i++) {
+    const ok = performBattleSwitch(outSlots[i], inOwned[i], true);
+    if (!ok) {
+      addBLog('換人中斷', 'sys');
+      closeBattleSwitchModal();
+      if (typeof renderBattleBoard === 'function') renderBattleBoard();
+      setBattleBtns(true);
+      return;
+    }
+  }
+  // 剩餘 inOwned 補陣亡／空欄位
+  const remainIn = inOwned.slice(pairs);
+  remainIn.forEach(inId => {
+    const slot = findDeadOrEmptyFieldSlot();
+    if (slot == null) return;
+    fillBattleSlotFromBench(slot, inId, true);
+  });
+  // 日誌與結束回合
+  addBLog('🔄 換人完成！共調動 ' + inN + ' 隻。', 'sys');
+  addBLog('換人結束，輪到敵方行動…', 'sys');
+  closeBattleSwitchModal();
+  S.selectedActions = {};
+  S.selectedTargets = {};
+  S._pickingTargetFor = null;
+  if (typeof renderBattleBoard === 'function') renderBattleBoard();
+  if (typeof updateBattleHp === 'function') updateBattleHp();
+  setBattleBtns(false);
+  setTimeout(() => {
+    if (typeof enemyTurn === 'function') enemyTurn();
+  }, 650);
+}
+function findDeadOrEmptyFieldSlot() {
+  const fieldIdxs = S._battleTeamIdxs || [];
+  const maxSlots = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  for (let slot = 0; slot < maxSlots; slot++) {
+    const pet = S.battleAllies && S.battleAllies[slot];
+    if (!pet || pet.hp <= 0) return slot;
+  }
+  return null;
+}
+/** 補陣亡空位（不交換，候補移到上場） */
+function fillBattleSlotFromBench(fieldSlot, benchOwnedIdx, silent) {
+  const fieldIdxs = S._battleTeamIdxs || [];
+  const bench = S._battleBenchIdxs || [];
+  const maxSlots = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  while (fieldIdxs.length < maxSlots) fieldIdxs.push(null);
+  while ((S.battleAllies || []).length < maxSlots) S.battleAllies.push(null);
+  const inOwned = benchOwnedIdx;
+  if (bench.indexOf(inOwned) < 0) return false;
+  const inPet = S.owned[inOwned];
+  if (!inPet || inPet.hp <= 0) return false;
+  // 舊欄位若有死掉的，同步血量後丟回候補
+  const outOwned = fieldIdxs[fieldSlot];
+  if (outOwned != null && S.owned[outOwned]) {
+    const cur = S.battleAllies && S.battleAllies[fieldSlot];
+    if (cur) {
+      S.owned[outOwned].hp = Math.max(0, cur.hp);
+      if (cur.mp != null) S.owned[outOwned].mp = cur.mp;
+    }
+  }
+  fieldIdxs[fieldSlot] = inOwned;
+  const bi = bench.indexOf(inOwned);
+  if (bi >= 0) {
+    if (outOwned != null) bench[bi] = outOwned;
+    else bench.splice(bi, 1);
+  }
+  S._battleTeamIdxs = fieldIdxs;
+  S._battleBenchIdxs = bench;
+  const fighter = buildFighterFromOwned(inPet);
+  fighter.ownedIdx = inOwned;
+  S.battleAllies[fieldSlot] = fighter;
+  if (!S.player || (S.player.hp <= 0)) S.player = fighter;
+  if (!S._battleParticipants) S._battleParticipants = [];
+  if (!S._battleFieldTouched) S._battleFieldTouched = [];
+  if (S._battleParticipants.indexOf(inOwned) < 0) S._battleParticipants.push(inOwned);
+  if (S._battleFieldTouched.indexOf(inOwned) < 0) S._battleFieldTouched.push(inOwned);
+  if (!silent) {
+    const inName = (inPet.emoji || '') + (typeof getPetDisplayName === 'function' ? getPetDisplayName(inPet) : inPet.name);
+    addBLog('🔄 ' + inName + ' 補上欄位' + (fieldSlot + 1) + '！', 'sys');
+  }
+  return true;
+}
+/** 戰鬥中換人：上場 slot ↔ 候補 ownedIdx；silent 時不立刻結束回合 */
+function performBattleSwitch(fieldSlot, benchOwnedIdx, silent) {
+  if (!S.battling || !S.playerTurn) return false;
+  const fieldIdxs = S._battleTeamIdxs || [];
+  const bench = S._battleBenchIdxs || [];
+  const maxSlots = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  while (fieldIdxs.length < maxSlots) fieldIdxs.push(null);
+  if (fieldSlot < 0 || fieldSlot >= maxSlots) return false;
+  const outOwned = fieldIdxs[fieldSlot];
+  const inOwned = benchOwnedIdx;
+  if (bench.indexOf(inOwned) < 0) return false;
+  const inPet = S.owned[inOwned];
+  if (!inPet || inPet.hp <= 0) {
+    addBLog('這隻候補無法上場！', 'sys');
+    return false;
+  }
+  // 同步目前上場血量回 owned
+  const cur = S.battleAllies && S.battleAllies[fieldSlot];
+  if (cur && outOwned != null && S.owned[outOwned]) {
+    S.owned[outOwned].hp = cur.hp;
+    if (cur.mp != null) S.owned[outOwned].mp = cur.mp;
+  }
+  // 交換名單
+  fieldIdxs[fieldSlot] = inOwned;
+  const bi = bench.indexOf(inOwned);
+  if (bi >= 0) bench[bi] = outOwned;
+  S._battleTeamIdxs = fieldIdxs;
+  S._battleBenchIdxs = bench;
+  // 建立新戰士
+  const fighter = buildFighterFromOwned(inPet);
+  fighter.ownedIdx = inOwned;
+  S.battleAllies[fieldSlot] = fighter;
+  if (!S.player || S.player === cur) S.player = fighter;
+  // 標記曾出戰／上過場（領經驗倍率）
+  if (!S._battleParticipants) S._battleParticipants = [];
+  if (!S._battleFieldTouched) S._battleFieldTouched = [];
+  [outOwned, inOwned].forEach(i => {
+    if (i != null && S._battleParticipants.indexOf(i) < 0) S._battleParticipants.push(i);
+  });
+  if (inOwned != null && S._battleFieldTouched.indexOf(inOwned) < 0) {
+    S._battleFieldTouched.push(inOwned);
+  }
+  const outP = outOwned != null ? S.owned[outOwned] : null;
+  const outName = outP ? ((outP.emoji || '') + (typeof getPetDisplayName === 'function' ? getPetDisplayName(outP) : outP.name)) : '同伴';
+  const inName = (inPet.emoji || '') + (typeof getPetDisplayName === 'function' ? getPetDisplayName(inPet) : inPet.name);
+  if (!silent) {
+    addBLog('🔄 換人！' + outName + ' 下场，' + inName + ' 上場！', 'sys');
+    addBLog('換人結束，輪到敵方行動…', 'sys');
+    closeBattleSwitchModal();
+    S.selectedActions = {};
+    S.selectedTargets = {};
+    S._pickingTargetFor = null;
+    if (typeof renderBattleBoard === 'function') renderBattleBoard();
+    if (typeof updateBattleHp === 'function') updateBattleHp();
+    setBattleBtns(false);
+    setTimeout(() => {
+      if (typeof enemyTurn === 'function') enemyTurn();
+    }, 650);
+  } else {
+    addBLog('🔄 ' + outName + ' 下场，' + inName + ' 上場！', 'sys');
+  }
+  return true;
+}
+function switchBattlePet(slot, freeSwitch) {
 
-function startWildBattle() {
+  // 相容舊呼叫：改開換人面板
+  if (freeSwitch) openBattleSwitchModal();
+  else openBattleSwitchModal();
+}
+
+function openLineupModal() {
+  if (!S.wild) {
+    addLog('zone-log', '沒有野生目標');
+    return;
+  }
+  const rosterLive = (S.team || []).filter(i => S.owned[i] && (S.owned[i].hp > 0));
+  if (!rosterLive.length) {
+    addLog('zone-log', '⚠️ 出戰寵物沒體力了，（戰鬥後會自動回滿）');
+    return;
+  }
+  // 預設選前 3 隻
+  const maxF = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  S._lineupSelected = rosterLive.slice(0, maxF);
+  S._lineupRoster = rosterLive.slice();
   $('capture-modal').classList.add('hidden');
-  // 記錄上場的隊伍索引（最多 3），戰鬥後全員領經驗
-  S._battleTeamIdxs = (S.team || []).filter(i => S.owned[i] && S.owned[i].hp > 0).slice(0, 3);
+  renderLineupModal();
+  const modal = $('lineup-modal');
+  if (modal) modal.classList.remove('hidden');
+  const cancel = $('lineup-cancel');
+  if (cancel) cancel.onclick = () => {
+    modal.classList.add('hidden');
+    $('capture-modal').classList.remove('hidden');
+  };
+  const conf = $('lineup-confirm');
+  if (conf) conf.onclick = () => confirmLineupAndFight();
+}
+function renderLineupModal() {
+  const list = $('lineup-list');
+  const st = $('lineup-status');
+  const conf = $('lineup-confirm');
+  if (!list) return;
+  list.innerHTML = '';
+  const maxF = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  const selected = S._lineupSelected || [];
+  const roster = S._lineupRoster || [];
+  // 同屬性提示
+  const typeCnt = {};
+  selected.forEach(i => {
+    const p = S.owned[i];
+    if (!p) return;
+    const t = p.type || (getBase(p.id) && getBase(p.id).type) || '';
+    if (t) typeCnt[t] = (typeCnt[t] || 0) + 1;
+  });
+  let bondHint = '';
+  Object.keys(typeCnt).forEach(t => {
+    if (typeCnt[t] >= 3) bondHint = '🔥 將啟動「' + t + '」同屬性羈絆！';
+  });
+  if (st) {
+    st.innerHTML = '已選 <b>' + selected.length + '</b> / ' + maxF +
+      (bondHint ? '<br><span style="color:#e65100">' + bondHint + '</span>' : '');
+  }
+  if (conf) conf.disabled = selected.length < 1;
+  roster.forEach(ownedIdx => {
+    const p = S.owned[ownedIdx];
+    if (!p) return;
+    const pos = selected.indexOf(ownedIdx);
+    const on = pos >= 0;
+    const base = getBase(p.id) || {};
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + (on ? 'btn-primary' : 'btn-back');
+    b.style.width = '100%';
+    b.style.textAlign = 'left';
+    const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(p) : p.name);
+    const type = p.type || base.type || '?';
+    b.innerHTML = (on ? ('✅ 上場' + (pos + 1) + '　') : '⬜　') +
+      (p.emoji || '') + name +
+      '　Lv.' + (p.level || 1) +
+      '　<span style="opacity:0.9">[' + type + ']</span>' +
+      '　❤️' + Math.round(p.hp) + '/' + Math.round(p.maxHp);
+    b.onclick = () => {
+      const i = selected.indexOf(ownedIdx);
+      if (i >= 0) {
+        selected.splice(i, 1);
+      } else {
+        if (selected.length >= maxF) {
+          // 已滿：把最舊的擠掉，新的加在最後
+          selected.shift();
+        }
+        selected.push(ownedIdx);
+      }
+      S._lineupSelected = selected;
+      renderLineupModal();
+    };
+    list.appendChild(b);
+  });
+}
+function confirmLineupAndFight() {
+  const maxF = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
+  const selected = (S._lineupSelected || []).filter(i => S.owned[i] && S.owned[i].hp > 0);
+  if (!selected.length) {
+    alert('請至少選擇 1 隻上場');
+    return;
+  }
+  const roster = (S._lineupRoster || []).filter(i => S.owned[i] && S.owned[i].hp > 0);
+  // 上場 = 選擇順序；候補 = 名單中未選的（保持原名單順序）
+  const field = selected.slice(0, maxF);
+  const bench = roster.filter(i => field.indexOf(i) < 0);
+  const modal = $('lineup-modal');
+  if (modal) modal.classList.add('hidden');
+  startWildBattleWithLineup(field, bench);
+}
+function startWildBattleWithLineup(fieldIdxs, benchIdxs) {
+  // 由 confirmLineup 指定上場／候補
+  S._pendingLineupField = (fieldIdxs || []).slice();
+  S._pendingLineupBench = (benchIdxs || []).slice();
+  startWildBattle();
+}
+function startWildBattle() {
+
+  $('capture-modal').classList.add('hidden');
+  const lineupModal = $('lineup-modal');
+  if (lineupModal) lineupModal.classList.add('hidden');
+  // 出戰名單最多 6：可先在遇敵時調整上場 3 隻；其餘候補；戰鬥中可換人
+  let rosterLive = (S.team || []).filter(i => S.owned[i] && (S.owned[i].hp > 0));
+  if (S._pendingLineupField && S._pendingLineupField.length) {
+    const field = S._pendingLineupField.filter(i => S.owned[i] && S.owned[i].hp > 0);
+    const bench = (S._pendingLineupBench || []).filter(i => S.owned[i] && S.owned[i].hp > 0 && field.indexOf(i) < 0);
+    // 把沒被排進 field/bench 但在 roster 的也放候補
+    rosterLive.forEach(i => {
+      if (field.indexOf(i) < 0 && bench.indexOf(i) < 0) bench.push(i);
+    });
+    S._battleTeamIdxs = field.slice(0, BATTLE_FIELD_SLOTS);
+    S._battleBenchIdxs = bench;
+    rosterLive = field.concat(bench);
+    S._pendingLineupField = null;
+    S._pendingLineupBench = null;
+  } else {
+    S._battleTeamIdxs = rosterLive.slice(0, BATTLE_FIELD_SLOTS);
+    S._battleBenchIdxs = rosterLive.slice(BATTLE_FIELD_SLOTS);
+  }
+  S._battleParticipants = rosterLive.slice(); // 名單內都可領經驗
+  // 真正上過場的領 1 倍；整場都在候補的領 1/4
+  S._battleFieldTouched = (S._battleTeamIdxs || []).slice();
   const live = S._battleTeamIdxs.map(i => S.owned[i]);
   if (!live.length) { addLog('zone-log','⚠️ 出戰寵物沒體力了，（戰鬥後會自動回滿）'); return; }
   recalculatePetStats(S.wild);
@@ -4120,26 +5401,40 @@ function startWildBattle() {
     f.ownedIdx = S._battleTeamIdxs[i];
     return f;
   });
-  while (S.battleAllies.length < 3) S.battleAllies.push(null);
+  while (S.battleAllies.length < BATTLE_FIELD_SLOTS) S.battleAllies.push(null);
   S.player = S.battleAllies.find(p => p) || null;
   S.activeTeamSlot = 0;
 
   // 敵方最多 3 隻（目前野生先 1 隻，之後可擴充）
   const ebase = getBase(S.wild.id) || {};
   function randomEnemyStar(level) {
-    // 野生星級隨機：多數偏低，等級越高越可能較高星
+    // 野生星級隨機：等級越高越容易高星；整體機率已調高
     const lv = Math.max(1, level || 1);
+    // 等級加成：提高高星區段權重（例：39 級明顯高星）
+    const lvBoost = Math.min(0.28, Math.floor(lv / 8) * 0.035);
     const roll = Math.random();
     let star = 0;
-    if (roll < 0.40) star = 0;            // 40% 無星
-    else if (roll < 0.65) star = rand(1, 2);
-    else if (roll < 0.82) star = rand(3, 5);
-    else if (roll < 0.94) star = rand(6, 10);
-    else star = rand(11, Math.min(20, 8 + Math.floor(lv / 3)));
-    // 低等野生上限再壓一點
-    if (lv < 8) star = Math.min(star, 3);
-    else if (lv < 15) star = Math.min(star, 8);
-    else if (lv < 25) star = Math.min(star, 15);
+    // 原：40/25/17/12/6 → 調高中高星
+    // 無星 28%、1-2星 22%、3-5星 20%、6-10星 16%、11+ 14%（再加等級偏移）
+    const t0 = Math.max(0.12, 0.28 - lvBoost);
+    const t1 = t0 + Math.max(0.14, 0.22 - lvBoost * 0.5);
+    const t2 = t1 + 0.20 + lvBoost * 0.3;
+    const t3 = t2 + 0.16 + lvBoost * 0.4;
+    // t4 剩餘 = 最高星段
+    if (roll < t0) star = 0;
+    else if (roll < t1) star = rand(1, 2);
+    else if (roll < t2) star = rand(3, 5);
+    else if (roll < t3) star = rand(6, 10);
+    else {
+      const hiCap = Math.min(25, 10 + Math.floor(lv / 2));
+      star = rand(11, Math.max(11, hiCap));
+    }
+    // 低等仍壓上限，但中高等放寬（39 級可到更高）
+    if (lv < 8) star = Math.min(star, 4);
+    else if (lv < 15) star = Math.min(star, 10);
+    else if (lv < 25) star = Math.min(star, 16);
+    else if (lv < 35) star = Math.min(star, 20);
+    // 35+ 幾乎不壓（最高 25）
     return star;
   }
   function makeEnemy(wildLike, lv) {
@@ -4270,6 +5565,75 @@ function startWildBattle() {
   }
 }
 
+
+/** 高等級判定基準：冒險者等級 與 我方出戰最高等級 取大 */
+function getBattleLevelBaseline(allies) {
+  let base = Math.max(1, Number(S.level) || 1);
+  (allies || S.battleAllies || []).forEach(p => {
+    if (!p) return;
+    base = Math.max(base, Math.max(1, Number(p.level) || 1));
+  });
+  return base;
+}
+
+/**
+ * 敵方是否「高等級」：任一人等級 ≥ 基準 + 8
+ * 回傳 { hasHigh, threshold, baseline, list:[{name,level,delta}] }
+ */
+function analyzeHighLevelEnemies(enemies, allies) {
+  const baseline = getBattleLevelBaseline(allies);
+  const threshold = baseline + 5;
+  const list = [];
+  (enemies || []).forEach(e => {
+    if (!e) return;
+    const lv = Math.max(1, Number(e.level) || 1);
+    if (lv >= threshold) {
+      list.push({
+        name: e.name || '???',
+        emoji: e.emoji || '',
+        level: lv,
+        delta: lv - baseline
+      });
+    }
+  });
+  list.sort((a, b) => b.level - a.level);
+  return { hasHigh: list.length > 0, threshold: threshold, baseline: baseline, list: list };
+}
+
+function formatHighLevelAlertText(info) {
+  if (!info || !info.hasHigh) return '';
+  const names = info.list.map(x => (x.emoji || '') + x.name + ' Lv.' + x.level + '（+' + x.delta + '）').join('、');
+  return '⚠️ 高等級警報！敵方有強敵：' + names +
+    '\n（基準 Lv.' + info.baseline + '，達 Lv.' + info.threshold + ' 以上即警報）';
+}
+
+function updateBattleHighLevelAlert() {
+  let el = document.getElementById('battle-high-level-alert');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'battle-high-level-alert';
+    const wrap = document.querySelector('.battle-screen-wrap');
+    const powerBar = document.getElementById('battle-power-bar');
+    if (wrap) {
+      if (powerBar && powerBar.parentNode === wrap) wrap.insertBefore(el, powerBar);
+      else if (wrap.firstChild) wrap.insertBefore(el, wrap.firstChild);
+      else wrap.appendChild(el);
+    }
+  }
+  const info = analyzeHighLevelEnemies(S.battleEnemies, S.battleAllies);
+  if (info.hasHigh) {
+    const short = info.list.map(x => (x.emoji || '') + x.name + ' Lv.' + x.level).join('　');
+    el.textContent = '⚠️ 高等級警報！' + short;
+    el.classList.add('show');
+    el.style.display = 'block';
+  } else {
+    el.classList.remove('show');
+    el.style.display = 'none';
+    el.textContent = '';
+  }
+  return info;
+}
+
 function startBattleUI() {
   renderBattleBoard();
   if (typeof clearBattleLog === 'function') clearBattleLog(); else { const _bl=$('b-log'); if(_bl) _bl.innerHTML=''; }
@@ -4277,6 +5641,14 @@ function startBattleUI() {
   const aNames = (S.battleAllies || []).filter(Boolean).map(p => p.name).join('、');
   const eNames = (S.battleEnemies || []).filter(Boolean).map(p => p.name).join('、');
   addBLog('戰鬥開始！' + aNames + ' vs ' + eNames, 'sys');
+  const hi = (typeof analyzeHighLevelEnemies === 'function')
+    ? analyzeHighLevelEnemies(S.battleEnemies, S.battleAllies)
+    : { hasHigh: false };
+  if (hi.hasHigh) {
+    const alertTxt = formatHighLevelAlertText(hi);
+    addBLog(alertTxt.replace(/\n/g, '｜'), 'sys');
+  }
+  if (typeof updateBattleHighLevelAlert === 'function') updateBattleHighLevelAlert();
   addBLog('為每隻我方選擇技能，或使用道具跳過選技', 'sys');
   S._battleMeta = {
     startedAt: Date.now(),
@@ -4450,14 +5822,21 @@ function renderEnemyCard(pet, slot) {
   const dead = pet.hp <= 0;
   const isTargeted = S.selectedTargets && Object.values(S.selectedTargets).some(i => i === slot);
   const needPick = S.playerTurn && S.battling && S._pickingTargetFor != null;
+  const baseline = (typeof getBattleLevelBaseline === 'function') ? getBattleLevelBaseline(S.battleAllies) : Math.max(1, Number(S.level) || 1);
+  const isHighLv = !dead && (Math.max(1, Number(pet.level) || 1) >= baseline + 5);
   let extraCls = dead ? ' empty' : '';
   if (!dead && needPick) extraCls += ' selectable';
   if (!dead && isTargeted) extraCls += ' targeted';
+  if (isHighLv) extraCls += ' high-level-foe';
   const cp = calcCombatPower(pet);
   const starHtml = renderStarsHtml(pet.starLevel || 0, { size: 12 });
+  const highBadge = isHighLv
+    ? '<div style="text-align:center;font-size:0.68rem;font-weight:900;color:#fff;background:#d50000;border-radius:8px;padding:2px 6px;margin:2px 0">⚠️ 高等級</div>'
+    : '';
   return '<div class="bcard enemy-card' + extraCls + '" id="enemy-card-' + slot + '" data-enemy-slot="' + slot + '">' +
     '<div class="bc-name">敵方' + (slot+1) + '　' + battlePetName(pet) + '</div>' +
     '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#b71c1c;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
+    highBadge +
     '<div class="bc-face">' + petFaceHtml(pet, 40) + '</div>' +
     '<div style="text-align:center;font-size:0.72rem;font-weight:800;color:#c62828;margin:1px 0">⚔️ ' + cp.toLocaleString() + '</div>' +
     '<div class="bc-triad"><span>武' + formatPetStat(pet.force) + '</span><span>智' + formatPetStat(pet.intel) + '</span><span>魅' + formatPetStat(pet.charm) + '</span></div>' +
@@ -4503,6 +5882,7 @@ function renderBattleBoard() {
       '<span style="color:#666;font-size:0.75rem">' + tip + '</span>' +
       '<span style="color:#c62828">⚔️ 敵方總戰力 <b style="font-size:1.05rem">' + enemyTotal.toLocaleString() + '</b></span>';
   }
+  if (typeof updateBattleHighLevelAlert === 'function') updateBattleHighLevelAlert();
   if (alliesBox) {
     alliesBox.innerHTML = [0,1,2].map(i => renderAllyCard(S.battleAllies && S.battleAllies[i], i)).join('');
     alliesBox.querySelectorAll('.bc-sk').forEach(btn => {
@@ -4595,6 +5975,7 @@ function renderBattleBoard() {
     const showFlee = S.battling && S.playerTurn && (S.tutorialDone || S.tutorialStep < 2);
     fleeBtn.style.display = showFlee ? 'inline-block' : 'none';
   }
+  if (typeof updateSameTypeBonusUI === 'function') updateSameTypeBonusUI();
   if (typeof applyTutorialSkillSpotlight === 'function') applyTutorialSkillSpotlight();
   if (typeof applyTargetSelectSpotlight === 'function') applyTargetSelectSpotlight();
 }
@@ -5127,6 +6508,7 @@ function renderBattleItems() {
   } else {
     box.innerHTML = '<span style="font-size:0.75rem;color:#888">道具：僅花蜜</span>';
   }
+  if (typeof updateBattleSwitchButton === 'function') updateBattleSwitchButton();
 }
 
 function regenBattleMp(list, label) {
@@ -5147,6 +6529,7 @@ function regenBattleMp(list, label) {
 
 function setBattleBtns(on) {
   S.playerTurn = on;
+  if (typeof updateBattleSwitchButton === 'function') updateBattleSwitchButton();
   if (on) {
     // 新回合開始：倒數每隻寵物的增益剩餘回合
     (S.battleAllies || []).forEach(p => {
@@ -5607,6 +6990,59 @@ function getTypeMul(atkType, defType) {
   const m = row[defType];
   return (m != null) ? m : 1;
 }
+
+/** 三隻同屬性上場加成：需恰好／至少 3 隻存活且同屬性 */
+const SAME_TYPE_ALLY_ATK_MUL = 1.20;  // 造成傷害 +20%
+const SAME_TYPE_ALLY_DEF_MUL = 0.90;  // 受到傷害 -10%
+function getLivingAllyTypes() {
+  const types = [];
+  (S.battleAllies || []).forEach(p => {
+    if (!p || p.hp <= 0) return;
+    const t = p.type || (typeof getBase === 'function' && getBase(p.id) && getBase(p.id).type) || '';
+    if (t) types.push(t);
+  });
+  return types;
+}
+function getSameTypeAllyBonus() {
+  const types = getLivingAllyTypes();
+  if (types.length < 3) return { active: false, type: '', atkMul: 1, defMul: 1 };
+  // 統計最多的屬性
+  const cnt = {};
+  types.forEach(t => { cnt[t] = (cnt[t] || 0) + 1; });
+  let best = '', bestN = 0;
+  Object.keys(cnt).forEach(t => {
+    if (cnt[t] > bestN) { bestN = cnt[t]; best = t; }
+  });
+  if (bestN < 3) return { active: false, type: '', atkMul: 1, defMul: 1 };
+  return {
+    active: true,
+    type: best,
+    count: bestN,
+    atkMul: SAME_TYPE_ALLY_ATK_MUL,
+    defMul: SAME_TYPE_ALLY_DEF_MUL
+  };
+}
+function updateSameTypeBonusUI() {
+  let el = document.getElementById('same-type-bonus-banner');
+  const bonus = getSameTypeAllyBonus();
+  if (!el) {
+    const arena = document.querySelector('.battle-screen-wrap') || document.getElementById('battle');
+    if (!arena) return;
+    el = document.createElement('div');
+    el.id = 'same-type-bonus-banner';
+    el.style.cssText = 'display:none;text-align:center;font-weight:800;font-size:0.85rem;padding:6px 10px;margin:4px 0 8px;border-radius:12px;border:2px solid #ffb74d;background:linear-gradient(90deg,#fff3e0,#fce4ec);color:#e65100;';
+    const board = arena.querySelector('.battle-row-allies') || arena.firstChild;
+    if (board && board.parentNode) board.parentNode.insertBefore(el, board);
+    else arena.insertBefore(el, arena.firstChild);
+  }
+  if (bonus.active) {
+    el.style.display = 'block';
+    el.innerHTML = '🔥 同屬性羈絆啟動！三隻「' + bonus.type + '」屬性　攻擊 <b>×' + bonus.atkMul.toFixed(2) + '</b>　受傷 <b>×' + bonus.defMul.toFixed(2) + '</b>';
+  } else {
+    el.style.display = 'none';
+    el.innerHTML = '';
+  }
+}
 function calcAtk(atk,def,sk,isP){
   // 規則：技能一定命中、一定不會被閃避（不判定 miss / dodge）
   const atkStat = Math.max(1, Number(atk.attack) || Number(atk.baseAtk) || 30);
@@ -5645,6 +7081,13 @@ function calcAtk(atk,def,sk,isP){
   const dType = def.type || (typeof getBase === 'function' && getBase(def.id) && getBase(def.id).type) || '';
   const typeMul = getTypeMul(aType, dType);
   if (typeMul !== 1) dmg = Math.max(1, Math.floor(dmg * typeMul));
+
+  // 三隻同屬性上場羈絆
+  const bond = (typeof getSameTypeAllyBonus === 'function') ? getSameTypeAllyBonus() : { active: false, atkMul: 1, defMul: 1 };
+  if (bond.active) {
+    if (isP) dmg = Math.max(1, Math.floor(dmg * (bond.atkMul || 1)));
+    else dmg = Math.max(1, Math.floor(dmg * (bond.defMul || 1))); // 敵打我 → 減傷
+  }
 
   let critRate = (atk.crit != null ? atk.crit : 0.08) + (sk.critB || 0);
   if (isP && S.pEffects && S.pEffects.critSet != null) critRate = S.pEffects.critSet;
@@ -6650,7 +8093,10 @@ function tryFleeBattle() {
 function snapshotPetCombatStats(p) {
   if (!p) return null;
   recalculatePetStats(p);
-  return {
+  const force = (Number(p.force) || 0) + (Number(p._treasureForce) || 0);
+  const intel = (Number(p.intel) || 0) + (Number(p._treasureIntel) || 0);
+  const charm = (Number(p.charm) || 0) + (Number(p._treasureCharm) || 0);
+  const snap = {
     level: Math.max(1, Number(p.level) || 1),
     evoStage: Math.max(0, Number(p.evoStage) || 0),
     starLevel: Math.max(0, Number(p.starLevel) || 0),
@@ -6662,10 +8108,22 @@ function snapshotPetCombatStats(p) {
     crit: Number(p.crit) || 0,
     dodge: Number(p.dodge) || 0,
     hit: Number(p.hit) || 0,
-    force: (Number(p.force) || 0) + (Number(p._treasureForce) || 0),
-    intel: (Number(p.intel) || 0) + (Number(p._treasureIntel) || 0),
-    charm: (Number(p.charm) || 0) + (Number(p._treasureCharm) || 0)
+    force: force,
+    intel: intel,
+    charm: charm,
+    // 拆解：本體三圍 / 寶物三圍（方便顯示加成來源）
+    bodyForce: Number(p.force) || 0,
+    bodyIntel: Number(p.intel) || 0,
+    bodyCharm: Number(p.charm) || 0,
+    treasureForce: Number(p._treasureForce) || 0,
+    treasureIntel: Number(p._treasureIntel) || 0,
+    treasureCharm: Number(p._treasureCharm) || 0,
+    treasureAtk: Number(p.treasureAtk) || 0,
+    treasureDef: Number(p.treasureDef) || 0,
+    treasureHp: Number(p.treasureHp) || 0,
+    combatPower: (typeof calcCombatPower === 'function') ? calcCombatPower(p) : 0
   };
+  return snap;
 }
 
 function formatStatArrow(before, after, isPercent) {
@@ -6689,9 +8147,13 @@ function formatStatArrow(before, after, isPercent) {
   return fmt(b) + ' → <b>' + fmt(a) + '</b> <span style="color:' + color + ';font-weight:700">(' + dFmt(delta) + ')</span>';
 }
 
-function buildPetStatDeltaLines(before, after) {
+function buildPetStatDeltaLines(before, after, opts) {
+  opts = opts || {};
+  // alwaysAll：一律列出所有數值（預設 true）；false 時只顯示有變化的
+  const alwaysAll = opts.alwaysAll !== false;
   if (!before || !after) return [];
   const rows = [
+    { key: 'combatPower', label: '⚔️ 戰力', pct: false },
     { key: 'maxHp', label: '❤️ 最大血量', pct: false },
     { key: 'maxMp', label: '💧 最大魔力', pct: false },
     { key: 'attack', label: '💥 攻擊', pct: false },
@@ -6708,16 +8170,64 @@ function buildPetStatDeltaLines(before, after) {
   rows.forEach(r => {
     const b = before[r.key], a = after[r.key];
     if (b == null || a == null) return;
-    if (Math.abs((Number(a) || 0) - (Number(b) || 0)) < 1e-9) return;
-    lines.push(r.label + '：' + formatStatArrow(b, a, r.pct));
+    const changed = Math.abs((Number(a) || 0) - (Number(b) || 0)) >= 1e-9;
+    if (!alwaysAll && !changed) return;
+    // 有變化的加粗標色；沒變化也顯示（完整清單）
+    if (changed) {
+      lines.push(r.label + '：' + formatStatArrow(b, a, r.pct));
+    } else {
+      const fmt = (v) => {
+        if (r.pct) return (Math.round(v * 1000) / 10).toFixed(1).replace(/\.0$/, '') + '%';
+        if (r.key === 'combatPower') return Math.round(v).toLocaleString();
+        const n = Math.round(v * 10) / 10;
+        return Number.isInteger(n) ? String(n) : n.toFixed(1);
+      };
+      lines.push('<span style="opacity:0.75">' + r.label + '：' + fmt(b) + '（無變化）</span>');
+    }
   });
-  if (!lines.length) {
-    ['maxHp', 'attack', 'defense', 'speed'].forEach(k => {
-      const label = { maxHp: '❤️ 最大血量', attack: '💥 攻擊', defense: '🛡️ 防禦', speed: '💨 速度' }[k];
-      lines.push(label + '：' + formatStatArrow(before[k], after[k], false));
+  // 三圍來源拆解（本體 / 寶物）若有變化也附加說明
+  const triadParts = [
+    { body: 'bodyForce', tre: 'treasureForce', label: '💪 武力組成' },
+    { body: 'bodyIntel', tre: 'treasureIntel', label: '🧠 智力組成' },
+    { body: 'bodyCharm', tre: 'treasureCharm', label: '✨ 魅力組成' }
+  ];
+  triadParts.forEach(t => {
+    if (before[t.body] == null || after[t.body] == null) return;
+    const bBody = Number(before[t.body]) || 0, aBody = Number(after[t.body]) || 0;
+    const bTre = Number(before[t.tre]) || 0, aTre = Number(after[t.tre]) || 0;
+    if (!alwaysAll && Math.abs(aBody - bBody) < 1e-9 && Math.abs(aTre - bTre) < 1e-9) return;
+    if (Math.abs(aBody - bBody) >= 1e-9 || Math.abs(aTre - bTre) >= 1e-9 || alwaysAll) {
+      lines.push(
+        '<span style="font-size:0.82rem;color:#666">' + t.label +
+        '：本體 ' + aBody + (Math.abs(aBody - bBody) >= 1e-9 ? ' (' + (aBody - bBody >= 0 ? '+' : '') + (aBody - bBody) + ')' : '') +
+        '　＋　寶物 ' + aTre + (Math.abs(aTre - bTre) >= 1e-9 ? ' (' + (aTre - bTre >= 0 ? '+' : '') + (aTre - bTre) + ')' : '') +
+        '</span>'
+      );
+    }
+  });
+  return lines;
+}
+
+/** 裝備／卸下寶物後：跳出完整數值加成清單 */
+function showEquipStatChangeScreen(pet, before, reason) {
+  if (!pet || !before) return;
+  recalculatePetStats(pet);
+  const after = snapshotPetCombatStats(pet);
+  const lines = buildPetStatDeltaLines(before, after, { alwaysAll: true });
+  const name = (typeof getPetDisplayName === 'function') ? getPetDisplayName(pet) : (pet.name || '寵物');
+  if (typeof showLevelUpScreen === 'function') {
+    showLevelUpScreen({
+      kind: 'equip',
+      name: name,
+      emoji: pet.emoji || '💎',
+      fromLabel: reason || '裝備變更',
+      toLabel: '數值已更新',
+      remainingFrags: null,
+      statLines: lines,
+      powerPetIdx: (S.owned || []).indexOf(pet),
+      powerReason: reason || '裝備寶物'
     });
   }
-  return lines;
 }
 
 function petExpNeeded(lv) {
@@ -6759,7 +8269,7 @@ function showBattleExpScreen(entries, onDone) {
     return;
   }
   // 關閉其他遮罩、提到最上層
-  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal', 'player-modal', 'name-modal'].forEach(id => {
+  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = $(id);
     if (el) el.classList.add('hidden');
   });
@@ -6861,7 +8371,7 @@ function showLevelUpScreen(info) {
   if (!info) return;
   window._currentLevelUpInfo = info;
   // 關閉可能蓋住升級畫面的彈窗，並確保本層在最上面
-  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal', 'player-modal', 'name-modal'].forEach(id => {
+  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = $(id);
     if (el) el.classList.add('hidden');
   });
@@ -6886,6 +8396,10 @@ function showLevelUpScreen(info) {
     em.textContent = info.emoji || '✨';
     title.textContent = '進化成功！';
     sub.textContent = (info.name || '') + '　' + (info.fromLabel || '') + ' → ' + (info.toLabel || '');
+  } else if (kind === 'equip') {
+    em.textContent = info.emoji || '💎';
+    title.textContent = (info.fromLabel && String(info.fromLabel).indexOf('卸') >= 0) ? '卸下寶物' : '裝備寶物';
+    sub.textContent = (info.name || '') + '　' + (info.fromLabel || '裝備變更');
   } else if (kind === 'pet') {
     em.textContent = info.emoji || '🐾';
     title.textContent = '寵物升級！';
@@ -6912,11 +8426,14 @@ function showLevelUpScreen(info) {
   } else if (kind === 'evo') {
     lines.push('✨ 進化階段：<b>' + (info.fromLabel || '') + ' → ' + (info.toLabel || '') + '</b>');
     lines.push('❤️ 血量已補滿');
+  } else if (kind === 'equip') {
+    lines.push('💎 ' + (info.fromLabel || '裝備變更'));
+    lines.push('以下為完整數值與戰力變化（含無變化項目）');
   }
 
   const statLines = info.statLines || [];
   if (statLines.length) {
-    lines.push('<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #ffcc80;font-weight:800;color:#e65100">數值變化</div>');
+    lines.push('<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #ffcc80;font-weight:800;color:#e65100">數值變化（全部）</div>');
     statLines.forEach(l => lines.push(l));
   }
   if (info.extraLines && info.extraLines.length) {
@@ -6957,19 +8474,43 @@ function endBattle(win){
       S.coins += bonus;
     }
 
-    // ===== 上場寵物全員獲得經驗（最多 3 隻，數值依表）=====
-    const battleIdxs = (S._battleTeamIdxs && S._battleTeamIdxs.length)
-      ? S._battleTeamIdxs.slice()
-      : (S.team || []).slice(0, 3);
+
+/** 本場寵物經驗倍率：上過場 1 倍，整場候補 0.25 倍 */
+function getBattlePetExpMult(ownedIdx) {
+  if (ownedIdx == null) return 0;
+  const touched = S._battleFieldTouched || S._battleTeamIdxs || [];
+  if (touched.indexOf(ownedIdx) >= 0) return 1;
+  // 候補／名單內但沒上場
+  const bench = S._battleBenchIdxs || [];
+  const parts = S._battleParticipants || [];
+  if (bench.indexOf(ownedIdx) >= 0 || parts.indexOf(ownedIdx) >= 0) return 0.25;
+  // 後備：依出戰名單順序 前3=1 後3=1/4
+  const pos = (S.team || []).indexOf(ownedIdx);
+  if (pos >= 0) return pos < (typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3) ? 1 : 0.25;
+  return 1;
+}
+
+    // ===== 本場參與寵物獲得經驗（上場 1 倍、候補 1/4）=====
+    const battleIdxs = (function() {
+      const set = [];
+      const add = (i) => { if (i != null && set.indexOf(i) < 0) set.push(i); };
+      (S._battleParticipants || []).forEach(add);
+      (S._battleTeamIdxs || []).forEach(add);
+      (S._battleBenchIdxs || []).forEach(add);
+      if (!set.length) (S.team || []).slice(0, 6).forEach(add);
+      return set;
+    })();
     const expEntries = [];
     const petLevelUpQueue = [];
     battleIdxs.forEach(oi => {
       const pet = S.owned[oi];
       if (!pet) return;
+      const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
+      const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult));
       const need = Math.max(1, (pet.level || 1) * 25);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
-      pet.exp = expBefore + expG;
+      pet.exp = expBefore + gain;
       let leveledUp = false;
       let toLv = fromLv;
       let petStatLines = null;
@@ -6994,7 +8535,8 @@ function endBattle(win){
         ownedIdx: oi,
         name: pet.name,
         emoji: pet.emoji || '🐾',
-        expGain: expG,
+        expGain: gain,
+        expMult: mult,
         fromLv: fromLv,
         toLv: toLv,
         leveledUp: leveledUp,
@@ -7026,14 +8568,9 @@ function endBattle(win){
     $('res-emoji').textContent='🎉';
     $('res-title').textContent='勝利！';
     const enemyN = (typeof getBattleRewardTargets === 'function' ? getBattleRewardTargets() : []).length || 1;
-    let winMsg='打倒 '+enemyN+' 隻！獲得 💰'+coins+'\n玩家經驗 +'+playerExpG+'　寵物經驗 +'+expG+'（上場全員、依敵數加總）\n目前勝場：'+S.wins+'\n玩家等級：Lv.'+S.level;
-    if (expReward.perEnemy && expReward.perEnemy.length > 1) {
-      winMsg += '\n（' + expReward.perEnemy.map(e => (e.emoji||'') + e.name + ' 寵EXP' + e.petExp).join('、') + '）';
-    }
-    if(leveled) winMsg+='\n🎊 冒險者升級！Lv.'+(S.level-levelsGained)+' → Lv.'+S.level+'（+'+ (levelsGained*20) +' 金錢）';
     const leveledNames = expEntries.filter(e => e.leveledUp).map(e => e.emoji + e.name + ' Lv.' + e.fromLv + '→' + e.toLv);
-    if (leveledNames.length) winMsg += '\n🐾 ' + leveledNames.join('、') + ' 升級！';
-    if(S._pendingEvoMsg){ winMsg+='\n✨ '+S._pendingEvoMsg; S._pendingEvoMsg=null; }
+    const evoMsg = S._pendingEvoMsg || null;
+    S._pendingEvoMsg = null;
     // 關閉勝利窗後：先顯示全員 EXP 條 → 再顯示升級畫面佇列
     S._pendingBattleExp = expEntries;
     S._pendingLevelUpQueue = [];
@@ -7060,12 +8597,28 @@ function endBattle(win){
         slot: i
       });
     }
+    let catchHint = '';
     if (catchCandidates.length) {
       const sampleRate = getPostBattleCatchRate(catchCandidates[0]);
-      winMsg += '\n🎾 可選擇 1 隻收服（成功率約 ' + formatCatchRate(sampleRate) + '）';
+      catchHint = '可選擇 1 隻收服（成功率約 ' + formatCatchRate(sampleRate) + '）';
     }
-    if (drops.lines.length) winMsg += '\n' + drops.lines.join('\n');
-    $('res-msg').textContent = winMsg;
+    const resHtml = (typeof buildVictoryResultHtml === 'function')
+      ? buildVictoryResultHtml({
+          enemyN: enemyN,
+          wins: S.wins,
+          coins: coins,
+          playerExp: playerExpG,
+          petExp: expG,
+          playerLevel: S.level,
+          playerLevelUp: leveled ? ('冒險者 Lv.' + (S.level - levelsGained) + ' → Lv.' + S.level + '（+' + (levelsGained * 20) + ' 金錢）') : null,
+          petLevelUps: leveledNames,
+          evoMsg: evoMsg,
+          lootItems: drops.items || [],
+          catchHint: catchHint
+        })
+      : '';
+    $('res-msg').innerHTML = resHtml;
+
 
     S._postBattleCatchUsed = false;
     S.pendingCatch = null;
@@ -7077,7 +8630,7 @@ function endBattle(win){
       S.pendingCatch = target;
       let rate = getPetCaptureRate(target, {});
       (allCatchBtns || []).forEach(b => { b.disabled = true; b.classList.remove('tut-pulse'); });
-      $('res-msg').textContent += '\n🎲 收服機率 ' + formatCatchRate(rate) + '（圖鑑）…';
+      appendResultCatchNote('🎲 收服機率 ' + formatCatchRate(rate) + '（圖鑑）…');
       if (roll(rate)) {
         const base = getBase(target.id) || target;
         const caught = clonePet(base, target.level || 1);
@@ -7095,24 +8648,61 @@ function endBattle(win){
         const starTxt = (typeof renderStarsHtml === 'function')
           ? renderStarsHtml(caught.starLevel || 0, { size: 14 })
           : ('★' + (caught.starLevel || 0));
-        $('res-msg').textContent += '\n🎉 成功捕捉 ' + (caught.emoji || '') + caught.name +
-          ' Lv.' + caught.level + '！';
+        appendResultCatchNote('🎉 成功捕捉 ' + (caught.emoji || '') + caught.name + ' Lv.' + caught.level + '！');
         if (btnEl) btnEl.textContent = '已捕捉 ✓';
-        if (!S.tutorialDone && S.tutorialStep >= 2) {
-          const okLater = document.createElement('button');
-          okLater.className = 'btn btn-primary';
-          okLater.textContent = '太棒了，繼續！';
-          okLater.onclick = () => {
-            S.wild = null; S.pendingCatch = null; S._catchCandidates = null;
-            $('result-modal').classList.add('hidden');
-            if (typeof finishTutorialAfterCatch === 'function') finishTutorialAfterCatch();
-            else if (typeof runPostBattleFlow === 'function') runPostBattleFlow();
-            else showScreen('map');
-          };
-          actions.appendChild(okLater);
-        }
+        // 收服成功 → 取暱稱（僅一次）；教學戰也會進入取名流程
+        const afterNick = () => {
+          try {
+            // 教學：取名結束後一定要能繼續（原本的「確定」被藏起來且 class 相同，不能再用 querySelector 判斷）
+            if (!S.tutorialDone && S.tutorialStep >= 2) {
+              let cont = actions.querySelector('[data-tut-after-catch]');
+              if (!cont) {
+                cont = document.createElement('button');
+                cont.className = 'btn btn-primary';
+                cont.setAttribute('data-tut-after-catch', '1');
+                cont.textContent = '太棒了，繼續！';
+                cont.onclick = () => {
+                  S.wild = null; S.pendingCatch = null; S._catchCandidates = null;
+                  const rm = $('result-modal');
+                  if (rm) rm.classList.add('hidden');
+                  if (typeof finishTutorialAfterCatch === 'function') finishTutorialAfterCatch();
+                  else if (typeof runPostBattleFlow === 'function') runPostBattleFlow();
+                  else showScreen('map');
+                };
+                actions.appendChild(cont);
+              }
+              cont.style.display = '';
+              cont.disabled = false;
+              // 藏起原本被鎖住的確定鈕，避免重複
+              actions.querySelectorAll('.btn-primary').forEach(b => {
+                if (b !== cont && !b.getAttribute('data-tut-after-catch')) {
+                  b.style.display = 'none';
+                  b.disabled = true;
+                }
+              });
+              if (typeof setTutBattleHint === 'function') {
+                setTutBattleHint('✅ 收服完成！按「太棒了，繼續！」進入下一步');
+              }
+              return;
+            }
+            // 非教學：若確定鈕被藏過就還原
+            actions.querySelectorAll('.btn-primary').forEach(b => {
+              if (!b.getAttribute('data-tut-after-catch')) {
+                b.style.display = '';
+                b.disabled = false;
+              }
+            });
+          } catch (err) {
+            console.error('afterNick error', err);
+            // 保底：教學直接往下走，避免卡死
+            if (!S.tutorialDone && typeof finishTutorialAfterCatch === 'function') {
+              try { finishTutorialAfterCatch(); } catch (e2) { console.error(e2); }
+            }
+          }
+        };
+        offerPetNickname(caught, afterNick);
       } else {
-        $('res-msg').textContent += '\n💨 ' + target.name + ' 逃走了…（機會已用完）';
+        appendResultCatchNote('💨 ' + target.name + ' 逃走了…（機會已用完）');
         if (btnEl) btnEl.textContent = '捕捉失敗';
       }
       S.pendingCatch = null;
@@ -7190,18 +8780,26 @@ function endBattle(win){
     const expG = expReward.petExp;
     const playerExpG = expReward.playerExp;
     S.exp += playerExpG;
-    const battleIdxs = (S._battleTeamIdxs && S._battleTeamIdxs.length)
-      ? S._battleTeamIdxs.slice()
-      : (S.team || []).slice(0, 3);
+    const battleIdxs = (function() {
+      const set = [];
+      const add = (i) => { if (i != null && set.indexOf(i) < 0) set.push(i); };
+      (S._battleParticipants || []).forEach(add);
+      (S._battleTeamIdxs || []).forEach(add);
+      (S._battleBenchIdxs || []).forEach(add);
+      if (!set.length) (S.team || []).slice(0, 6).forEach(add);
+      return set;
+    })();
     const expEntries = [];
     S._pendingLevelUpQueue = [];
     battleIdxs.forEach(oi => {
       const pet = S.owned[oi];
       if (!pet) return;
+      const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
+      const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult));
       const need = Math.max(1, (pet.level || 1) * 25);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
-      pet.exp = expBefore + expG;
+      pet.exp = expBefore + gain;
       let leveledUp = false, toLv = fromLv, petStatLines = null, canEvo = false;
       while (pet.exp >= (pet.level || 1) * 25) {
         pet.exp -= (pet.level || 1) * 25;
@@ -7217,7 +8815,7 @@ function endBattle(win){
       }
       expEntries.push({
         ownedIdx: oi, name: pet.name, emoji: pet.emoji || '🐾',
-        expGain: expG, fromLv, toLv, leveledUp,
+        expGain: gain, expMult: mult, fromLv, toLv, leveledUp,
         expBefore, needBefore: need,
         expAfter: Math.max(0, Number(pet.exp) || 0),
         needAfter: Math.max(1, (pet.level || 1) * 25),
@@ -8014,10 +9612,10 @@ function openPetInfo(idx) {
   const sumBar0 = document.getElementById('codex-summon-bar');
   if (sumBar0) sumBar0.innerHTML = '';
   recalculatePetStats(p);
-  const stages = ['基礎', '初始進化', '中階進化', '進階進化', '終極進化', '完美進化'];
-  const stage = Math.max(0, Math.min(5, Number(p.evoStage) || 0));
+  const stages = EVO_STAGE_NAMES;
+  const stage = Math.max(0, Math.min((typeof EVO_STAGE_MAX === 'number' ? EVO_STAGE_MAX : 11), Number(p.evoStage) || 0));
   $('pet-info-emoji').innerHTML = petFaceHtml(p, 64);
-  $('pet-info-name').textContent = p.name + '　Lv.' + p.level;
+  $('pet-info-name').textContent = getPetDisplayName(p) + '　Lv.' + p.level;
   $('pet-info-summary').textContent = (p.type || '未知') + '｜' + stages[stage];
   const atkFx = getAttackFormulaBreakdown(p);
   const defFx = getDefenseFormulaBreakdown(p);
@@ -8076,12 +9674,18 @@ function openPetInfo(idx) {
         '　<span style="color:#e65100;font-size:0.85rem">（基礎攻擊 +' + (Math.max(0, Number(p.starLevel)||0)) + '）</span><br>' +
         '🧩 碎片：<b>' + getFragmentCount(p.id) + '</b>' +
         (getStarMeta(p.starLevel || 0).isMax ? '（已滿星）' : '／升星需要 <b>' + getStarMeta(p.starLevel || 0).nextCost + '</b>') +
-        '<br>♻️ 分解可得：<b>' + calcDismantleFragments(p) + '</b> 片碎片' +
+        '<br>♻️ 可換成：<b>' + calcDismantleFragments(p) + '</b> 片碎片' +
       '</div>' +
       '<div style="text-align:center;padding:10px 16px;border-radius:14px;background:linear-gradient(145deg,#fff3e0,#fce4ec);border:2px solid #ffb74d;min-width:110px">' +
         '<div style="font-size:0.75rem;color:#e65100;font-weight:700">⚔️ 戰力</div>' +
         '<div style="font-size:1.55rem;font-weight:900;color:#bf360c;line-height:1.2">' + combatPower.toLocaleString() + '</div>' +
       '</div>' +
+    '</div>' +
+    '<div style="margin-top:12px;padding:8px 10px;background:#f1f8e9;border:2px solid #a5d6a7;border-radius:12px">' +
+      '<div style="font-weight:800;color:#2e7d32;margin-bottom:4px">✨ 本寵物進化條件</div>' +
+      '<div style="font-size:0.8rem;color:#6a1b9a;margin-bottom:6px">目前：' +
+        ((typeof formatNextEvoReqHint === 'function') ? formatNextEvoReqHint(p) : '') + '</div>' +
+      (typeof formatPetEvoReqsHtml === 'function' ? formatPetEvoReqsHtml(getBase(p.id) || p) : '') +
     '</div>';
 
   // 綁定分頁切換
@@ -8174,22 +9778,57 @@ function openPetInfo(idx) {
       };
     });
   }
-  // 進化／升星紅點
+  // 進化／升星紅點（有條件時才可按；否則顯示還缺什麼）
   const evoBtn = $('pet-info-evo');
   if (evoBtn) {
     if (canStageEvolve(p)) {
       evoBtn.style.display = 'inline-block';
+      evoBtn.disabled = false;
       evoBtn.innerHTML = '✨ 進化<span class="red-dot"></span>';
+      evoBtn.title = formatNextEvoReqHint(p);
     } else {
-      evoBtn.style.display = 'none';
+      const cur = Math.max(0, Number(p.evoStage) || 0);
+      if (cur >= ((typeof EVO_STAGE_MAX === 'number') ? EVO_STAGE_MAX : 11)) {
+        evoBtn.style.display = 'none';
+      } else {
+        // 仍顯示按鈕但禁用，並在 title / 文字提示條件
+        evoBtn.style.display = 'inline-block';
+        evoBtn.disabled = true;
+        evoBtn.innerHTML = '✨ 進化（條件未滿）';
+        evoBtn.title = formatNextEvoReqHint(p);
+      }
     }
   }
+  // 在詳情區補一行進化條件
+  try {
+    const detailEl = $('pet-info-detail');
+    if (detailEl && typeof formatNextEvoReqHint === 'function') {
+      const hint = formatNextEvoReqHint(p);
+      const cur = Math.max(0, Number(p.evoStage) || 0);
+      const curName = EVO_STAGE_NAMES[cur] || ('階段' + cur);
+      const line = '<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:#f3e5f5;border:1px solid #ce93d8;font-size:0.82rem;color:#6a1b9a">' +
+        '✨ 目前：<b>' + curName + '</b><br>' + hint + '</div>';
+      if (detailEl.innerHTML.indexOf('目前：') < 0) {
+        detailEl.innerHTML += line;
+      }
+    }
+  } catch (e) {}
   const starBtn = $('pet-info-star');
   if (starBtn) {
     const meta = getStarMeta(p.starLevel || 0);
     const canStar = !meta.isMax && getFragmentCount(p.id) >= (meta.nextCost || 999999);
     starBtn.innerHTML = canStar ? '⭐ 升星<span class="red-dot"></span>' : '⭐ 升星';
     starBtn.classList.remove('tut-star-pulse');
+  }
+  const starBonusBtn = $('pet-info-star-bonus');
+  if (starBonusBtn) {
+    const pendingBonus = (typeof getStarTierBonusPendingCount === 'function') ? getStarTierBonusPendingCount(p) : 0;
+    if (pendingBonus > 0) {
+      starBonusBtn.style.display = 'inline-block';
+      starBonusBtn.innerHTML = '🎁 領取星階加成 ×' + pendingBonus + '<span class="red-dot"></span>';
+    } else {
+      starBonusBtn.style.display = 'none';
+    }
   }
   // 升星教學：只允許目標寵物
   if (!S.tutorialDone && S.tutorialStep === 4) {
@@ -8249,6 +9888,8 @@ function makeSummonCard(base, have, need) {
     '<div class="meta">' + (base.type || '') + '　' + (base.rarity || '') +
       '<br>🧩 碎片 ' + have + '/' + need +
       '<br>合成後獲得 Lv.1' +
+      '<br><span style="color:#6a1b9a;font-weight:700">' + (typeof formatPetEvoBrief === 'function' ? formatPetEvoBrief(base) : '') + '</span>' +
+      '<br><span style="color:#2e7d32;font-weight:700">點擊查看進化條件</span>' +
     '</div>' + btnHtml;
   const btn = div.querySelector('[data-summon]');
   if (btn) {
@@ -8273,6 +9914,7 @@ function summonPetFromFragments(petId) {
   if (!S.fragments) S.fragments = {};
   S.fragments[petId] = have - need;
   const pet = clonePet(base, 1);
+  pet.namedOnce = true; // 碎片合成不算剛收服，不可取暱稱
   S.owned.push(pet);
   markDiscovered(petId);
   // 若隊伍未滿，自動加入
@@ -8280,6 +9922,7 @@ function summonPetFromFragments(petId) {
   saveGame();
   alert('🎉 成功合成「' + base.emoji + base.name + '」！');
   renderTeam();
+  if (typeof renderCodex === 'function') renderCodex();
   updateHeader();
   if (typeof updateRedDots === 'function') updateRedDots();
 }
@@ -8301,7 +9944,13 @@ function makePetCard(p,idx,inTeam){
   const needDot = canStageEvolve(p) || (getStarMeta(p.starLevel||0).nextCost != null && getFragmentCount(p.id) >= (getStarMeta(p.starLevel||0).nextCost||9999) && !getStarMeta(p.starLevel||0).isMax);
   const cardDot = needDot ? '<span class="red-dot"></span>' : '';
   const cp = calcCombatPower(p);
-  div.innerHTML=cardDot+(inTeam?'<span class="team-label">出戰</span>':'')+evoBadge+'<div class="emoji">'+petFaceHtml(p,52)+'</div><div class="name">'+p.name+'</div><div class="meta">Lv.'+p.level+'　'+(base.type||'')+'　'+(EVO_STAGE_NAMES[Math.max(0,Number(p.evoStage)||0)]||'')+'<br>'+renderStarsHtml(p.starLevel||0,{size:14})+'<br>❤️ '+formatPetStat(p.hp)+'/'+formatPetStat(p.maxHp)+'　🧩'+getFragmentCount(p.id)+'<br><span style="color:#e65100;font-weight:800;font-size:0.72rem">⚔️ '+cp.toLocaleString()+'</span></div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>'+evoBtn+teamBtn;
+  const teamPos = S.team.indexOf(idx);
+  let teamTag = '';
+  if (inTeam) {
+    if (teamPos >= 0 && teamPos < BATTLE_FIELD_SLOTS) teamTag = '<span class="team-label">上場' + (teamPos + 1) + '</span>';
+    else teamTag = '<span class="team-label" style="background:#78909c">候補</span>';
+  }
+  div.innerHTML=cardDot+teamTag+evoBadge+'<div class="emoji">'+petFaceHtml(p,52)+'</div><div class="name">'+getPetDisplayName(p)+'</div><div class="meta">Lv.'+p.level+'　'+(base.type||'')+'　'+(EVO_STAGE_NAMES[Math.max(0,Number(p.evoStage)||0)]||'')+'<br>'+renderStarsHtml(p.starLevel||0,{size:14})+'<br>❤️ '+formatPetStat(p.hp)+'/'+formatPetStat(p.maxHp)+'　🧩'+getFragmentCount(p.id)+'<br><span style="color:#e65100;font-weight:800;font-size:0.72rem">⚔️ '+cp.toLocaleString()+'</span></div><div class="hp-mini"><div class="hp-mini-fill" style="width:'+pct+'%"></div></div>'+evoBtn+teamBtn;
   const stageBtn = div.querySelector('[data-stage-evo]');
   if (stageBtn) {
     stageBtn.onclick = (e) => { e.stopPropagation(); doStageEvolve(idx); };
@@ -8319,10 +9968,20 @@ function makePetCard(p,idx,inTeam){
   };
   return div;
 }
+const TEAM_ROSTER_MAX = 6;
+const BATTLE_FIELD_SLOTS = 3;
+
 function toggleTeam(idx){
-  const pos=S.team.indexOf(idx);
-  if(pos>=0) S.team.splice(pos,1);
-  else { if(S.team.length>=3){ alert('最多 3 隻！'); return; } S.team.push(idx); }
+  const pos = S.team.indexOf(idx);
+  if (pos >= 0) {
+    S.team.splice(pos, 1);
+  } else {
+    if (S.team.length >= TEAM_ROSTER_MAX) {
+      alert('出戰名單最多 ' + TEAM_ROSTER_MAX + ' 隻！\n（前 3 上場，後備最多 3 隻）');
+      return;
+    }
+    S.team.push(idx);
+  }
   renderTeam();
   saveGame();
 }
@@ -8362,7 +10021,19 @@ function renderBag(){
     has = true;
     const d = document.createElement('div'); d.className = 'item-card';
     d.style.borderColor = '#81c784';
-    d.innerHTML = '<div class="emoji">' + petFaceHtml(base, 40) + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">用於升星／召喚</div>';
+    let extra = '用於升星／召喚';
+    let exchangeBtn = '';
+    // 火爆熊碎片：每 10 片可換 1 片神·火爆熊碎片
+    if (pid === 'huobao_xiong') {
+      const canEx = Math.floor(n / 10);
+      extra = '每 10 片可換 1 片神·火爆熊碎片';
+      if (canEx > 0) {
+        exchangeBtn = '<button class="btn btn-pink" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-ex-huobao="1">🔄 兌換（可換 ' + canEx + ' 片）</button>';
+      }
+    }
+    d.innerHTML = '<div class="emoji">' + petFaceHtml(base, 40) + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + extra + '</div>' + exchangeBtn;
+    const exBtn = d.querySelector('[data-ex-huobao]');
+    if (exBtn) exBtn.onclick = () => exchangeHuobaoFragsToShen();
     box.appendChild(d);
   });
 
@@ -8444,7 +10115,11 @@ function openCodexDetail(petId) {
     '📍 基礎命中：<b>' + (base.baseHit != null ? (base.baseHit * 100).toFixed(1) + '%' : '—') + '</b><br>' +
     '🎾 收服率：<b>' + capt + '</b><br>' +
     '🧩 碎片：<b>' + fr + '</b>' + (need ? ('／合成需要 <b>' + need + '</b>') : '') +
-    '<div style="margin-top:8px;font-size:0.8rem;color:#888">※ 以上為圖鑑基礎值；實際能力會隨等級、星級、寶物變動。</div>';
+    '<div style="margin-top:12px;padding:8px 10px;background:#f1f8e9;border:2px solid #a5d6a7;border-radius:12px">' +
+    '<div style="font-weight:800;color:#2e7d32;margin-bottom:6px">✨ 本寵物進化條件</div>' +
+    (typeof formatPetEvoReqsHtml === 'function' ? formatPetEvoReqsHtml(base) : '') +
+    '</div>' +
+    '<div style="margin-top:8px;font-size:0.8rem;color:#888">※ 以上為圖鑑基礎值；實際能力會隨等級、星級、寶物變動。進化需同時滿足等級與上表額外條件。</div>';
 
   const skills = Array.isArray(base.skills) ? base.skills : [];
   $('pet-info-skills').innerHTML = Array.from({ length: 4 }, (_, i) => {
@@ -8464,17 +10139,52 @@ function openCodexDetail(petId) {
   const disBtn = $('pet-info-dismantle');
   if (disBtn) disBtn.style.display = 'none';
   const sumBar = document.getElementById('codex-summon-bar');
-  if (sumBar) sumBar.innerHTML = '';
+  // 若 HTML 沒有固定欄位，就動態插在 detail 下方
+  let bar = sumBar;
+  if (!bar) {
+    bar = document.getElementById('codex-summon-bar-dynamic');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'codex-summon-bar-dynamic';
+      bar.style.cssText = 'margin:10px 0 4px;text-align:center';
+      const detail = $('pet-info-detail');
+      if (detail && detail.parentNode) detail.parentNode.insertBefore(bar, detail.nextSibling);
+    }
+  }
+  if (bar) {
+    bar.innerHTML = '';
+    if (need > 0) {
+      const can = fr >= need;
+      bar.innerHTML =
+        '<div style="font-size:0.85rem;color:#6a1b9a;margin-bottom:6px">🧩 碎片 <b>' + fr + '</b> / 合成需 <b>' + need + '</b></div>' +
+        (can
+          ? '<button type="button" class="btn btn-purple" id="codex-do-summon">✨ 再次合成（Lv.1）</button>'
+          : '<div style="font-size:0.8rem;color:#888">碎片不足，繼續戰鬥收集即可再合成</div>');
+      const btn = bar.querySelector('#codex-do-summon');
+      if (btn) {
+        btn.onclick = () => {
+          summonPetFromFragments(base.id);
+          modal.classList.add('hidden');
+          if (typeof renderCodex === 'function') renderCodex();
+          if (typeof showScreen === 'function') showScreen('team');
+        };
+      }
+    } else {
+      bar.innerHTML = '<div style="font-size:0.8rem;color:#888">此寵物無法用碎片合成</div>';
+    }
+  }
   modal.classList.remove('hidden');
 }
 
 function renderCodex(){
   const ownedBox = $('codex-owned-list');
+  const summonBox = $('codex-summon-list');
   const prog = $('codex-progress');
   if (!ownedBox) return;
   ownedBox.innerHTML = '';
+  if (summonBox) summonBox.innerHTML = '';
 
-  // 只顯示已擁有的寵物（依種類去重，點擊跳到隊伍詳情）
+  // 已擁有（依種類去重，點擊跳到隊伍詳情）
   const ownedIds = {};
   const ownedList = [];
   (S.owned || []).forEach(p => {
@@ -8483,7 +10193,6 @@ function renderCodex(){
     ownedIds[p.id] = true;
     ownedList.push(p);
   });
-  // 戰力高的排前面
   ownedList.sort((a, b) => {
     const pa = typeof calcCombatPower === 'function' ? calcCombatPower(a) : 0;
     const pb = typeof calcCombatPower === 'function' ? calcCombatPower(b) : 0;
@@ -8508,7 +10217,8 @@ function renderCodex(){
         '　HP ' + formatPetStat(p.maxHp || base.baseHp || '?') +
         '<br>⚔️ 戰力 ' + (cp ? cp.toLocaleString() : '—') +
         '　🧩 ×' + fr +
-        '<br><span style="color:#2e7d32;font-weight:700">點擊查看詳情</span>' +
+        '<br><span style="color:#6a1b9a;font-weight:700">' + (typeof formatPetEvoBrief === 'function' ? formatPetEvoBrief(base) : '') + '</span>' +
+        '<br><span style="color:#2e7d32;font-weight:700">點擊查看進化條件</span>' +
       '</div>';
     d.onclick = () => openCodexDetail(base.id);
     ownedBox.appendChild(d);
@@ -8517,7 +10227,48 @@ function renderCodex(){
   if (!ownedList.length) {
     ownedBox.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1">還沒有擁有任何寵物</p>';
   }
-  if (prog) prog.textContent = '（' + ownedList.length + '）';
+
+  // 未擁有：已發現／可合成的（含「曾經擁有但已換成碎片」）
+  const summonList = [];
+  (ALL_PETS || []).forEach(base => {
+    if (!base || !base.id) return;
+    if (ownedIds[base.id]) return; // 身上還有就不顯示在合成區
+    const need = base.fragmentSummon || 0;
+    if (need <= 0) return;
+    const discovered = typeof isDiscovered === 'function' ? isDiscovered(base.id) : false;
+    const have = typeof getFragmentCount === 'function' ? getFragmentCount(base.id) : 0;
+    // 已發現、或已有至少 1 片碎片，就顯示（方便換成碎片後再合成）
+    if (!discovered && have <= 0) return;
+    summonList.push({ base: base, have: have, need: need });
+  });
+  summonList.sort((a, b) => {
+    // 可合成的排前面，再依碎片進度
+    const ca = a.have >= a.need ? 1 : 0;
+    const cb = b.have >= b.need ? 1 : 0;
+    if (cb !== ca) return cb - ca;
+    return (b.have / Math.max(1, b.need)) - (a.have / Math.max(1, a.need));
+  });
+
+  if (summonBox) {
+    if (!summonList.length) {
+      summonBox.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1">尚無可合成的寵物（遇過或持有碎片後會出現）</p>';
+    } else {
+      summonList.forEach(row => {
+        const card = makeSummonCard(row.base, row.have, row.need);
+        card.style.cursor = 'pointer';
+        card.onclick = (e) => {
+          if (e.target && e.target.closest && e.target.closest('[data-summon]')) return;
+          openCodexDetail(row.base.id);
+        };
+        summonBox.appendChild(card);
+      });
+    }
+  }
+
+  if (prog) {
+    const totalKnown = ownedList.length + summonList.length;
+    prog.textContent = '（擁有 ' + ownedList.length + '　可合成 ' + summonList.length + '）';
+  }
 }
 
 function hasAnyStageEvolve() {
@@ -8665,25 +10416,52 @@ const HELP_CONTENT = {
     <ul>
       <li>野外可直接嘗試捕捉，血量愈低愈好抓。</li>
       <li>戰鬥<b>勝利後</b>會再給一次收服機會（成功率較高）。</li>
+      <li>收服成功後可為寵物取暱稱（最多 8 字），<b>僅一次</b>，之後無法再改。</li>
+      <li>開局夥伴與碎片合成的寵物不算「剛收服」，無法取暱稱。</li>
       <li>神話級寵物收服率很低，多靠碎片合成更穩。</li>
+      <li>教學戰收服<b>必定成功</b>，並會進入取名流程。</li>
     </ul>
     <h3>🧩 碎片與戰利品</h3>
     <p>勝利後會掉落寵物碎片、經驗、金幣；部分區域還會掉寶物碎片（如雷刀、冰刀）。</p>
+    <p>🎒 背包中：火爆熊碎片每 <b>10</b> 片可兌換 1 片神·火爆熊碎片（湊滿時會出現「🔄 兌換」按鈕，一次兌換目前可換的全部份數）。</p>
     <div class="tip">💡 敗戰仍有少量經驗，可練習操作與熟悉技能。</div>
+    <h3>🔥 同屬性羈絆</h3>
+    <p>場上<strong>3 隻存活且同屬性</strong>（例如三隻火、三隻水）時啟動羈絆：</p>
+    <ul>
+      <li>我方造成傷害 <b>×1.20</b>（+20%）</li>
+      <li>我方受到傷害 <b>×0.90</b>（-10%）</li>
+    </ul>
+    <div class="tip">💡 換人後若同屬性不足 3 隻，羈絆會立即消失；補回 3 隻同屬又會重新啟動。</div>
   `,
   grow: `
     <h3>⭐ 升星</h3>
     <p>收集同種寵物碎片可升星，提升基礎攻擊等能力。星階：白→綠→藍→紫→金→紅→閃金→閃彩。</p>
+    <p>每升到下一個<strong>星階色</strong>（例如白→綠、綠→藍）時，可永久選擇 <b>武力 +10</b>、<b>智力 +10</b> 或 <b>魅力 +10</b> 其一。若先前升星時還沒選過，可在寵物資訊按「🎁 領取星階加成」補領。</p>
     <h3>✨ 進化</h3>
-    <p>達到指定等級與武力／智力／魅力等條件後可階段進化，解鎖更強技能與數值倍率。</p>
+    <p>達到指定<strong>等級</strong>與該寵物的<strong>額外條件</strong>（武力／智力／魅力／攻擊／防禦／速度等）後，可在隊伍頁按「進化」手動升階。</p>
+    <h4 style="margin:8px 0 4px;color:#33691e">📋 共同等級門檻</h4>
+    <div style="font-size:0.82rem;line-height:1.65;background:#f1f8e9;border:1px solid #c5e1a5;border-radius:10px;padding:8px 10px;margin-bottom:8px">
+      <div>初始進化　<strong>Lv.13</strong></div>
+      <div>中階進化　<strong>Lv.19</strong></div>
+      <div>進階進化　<strong>Lv.29</strong></div>
+      <div>終極進化　<strong>Lv.37</strong></div>
+      <div>完美進化　<strong>Lv.49</strong></div>
+      <div>極限進化　<strong>Lv.60</strong></div>
+      <div>無限進化　<strong>Lv.75</strong></div>
+      <div>恆星進化　<strong>Lv.100</strong></div>
+      <div>星系進化　<strong>Lv.115</strong></div>
+      <div>黑洞進化　<strong>Lv.130</strong></div>
+      <div>宇宙進化　<strong>Lv.160</strong></div>
+    </div>
+    <div class="tip">📖 每隻寵物的「額外三圍／攻擊／防禦條件」請到<strong>圖鑑</strong>點進該寵物查看完整進化表。</div>
     <h3>🪸 寶物與鍛造</h3>
     <ul>
       <li>地圖「珊瑚鍛造坊」可用寶物碎片合成／升階寶物。</li>
       <li>寶物可裝備在寵物身上（最多 6 格），提供武力、攻擊等加成。</li>
       <li>部分寶物對特定寵物有額外效果（例如雷刀＋電電豬）。</li>
     </ul>
-    <h3>♻️ 分解</h3>
-    <p>不需要的寵物可分解成碎片，用來幫主力升星。</p>
+    <h3>♻️ 換成碎片</h3>
+    <p>不需要的寵物可換成碎片，用來幫主力升星或再次合成。</p>
     <div class="tip">💡 隊伍頁可點寵物卡片查看詳細數值、公式展開、升星與進化按鈕。</div>
   `
 };
