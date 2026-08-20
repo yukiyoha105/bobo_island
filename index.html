@@ -1178,6 +1178,42 @@
 </style>
 </head>
 <body>
+  <!-- 左側廣告 -->
+  <div id="ad-left" style="
+    position: fixed;
+    left: 8px;
+    top: 120px;
+    width: 160px;
+    z-index: 50;
+    display: none;
+  ">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:160px;height:600px"
+         data-ad-client="ca-pub-4837269887561375"
+         data-ad-slot="3622372158"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- 右側廣告 -->
+  <div id="ad-right" style="
+    position: fixed;
+    right: 8px;
+    top: 120px;
+    width: 160px;
+    z-index: 50;
+    display: none;
+  ">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:160px;height:600px"
+         data-ad-client="ca-pub-4837269887561375"
+         data-ad-slot="3622372158"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
   <div class="game">
     <div class="header">
       <h1>🏝️ 波波島</h1>
@@ -1199,18 +1235,7 @@
       <button class="nav-btn" data-screen="history">📜 紀錄</button>
       <button class="nav-btn" data-screen="bag">🎒 背包</button>
     </div>
-<!-- 廣告：導覽列下方 -->
-<div style="padding: 8px 10px; text-align: center; background: #f0f7f0;">
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-4837269887561375"
-       data-ad-slot="3622372158"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
+	
     <div id="map" class="screen active">
       <div class="island-wrap" id="island-wrap">
         <div class="cat-island" id="cat-island" title="貓島">
@@ -12383,7 +12408,19 @@ tryRestoreSession();
   }
   requestAnimationFrame(loop);
 })();
-
+<script>
+(function () {
+  function updateSideAds() {
+    var show = window.innerWidth >= 1200; // 螢幕寬度夠大才顯示
+    var left = document.getElementById('ad-left');
+    var right = document.getElementById('ad-right');
+    if (left) left.style.display = show ? 'block' : 'none';
+    if (right) right.style.display = show ? 'block' : 'none';
+  }
+  updateSideAds();
+  window.addEventListener('resize', updateSideAds);
+})();
+</script>
 </script>
 </body>
 </html>
