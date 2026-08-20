@@ -1199,7 +1199,18 @@
       <button class="nav-btn" data-screen="history">📜 紀錄</button>
       <button class="nav-btn" data-screen="bag">🎒 背包</button>
     </div>
-
+<!-- 廣告：導覽列下方 -->
+<div style="padding: 8px 10px; text-align: center; background: #f0f7f0;">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-4837269887561375"
+       data-ad-slot="3622372158"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
     <div id="map" class="screen active">
       <div class="island-wrap" id="island-wrap">
         <div class="cat-island" id="cat-island" title="貓島">
@@ -1428,7 +1439,8 @@
         <button class="btn btn-primary" id="sb-intel" style="width:100%;line-height:1.35">🧠 智力 +10<br><span id="sb-intel-cp" style="font-size:0.78rem;font-weight:700;opacity:0.95"></span></button>
         <button class="btn btn-purple" id="sb-charm" style="width:100%;line-height:1.35">✨ 魅力 +10<br><span id="sb-charm-cp" style="font-size:0.78rem;font-weight:700;opacity:0.95"></span></button>
       </div>
-      <p style="font-size:0.78rem;color:#888;margin:0">此加成永久有效，之後無法更改。按鈕上會預覽戰力變化。</p>
+      <p style="font-size:0.78rem;color:#888;margin:0">此加成永久有效，選完才生效。可按「稍後」關閉，之後在寵物資訊補領。</p>
+      <button type="button" class="btn btn-back" id="sb-close" style="width:100%;margin-top:10px">稍後再說</button>
     </div>
   </div>
 
@@ -2741,32 +2753,40 @@ function applyTreasureStatsToPet(p) {
 const AVATARS = ['🧑‍🌾','👧','👦','🧙','🦸','🧝','🧛','🧔','👩‍🚀','🥷'];
 
 /* ===== 星級系統：碎片需求 ===== */
-const STAR_COLORS = ['白','綠','藍','紫','金','紅','閃金','閃彩'];
+/* 升星表（手稿）：列=色階，欄=1→2／2→3／3→4／4→5／5→下一色1★ */
+const STAR_COLORS = ['白','綠','藍','紫','金','紅','閃金','閃紅','閃彩'];
 const STAR_COLOR_HEX = [
-  '#b0b0b0',  // 白階：中性灰（不過白也不過深）
+  '#b0b0b0',  // 白
   '#66bb6a',  // 綠
   '#42a5f5',  // 藍
   '#ab47bc',  // 紫
   '#ffca28',  // 金
   '#ef5350',  // 紅
-  '#ffd54f',  // 閃金（偏亮金）
-  '#ff80ab'   // 閃彩（粉彩）
+  '#ffd54f',  // 閃金
+  '#ff1744',  // 閃紅
+  '#ff80ab'   // 閃彩
 ];
 const STAR_COSTS = [
-  [1,2,3,4,5],
-  [10,15,20,20,20],
-  [25,25,25,25,30],
-  [35,40,45,50,55],
-  [60,60,60,70,75],
-  [80,80,80,80,80],
-  [100,100,100,120,140],
-  [160,180,200,220,240]
+  [1, 2, 3, 4, 5],           // 白
+  [5, 5, 5, 5, 5],           // 綠
+  [10, 10, 10, 10, 10],      // 藍
+  [20, 20, 20, 20, 40],      // 紫
+  [50, 60, 70, 80, 100],     // 金
+  [140, 140, 140, 140, 140], // 紅
+  [200, 200, 200, 200, 200], // 閃金
+  [300, 300, 300, 300, 300], // 閃紅
+  [500, 600, 700, 800, 900]  // 閃彩
 ];
 function getStarMeta(starLevel) {
   const lv = Math.max(0, Math.floor(Number(starLevel) || 0));
-  const maxStage = STAR_COLORS.length * 5 - 1;
-  if (lv > maxStage) {
-    return { colorIndex: 7, starInColor: 5, colorName: '閃彩', label: '閃彩5★（滿星）', isMax: true, nextCost: null, color: STAR_COLOR_HEX[7] };
+  const maxStage = STAR_COLORS.length * 5 - 1; // 閃彩5★
+  if (lv >= maxStage) {
+    const last = STAR_COLORS.length - 1;
+    return {
+      colorIndex: last, starInColor: 5, colorName: STAR_COLORS[last],
+      label: STAR_COLORS[last] + '5★（滿星）', isMax: true, nextCost: null,
+      color: STAR_COLOR_HEX[last]
+    };
   }
   const colorIndex = Math.floor(lv / 5);
   const starInColor = (lv % 5) + 1;
@@ -2785,7 +2805,7 @@ function renderStarsHtml(starLevel, opts) {
   const meta = getStarMeta(starLevel);
   const filled = meta.starInColor;
   const color = meta.color || '#e8e8e8';
-  const isShine = meta.colorIndex >= 6; // 閃金、閃彩
+  const isShine = meta.colorIndex >= 6; // 閃金、閃紅、閃彩
   let stars = '';
   for (let i = 1; i <= 5; i++) {
     if (i <= filled) {
@@ -3184,15 +3204,20 @@ function claimPendingStarTierBonuses(idx) {
     openStarTierBonusPicker(idx, pet, {
       mode: 'claim',
       continueFn: function(stat) {
-        // 還有剩餘就繼續彈
+        // 使用者按「稍後」：不強制一次領完
+        if (stat === 'defer' || stat == null) {
+          if (typeof renderTeam === 'function') renderTeam();
+          if (typeof openPetInfo === 'function') openPetInfo(idx);
+          if (typeof updateRedDots === 'function') updateRedDots();
+          return;
+        }
+        // 還有剩餘才繼續彈；否則刷新
         if (getStarTierBonusPendingCount(pet) > 0) {
           setTimeout(claimOne, 80);
         } else {
           if (typeof renderTeam === 'function') renderTeam();
           if (typeof openPetInfo === 'function') openPetInfo(idx);
           if (typeof updateRedDots === 'function') updateRedDots();
-          const labels = { force: '武力', intel: '智力', charm: '魅力' };
-          // 最後一次已在 apply 時存檔；這裡只提示總結可省略
         }
       }
     });
@@ -3243,11 +3268,33 @@ function applyStarTierBonus(stat) {
   if (typeof pending.continueFn === 'function') pending.continueFn(stat);
 }
 
+function closeStarTierBonusModal(deferred) {
+  const modal = $('star-bonus-modal');
+  if (modal) modal.classList.add('hidden');
+  const pending = _pendingStarBonus;
+  _pendingStarBonus = null;
+  if (!pending) return;
+  // 延後領取：不扣次數，保留 pending；升星流程仍要收尾
+  if (typeof pending.continueFn === 'function') {
+    pending.continueFn(deferred ? 'defer' : null);
+  }
+  if (typeof updateRedDots === 'function') updateRedDots();
+}
+
 function bindStarBonusModal() {
   const f = $('sb-force'), i = $('sb-intel'), c = $('sb-charm');
   if (f) f.onclick = () => applyStarTierBonus('force');
   if (i) i.onclick = () => applyStarTierBonus('intel');
   if (c) c.onclick = () => applyStarTierBonus('charm');
+  const closeBtn = $('sb-close');
+  if (closeBtn) closeBtn.onclick = () => closeStarTierBonusModal(true);
+  const modal = $('star-bonus-modal');
+  if (modal && !modal._sbBackdropBound) {
+    modal._sbBackdropBound = true;
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeStarTierBonusModal(true);
+    });
+  }
 }
 function tryUpgradeStar(idx) {
   const p = S.owned[idx];
@@ -3285,6 +3332,7 @@ function tryUpgradeStar(idx) {
     if (bonusStat === 'force') statLines = (statLines || []).concat(['💪 武力 +10（星階色加成）']);
     else if (bonusStat === 'intel') statLines = (statLines || []).concat(['🧠 智力 +10（星階色加成）']);
     else if (bonusStat === 'charm') statLines = (statLines || []).concat(['✨ 魅力 +10（星階色加成）']);
+    else if (bonusStat === 'defer') statLines = (statLines || []).concat(['🎁 星階色加成已保留，可稍後在寵物資訊領取']);
     if (typeof renderTeam === 'function') renderTeam();
     updateHeader();
     if (typeof updateRedDots === 'function') updateRedDots();
@@ -3873,28 +3921,23 @@ function recalculatePetDefense(p) {
   if (!p) return 0;
   const base = getBase(p.id) || {};
   const number = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+  // 手稿防公式：D = 基防×0.3 + 武×0.5 + 智×0.9 + 魅×0.8 + 星×2
+  // 基/初/中…：mul×D + 等×levelBonus（mul 每階+0.05，levelBonus 每階+0.5）
   const initialDef = number(p.baseDef ?? base.baseDef) + number(p.treasureBaseDef || 0);
   const treasureDef = number(p.treasureDef ?? p.equipment?.treasureDef ?? 0);
-  const intel = number(p.intel ?? base.intel);
-  const charm = number(p.charm ?? base.charm);
-  const enhancementLevel = number(p.enhancementLevel ?? 0);
+  const force = number(p.force ?? base.force) + number(p._treasureForce || 0);
+  const intel = number(p.intel ?? base.intel) + number(p._treasureIntel || 0);
+  const charm = number(p.charm ?? base.charm) + number(p._treasureCharm || 0);
   const starLevel = number(p.starLevel ?? 0);
   const level = Math.max(1, number(p.level) || 1);
-  const stage = Math.max(0, Math.min(5, Math.floor(number(p.evoStage ?? base.evoStage))));
-  const evolution = [
-    { multiplier: 1, levelBonus: 5 },
-    { multiplier: 1.1, levelBonus: 6 },
-    { multiplier: 1.2, levelBonus: 7 },
-    { multiplier: 1.35, levelBonus: 8 },
-    { multiplier: 1.5, levelBonus: 9 },
-    { multiplier: 1.7, levelBonus: 10 }
-  ][stage];
-  const B = initialDef * 0.4 + treasureDef * 0.1 + intel * 0.1 + charm * 0.05
-    + enhancementLevel * 15 + starLevel * 0.2;
+  const stage = Math.max(0, Math.floor(number(p.evoStage ?? base.evoStage)));
+  const D = (initialDef + treasureDef) * 0.3 + force * 0.5 + intel * 0.9 + charm * 0.8 + starLevel * 2;
+  const mul = 1 + stage * 0.05;
+  const levelBonus = 2.2 + stage * 0.5;
   p.treasureDef = treasureDef;
-  p.enhancementLevel = enhancementLevel;
+  p.enhancementLevel = number(p.enhancementLevel ?? 0);
   p.starLevel = starLevel;
-  p.defense = evolution.multiplier * B + level * evolution.levelBonus;
+  p.defense = mul * D + level * levelBonus;
   return p.defense;
 }
 
@@ -3904,37 +3947,26 @@ function recalculatePetAttack(p) {
   const base = getBase(p.id) || {};
   const number = value => Number.isFinite(Number(value)) ? Number(value) : 0;
   const starLevel = number(p.starLevel ?? 0);
-  // 每升 1 星：基礎攻擊 +1（加進基礎攻擊再走完整公式）
-  const rawBaseAtk = number(p.baseAtk ?? base.baseAtk);
-  let initialAtk = rawBaseAtk + starLevel + number(p.treasureBaseAtk || 0);
+  // 手稿攻公式：A = 基攻×0.3 + 武×0.1 + 魅×0.7 + 智×0.8 + 星×2
+  // 基/初/中…：mul×A + 等×levelBonus（mul 每階+0.06，levelBonus 每階+0.6）
+  const rawBaseAtk = number(p.baseAtk ?? base.baseAtk) + number(p.treasureBaseAtk || 0);
   const treasureAtk = number(p.treasureAtk ?? p.equipment?.treasureAtk ?? 0);
-  const force = number(p.force ?? base.force);
-  const intel = number(p.intel ?? base.intel);
-  const tForce = number(p._treasureForce);
-  const enhancementLevel = number(p.enhancementLevel ?? 0);
+  const force = number(p.force ?? base.force) + number(p._treasureForce || 0);
+  const intel = number(p.intel ?? base.intel) + number(p._treasureIntel || 0);
+  const charm = number(p.charm ?? base.charm) + number(p._treasureCharm || 0);
   const level = Math.max(1, number(p.level) || 1);
-  const stage = Math.max(0, Math.min(5, Math.floor(number(p.evoStage ?? base.evoStage))));
+  const stage = Math.max(0, Math.floor(number(p.evoStage ?? base.evoStage)));
+  let baseAtkForFormula = rawBaseAtk + treasureAtk;
   // 神·提升被動：每點武力 → 基礎攻擊 +1（需中階且≥19級）
   if (p.id === 'shen_huobao_xiong' && stage >= 2 && level >= 19) {
-    initialAtk += force;
+    baseAtkForFormula += force;
   }
-  const evolution = [
-    { multiplier: 1, levelBonus: 6 },
-    { multiplier: 1.1, levelBonus: 7 },
-    { multiplier: 1.2, levelBonus: 8 },
-    { multiplier: 1.35, levelBonus: 9 },
-    { multiplier: 1.5, levelBonus: 10 },
-    { multiplier: 1.7, levelBonus: 11 }
-  ][stage];
-  const B = initialAtk * 0.4 + treasureAtk * 0.2 + force * 0.1 + intel * 0.05
-    + enhancementLevel * 15;
+  const A = baseAtkForFormula * 0.3 + force * 0.1 + charm * 0.7 + intel * 0.8 + starLevel * 2;
+  const mul = 1 + stage * 0.06;
+  const levelBonus = 3 + stage * 0.6;
   p.treasureAtk = treasureAtk;
-  // 供介面顯示：含升星後的有效基礎攻擊
-  p.effectiveBaseAtk = initialAtk;
-  let atk = evolution.multiplier * B + level * evolution.levelBonus;
-  // 寶物武力：每點額外轉成攻擊（裝備才有感）
-  atk += tForce * 0.8;
-  p.attack = atk;
+  p.effectiveBaseAtk = baseAtkForFormula;
+  p.attack = mul * A + level * levelBonus;
   return p.attack;
 }
 
@@ -4675,13 +4707,10 @@ function openStreakModal(auto) {
     claimBtn.onclick = () => {
       const got = claimPlayStreakReward();
       if (!got) return;
-      if (box) box.innerHTML = formatStreakRewardHtml(got) +
-        '<div style="margin-top:8px;color:#2e7d32">已領取！</div>';
-      claimBtn.disabled = true;
-      claimBtn.textContent = '✅ 今日已領取';
-      if (msg) msg.innerHTML = '目前連續簽到 <b style="color:#e65100;font-size:1.2rem">' + day + '</b> 天<br>今日獎勵已領取！';
       addLog('map-log', '🎁 連續簽到第 ' + day + ' 天獎勵已領取！');
       updateStreakButtonUI();
+      // 領完直接關閉
+      modal.classList.add('hidden');
     };
   }
   const closeBtn = $('streak-close');
@@ -7653,36 +7682,30 @@ function updateSameTypeBonusUI() {
 }
 function calcAtk(atk,def,sk,isP){
   // 規則：技能一定命中、一定不會被閃避（不判定 miss / dodge）
+  // 手稿受擊：{ 技能% × 攻擊 × 暴擊倍率 } − 目標防 × 0.8
   const atkStat = Math.max(1, Number(atk.attack) || Number(atk.baseAtk) || 30);
   let defStat = Math.max(0, Number(def.defense) || Number(def.baseDef) || 0);
   // 防禦指令：該回合防禦 +50
   if (def && def._defending) defStat += 50;
 
-  let dmg;
-  // 炎·聖火戰法：800% + 每60武力 +100%
+  let skillPct = 100;
   if (sk.baseAtkPercent != null) {
-    let pct = Number(sk.baseAtkPercent);
+    skillPct = Number(sk.baseAtkPercent);
     const force = Number(atk.force) || 0;
     if (sk.forceScale) {
-      pct += Math.floor(force / sk.forceScale) * (sk.forceScaleBonus || 100);
+      skillPct += Math.floor(force / sk.forceScale) * (sk.forceScaleBonus || 100);
     }
-    dmg = atkStat * (pct / 100);
-    dmg = Math.max(1, dmg - defStat * 0.25);
   } else if (sk.forcePercent != null) {
-    // 炎·業火爆烈：(武力 + N)% 傷害
     const force = Number(atk.force) || 0;
-    const pct = force + Number(sk.forcePercent);
-    dmg = atkStat * (pct / 100);
-    dmg = Math.max(1, dmg - defStat * 0.25);
+    skillPct = force + Number(sk.forcePercent);
   } else if (sk.atkPercent != null) {
-    dmg = atkStat * (Number(sk.atkPercent) / 100);
-    dmg = Math.max(1, dmg - defStat * 0.25);
+    skillPct = Number(sk.atkPercent);
   } else if (sk.power != null) {
-    dmg = sk.power + rand(-4, 6);
-  } else {
-    dmg = atkStat * 0.8 - defStat * 0.2;
+    // 固定威力技能：先換算成近似 %
+    skillPct = (Number(sk.power) / Math.max(1, atkStat)) * 100;
   }
-  dmg = Math.max(1, Math.floor(dmg + rand(-3, 5)));
+  let dmg = atkStat * (skillPct / 100);
+  dmg = Math.max(0, dmg + rand(-3, 5));
 
   // 屬性克制（水克火 1.5 倍；火打水 0.75 倍等）
   const aType = atk.type || (typeof getBase === 'function' && getBase(atk.id) && getBase(atk.id).type) || '';
@@ -7728,8 +7751,10 @@ function calcAtk(atk,def,sk,isP){
     if (isP && S.pEffects && S.pEffects.critDmgMul) cd *= S.pEffects.critDmgMul;
     if (!isP && S.eSelfEffects && S.eSelfEffects.critDmgMul) cd *= S.eSelfEffects.critDmgMul;
     critMulUsed = cd;
-    dmg = Math.floor(dmg * cd);
+    dmg = dmg * cd;
   }
+  // 手稿：傷害 − 目標防 × 0.8
+  dmg = Math.max(1, Math.floor(dmg - defStat * 0.8));
 
   if (isP && S.atkBoost) { dmg = Math.floor(dmg * 1.5); S.atkBoost = false; }
   if (isP && S.eEffects && S.eEffects.slow) dmg = Math.floor(dmg * 1.2);
@@ -9955,100 +9980,82 @@ function formatPetStat(value) {
   return Number.isInteger(number) ? String(number) : number.toFixed(1);
 }
 
-/** 攻擊公式拆解（給寵物資訊顯示） */
+/** 攻擊公式拆解（給寵物資訊顯示）— 手稿同步 */
 function getAttackFormulaBreakdown(p) {
   if (!p) return { final: 0, html: '' };
   const base = getBase(p.id) || {};
   const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const starLevel = n(p.starLevel);
-  const rawBaseAtk = n(p.baseAtk ?? base.baseAtk);
-  let initialAtk = rawBaseAtk + starLevel;
+  const rawBaseAtk = n(p.baseAtk ?? base.baseAtk) + n(p.treasureBaseAtk);
   const treasureAtk = n(p.treasureAtk);
-  const force = n(p.force ?? base.force);
-  const intel = n(p.intel ?? base.intel);
-  const tForce = n(p._treasureForce);
-  const enhancementLevel = n(p.enhancementLevel);
+  const force = n(p.force ?? base.force) + n(p._treasureForce);
+  const intel = n(p.intel ?? base.intel) + n(p._treasureIntel);
+  const charm = n(p.charm ?? base.charm) + n(p._treasureCharm);
   const level = Math.max(1, n(p.level) || 1);
-  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
+  const stage = Math.max(0, Math.floor(n(p.evoStage ?? base.evoStage)));
+  let baseAtkForFormula = rawBaseAtk + treasureAtk;
   let passiveNote = '';
   if (p.id === 'shen_huobao_xiong' && stage >= 2 && level >= 19) {
-    initialAtk += force;
-    passiveNote = '（含神·提升：武力→基礎攻擊 +' + force + '）';
+    baseAtkForFormula += force;
+    passiveNote = '（含神·提升：武力→基攻 +' + force + '）';
   }
-  const evolution = [
-    { multiplier: 1, levelBonus: 6 },
-    { multiplier: 1.1, levelBonus: 7 },
-    { multiplier: 1.2, levelBonus: 8 },
-    { multiplier: 1.35, levelBonus: 9 },
-    { multiplier: 1.5, levelBonus: 10 },
-    { multiplier: 1.7, levelBonus: 11 }
-  ][stage];
-  const termBase = initialAtk * 0.4;
-  const termTreasure = treasureAtk * 0.2;
-  const termForce = force * 0.1;
-  const termIntel = intel * 0.05;
-  const termEnh = enhancementLevel * 15;
-  const B = termBase + termTreasure + termForce + termIntel + termEnh;
-  const afterEvo = evolution.multiplier * B;
-  const levelPart = level * evolution.levelBonus;
-  const treasureForcePart = tForce * 0.8;
-  const final = afterEvo + levelPart + treasureForcePart;
-  const starTxt = starLevel > 0 ? (' + 星' + starLevel) : '';
+  const tBase = baseAtkForFormula * 0.3;
+  const tForce = force * 0.1;
+  const tCharm = charm * 0.7;
+  const tIntel = intel * 0.8;
+  const tStar = starLevel * 2;
+  const A = tBase + tForce + tCharm + tIntel + tStar;
+  const mul = 1 + stage * 0.06;
+  const levelBonus = 3 + stage * 0.6;
+  const final = mul * A + level * levelBonus;
+  const stageName = (typeof EVO_STAGE_NAMES !== 'undefined' && EVO_STAGE_NAMES[stage]) ? EVO_STAGE_NAMES[stage] : ('階' + stage);
   const html =
     '<div style="margin:4px 0 8px;padding:8px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#5d4037">' +
-    '<b style="color:#e65100">💥 攻擊公式</b><br>' +
-    '有效基礎攻擊 = 基礎攻擊 ' + rawBaseAtk + starTxt + (passiveNote ? (' ' + passiveNote) : '') + ' = <b>' + initialAtk + '</b><br>' +
-    'B = 基礎×0.4 + 寶物攻×0.2 + 武力×0.1 + 智力×0.05 + 強化×15<br>' +
-    '　= ' + initialAtk + '×0.4 + ' + treasureAtk + '×0.2 + ' + force + '×0.1 + ' + intel + '×0.05 + ' + enhancementLevel + '×15<br>' +
-    '　= ' + termBase.toFixed(2) + ' + ' + termTreasure.toFixed(2) + ' + ' + termForce.toFixed(2) + ' + ' + termIntel.toFixed(2) + ' + ' + termEnh.toFixed(2) + ' = <b>' + B.toFixed(2) + '</b><br>' +
-    '攻擊 = 進化倍率×B + 等級×等級加成 + 寶物武力×0.8<br>' +
-    '　= ' + evolution.multiplier + '×' + B.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + ' + ' + tForce + '×0.8<br>' +
-    '　= ' + afterEvo.toFixed(2) + ' + ' + levelPart.toFixed(2) + ' + ' + treasureForcePart.toFixed(2) + ' = <b style="color:#e65100">' + final.toFixed(2) + '</b>' +
+    '<b style="color:#e65100">💥 攻擊公式（手稿）</b><br>' +
+    '基攻(含寶物) = <b>' + baseAtkForFormula.toFixed(1) + '</b>　武 <b>' + force + '</b>　魅 <b>' + charm + '</b>　智 <b>' + intel + '</b>　星 <b>' + starLevel + '</b>' +
+    (passiveNote ? ('<br>' + passiveNote) : '') + '<br>' +
+    'A = 基攻×0.3 + 武×0.1 + 魅×0.7 + 智×0.8 + 星×2<br>' +
+    '　= ' + baseAtkForFormula.toFixed(1) + '×0.3 + ' + force + '×0.1 + ' + charm + '×0.7 + ' + intel + '×0.8 + ' + starLevel + '×2<br>' +
+    '　= ' + tBase.toFixed(2) + ' + ' + tForce.toFixed(2) + ' + ' + tCharm.toFixed(2) + ' + ' + tIntel.toFixed(2) + ' + ' + tStar.toFixed(2) + ' = <b>' + A.toFixed(2) + '</b><br>' +
+    '攻擊 = 進化倍率×A + 等級×等級加成　（' + stageName + '：倍率 ' + mul.toFixed(2) + '、等加成 ' + levelBonus.toFixed(1) + '）<br>' +
+    '　= ' + mul.toFixed(2) + '×' + A.toFixed(2) + ' + ' + level + '×' + levelBonus.toFixed(1) + ' = <b style="color:#e65100">' + final.toFixed(2) + '</b>' +
     '</div>';
   return { final: final, html: html };
 }
 
-/** 防禦公式拆解 */
+/** 防禦公式拆解 — 手稿同步 */
 function getDefenseFormulaBreakdown(p) {
   if (!p) return { final: 0, html: '' };
   const base = getBase(p.id) || {};
   const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
-  const initialDef = n(p.baseDef ?? base.baseDef);
+  const initialDef = n(p.baseDef ?? base.baseDef) + n(p.treasureBaseDef);
   const treasureDef = n(p.treasureDef);
-  const intel = n(p.intel ?? base.intel);
-  const charm = n(p.charm ?? base.charm);
-  const enhancementLevel = n(p.enhancementLevel);
+  const force = n(p.force ?? base.force) + n(p._treasureForce);
+  const intel = n(p.intel ?? base.intel) + n(p._treasureIntel);
+  const charm = n(p.charm ?? base.charm) + n(p._treasureCharm);
   const starLevel = n(p.starLevel);
   const level = Math.max(1, n(p.level) || 1);
-  const stage = Math.max(0, Math.min(5, Math.floor(n(p.evoStage ?? base.evoStage))));
-  const evolution = [
-    { multiplier: 1, levelBonus: 5 },
-    { multiplier: 1.1, levelBonus: 6 },
-    { multiplier: 1.2, levelBonus: 7 },
-    { multiplier: 1.35, levelBonus: 8 },
-    { multiplier: 1.5, levelBonus: 9 },
-    { multiplier: 1.7, levelBonus: 10 }
-  ][stage];
-  const termDef = initialDef * 0.4;
-  const termTreasure = treasureDef * 0.1;
-  const termIntel = intel * 0.1;
-  const termCharm = charm * 0.05;
-  const termEnh = enhancementLevel * 15;
-  const termStar = starLevel * 0.2;
-  const B = termDef + termTreasure + termIntel + termCharm + termEnh + termStar;
-  const afterEvo = evolution.multiplier * B;
-  const levelPart = level * evolution.levelBonus;
-  const final = afterEvo + levelPart;
+  const stage = Math.max(0, Math.floor(n(p.evoStage ?? base.evoStage)));
+  const baseDefForFormula = initialDef + treasureDef;
+  const tDef = baseDefForFormula * 0.3;
+  const tForce = force * 0.5;
+  const tIntel = intel * 0.9;
+  const tCharm = charm * 0.8;
+  const tStar = starLevel * 2;
+  const D = tDef + tForce + tIntel + tCharm + tStar;
+  const mul = 1 + stage * 0.05;
+  const levelBonus = 2.2 + stage * 0.5;
+  const final = mul * D + level * levelBonus;
+  const stageName = (typeof EVO_STAGE_NAMES !== 'undefined' && EVO_STAGE_NAMES[stage]) ? EVO_STAGE_NAMES[stage] : ('階' + stage);
   const html =
     '<div style="margin:4px 0 8px;padding:8px 10px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#1565c0">' +
-    '<b style="color:#0d47a1">🛡️ 防禦公式</b><br>' +
-    '基礎防禦 = <b>' + initialDef + '</b><br>' +
-    'B = 基礎防×0.4 + 寶物防×0.1 + 智力×0.1 + 魅力×0.05 + 強化×15 + 星級×0.2<br>' +
-    '　= ' + initialDef + '×0.4 + ' + treasureDef + '×0.1 + ' + intel + '×0.1 + ' + charm + '×0.05 + ' + enhancementLevel + '×15 + ' + starLevel + '×0.2<br>' +
-    '　= ' + termDef.toFixed(2) + ' + ' + termTreasure.toFixed(2) + ' + ' + termIntel.toFixed(2) + ' + ' + termCharm.toFixed(2) + ' + ' + termEnh.toFixed(2) + ' + ' + termStar.toFixed(2) + ' = <b>' + B.toFixed(2) + '</b><br>' +
-    '防禦 = 進化倍率×B + 等級×等級加成<br>' +
-    '　= ' + evolution.multiplier + '×' + B.toFixed(2) + ' + ' + level + '×' + evolution.levelBonus + '<br>' +
-    '　= ' + afterEvo.toFixed(2) + ' + ' + levelPart.toFixed(2) + ' = <b style="color:#0d47a1">' + final.toFixed(2) + '</b>' +
+    '<b style="color:#0d47a1">🛡️ 防禦公式（手稿）</b><br>' +
+    '基防(含寶物) = <b>' + baseDefForFormula.toFixed(1) + '</b>　武 <b>' + force + '</b>　智 <b>' + intel + '</b>　魅 <b>' + charm + '</b>　星 <b>' + starLevel + '</b><br>' +
+    'D = 基防×0.3 + 武×0.5 + 智×0.9 + 魅×0.8 + 星×2<br>' +
+    '　= ' + baseDefForFormula.toFixed(1) + '×0.3 + ' + force + '×0.5 + ' + intel + '×0.9 + ' + charm + '×0.8 + ' + starLevel + '×2<br>' +
+    '　= ' + tDef.toFixed(2) + ' + ' + tForce.toFixed(2) + ' + ' + tIntel.toFixed(2) + ' + ' + tCharm.toFixed(2) + ' + ' + tStar.toFixed(2) + ' = <b>' + D.toFixed(2) + '</b><br>' +
+    '防禦 = 進化倍率×D + 等級×等級加成　（' + stageName + '：倍率 ' + mul.toFixed(2) + '、等加成 ' + levelBonus.toFixed(1) + '）<br>' +
+    '　= ' + mul.toFixed(2) + '×' + D.toFixed(2) + ' + ' + level + '×' + levelBonus.toFixed(1) + ' = <b style="color:#0d47a1">' + final.toFixed(2) + '</b>' +
     '</div>';
   return { final: final, html: html };
 }
@@ -10179,15 +10186,15 @@ function getDamageFormulaBreakdown(p) {
     '<b style="color:#ad1457">⚔️ 技能傷害公式</b><br>' +
     '<span class="fg-title" style="color:#ad1457">① 百分比傷害技能（多數攻擊技）</span><br>' +
     '基礎傷害 = 攻擊力 × (技能% / 100)<br>' +
-    '最終傷害 = max(1, ⌊基礎傷害 − 防禦×0.25 + 亂數(−3~5)⌋)<br>' +
+    '最終傷害 = max(1, ⌊基礎傷害 − 防禦×0.8 + 亂數(−3~5)⌋)<br>' +
     '以你目前攻擊 <b>' + atk.toFixed(1) + '</b>、假設敵防 ' + defExample + '、技能 100% 為例：<br>' +
     '　= max(1, ⌊' + atk.toFixed(1) + '×1.00 − ' + defExample + '×0.25 + 亂數⌋)<br>' +
     '　≈ <b>' + Math.max(1, Math.floor(atk - defExample * 0.25)).toFixed(0) + '</b>（未計亂數）<br><br>' +
     '<span style="color:#ad1457;font-weight:800">② 武力百分比技能</span><br>' +
-    '技能% = 武力 + 固定加成　→　傷害 = 攻擊 × (技能%/100) − 防禦×0.25<br><br>' +
+    '技能% = 武力 + 固定加成　→　傷害 = 攻擊 × (技能%/100) − 防禦×0.8<br><br>' +
     '<span style="color:#ad1457;font-weight:800">③ 基礎% + 武力縮放（如炎·聖火）</span><br>' +
     '技能% = 基礎% + ⌊武力 / 縮放單位⌋ × 加成%<br>' +
-    '傷害 = 攻擊 × (技能%/100) − 防禦×0.25<br><br>' +
+    '傷害 = 攻擊 × (技能%/100) − 防禦×0.8<br><br>' +
     '<span style="color:#ad1457;font-weight:800">④ 暴擊</span><br>' +
     '若觸發暴擊：最終傷害 = ⌊傷害 × 暴擊倍率⌋<br>' +
     '你的暴擊倍率 = <b>×' + critDmg.toFixed(2) + '</b>（公式：1.01 + 等級×0.01）<br><br>' +
@@ -11256,7 +11263,7 @@ const HELP_CONTENT = {
   `,
   grow: `
     <h3>⭐ 升星</h3>
-    <p>收集同種寵物碎片可升星，提升基礎攻擊等能力。星階：白→綠→藍→紫→金→紅→閃金→閃彩。</p>
+    <p>收集同種寵物碎片可升星，提升基礎攻擊等能力。星階：白→綠→藍→紫→金→紅→閃金→閃紅→閃彩。</p>
     <p>每升到下一個<strong>星階色</strong>（例如白→綠、綠→藍）時，可永久選擇 <b>武力 +10</b>、<b>智力 +10</b> 或 <b>魅力 +10</b> 其一。若先前升星時還沒選過，可在寵物資訊按「🎁 領取星階加成」補領。</p>
     <h3>✨ 進化</h3>
     <p>達到指定<strong>等級</strong>與該寵物的<strong>額外條件</strong>（武力／智力／魅力／攻擊／防禦／速度等）後，可在隊伍頁按「進化」手動升階。</p>
