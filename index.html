@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4837269887561375"
+     crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#4caf50">
@@ -134,6 +136,15 @@
     .spot.locked .spot-label { background: rgba(200,200,200,0.8); border-color: #999; color: #666; }
     .spot.elevated .spot-icon { filter: drop-shadow(0 4px 3px rgba(0,0,0,0.3)); }
     .spot.elevated .spot-label { border-color: #7fae56; }
+    .spot.hell-trial .spot-icon { font-size: 2.1rem; filter: drop-shadow(0 0 6px rgba(180,0,0,0.7)); animation: hellPulse 1.6s ease-in-out infinite; }
+    .spot.hell-trial .spot-label {
+      color: #fff; background: linear-gradient(90deg,#b71c1c,#4a0000); border-color: #ff1744;
+      text-shadow: 0 1px 2px #000;
+    }
+    @keyframes hellPulse {
+      0%,100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 4px rgba(200,0,0,0.5)); }
+      50% { transform: translateY(-6px) scale(1.08); filter: drop-shadow(0 0 10px rgba(255,40,0,0.9)); }
+    }
     .deco { position: absolute; z-index: 3; pointer-events: none; font-size: 1.3rem; opacity: 0.85; }
     .sun {
       position: absolute; top: 4%; right: 6%; width: 50px; height: 50px;
@@ -1177,6 +1188,7 @@
         <span class="stat-chip" id="pet-count">🐾 0</span>
         <span class="stat-chip" id="user-display" style="display:none"></span>
         <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
+        <button class="stat-chip" id="streak-btn" title="連續簽到獎勵" style="border:none;cursor:pointer;font-family:inherit;font-weight:700;background:rgba(255,255,255,0.4);">🎁 連續簽到</button>
         <button class="stat-chip" id="help-btn" title="新手引導／屬性相剋" style="border:none;cursor:pointer;font-family:inherit;font-weight:700;background:rgba(255,255,255,0.4);">❓ 說明</button>
       </div>
     </div>
@@ -1336,7 +1348,7 @@
   </div>
 
   <div class="overlay hidden" id="lineup-modal">
-    <div class="modal" style="max-width:min(480px,94vw);text-align:left">
+    <div class="modal" style="max-width:min(720px,96vw);width:min(720px,96vw);text-align:left">
       <div class="big" style="text-align:center">🎯</div>
       <h2 style="text-align:center">選擇上場三隻</h2>
       <p id="lineup-msg" style="font-size:0.85rem;color:#555;text-align:center;margin-bottom:8px">
@@ -1344,9 +1356,22 @@
         其餘出戰名單會自動當候補。可組同屬性觸發羈絆！
       </p>
       <div id="lineup-status" style="text-align:center;font-weight:800;color:#6a1b9a;margin-bottom:8px">已選 0 / 3</div>
-      <div id="lineup-list" style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:10px"></div>
-      <button type="button" class="btn btn-pink" id="lineup-confirm" style="width:100%" disabled>✅ 確認出戰</button>
-      <button type="button" class="btn btn-back" id="lineup-cancel" style="width:100%;margin-top:8px">返回</button>
+      <div id="lineup-list" style="display:flex;flex-direction:column;align-items:center;gap:6px;max-height:50vh;overflow-x:hidden;overflow-y:auto;margin-bottom:10px"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:4px"><button type="button" class="btn btn-pink" id="lineup-confirm" style="width:500px;max-width:100%" disabled>✅ 確認出戰</button>
+      <button type="button" class="btn btn-back" id="lineup-cancel" style="width:500px;max-width:100%">返回</button></div>
+    </div>
+  </div>
+
+
+  <div class="overlay hidden" id="streak-modal">
+    <div class="modal" style="max-width:min(420px,94vw)">
+      <div class="big">🎁</div>
+      <h2>連續簽到獎勵</h2>
+      <p id="streak-msg" style="font-size:0.9rem;color:#555;line-height:1.6;margin:8px 0"></p>
+      <div id="streak-reward-box" style="background:linear-gradient(145deg,#fff8e1,#fce4ec);border:2px solid #ffb74d;border-radius:14px;padding:12px;margin:10px 0;font-weight:700;color:#e65100;line-height:1.7"></div>
+      <div id="streak-calendar" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0;font-size:0.72rem"></div>
+      <button type="button" class="btn btn-pink" id="streak-claim" style="width:100%">🎁 領取今日獎勵</button>
+      <button type="button" class="btn btn-back" id="streak-close" style="width:100%;margin-top:8px">稍後</button>
     </div>
   </div>
 
@@ -1427,6 +1452,7 @@
       </div>
       <div class="pet-info-actions" id="pet-info-actions">
         <button type="button" class="btn btn-purple" id="pet-info-evo" style="position:relative;display:none">✨ 進化</button>
+        <button type="button" class="btn btn-pink" id="pet-info-ascend" style="position:relative;display:none">🔄 轉化高階</button>
         <button type="button" class="btn btn-shop" id="pet-info-star" style="position:relative">⭐ 升星</button>
         <button type="button" class="btn btn-explore" id="pet-info-star-bonus" style="position:relative;display:none">🎁 領取星階加成</button>
         <button type="button" class="btn btn-pink" id="pet-info-dismantle">♻️ 換成碎片</button>
@@ -1492,6 +1518,7 @@
         <button type="button" class="help-tab" data-htab="type">⚔️ 屬性相剋</button>
         <button type="button" class="help-tab" data-htab="battle">🎮 戰鬥與收服</button>
         <button type="button" class="help-tab" data-htab="grow">⭐ 養成</button>
+        <button type="button" class="help-tab" data-htab="features">🧭 功能導覽</button>
       </div>
       <div class="help-body" id="help-body"></div>
       <div class="help-footer">
@@ -1790,7 +1817,8 @@ const ALL_PETS = [
     dropPetExp: [50, 90],
     dropPlayerExp: [90, 130],
     dropCoins: [60, 120],
-    dropLeiDaoFrags: [10, 15],
+    dropLeiDaoFrags: [1, 2],
+    dropLeiDaoChance: 0.22,
     skills: [
       { id:'dangdianlei', name:'當電雷', emoji:'⚡', evoReq:0, unlockLv:0, mp:32,
         fixedHits:15, atkPercentMin:25, atkPercentMax:38 },
@@ -1849,7 +1877,8 @@ const ALL_PETS = [
     dropPetExp: [120, 180],
     dropPlayerExp: [210, 290],
     dropCoins: [120, 220],
-    dropLeiDaoFrags: [20, 45],
+    dropLeiDaoFrags: [1, 4],
+    dropLeiDaoChance: 0.35,
     // 裝備加成（手稿）
     equipBonuses: {
       lei_dao: { force: 10 },
@@ -1883,7 +1912,13 @@ const ZONES = [
   {id:'volcano',  name:'火山',      emoji:'🌋', desc:'島中央偏右的火山，隨時可能噴發。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40},
   {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！有 25% 機率遇到等級很高的野生。', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
   {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao','hai_shuibo_bao'], x:62, y:65},
-  {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82}
+  {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82},
+  /* 本島左上角：絕對試煉地獄 — 全島最難終點 */
+  {id:'abs_hell', name:'絕對試煉地獄', emoji:'☠️',
+    desc:'本島左上角的深淵裂縫。傳說只有真正的強者才能踏入。固定 3 隻強化敵人，等級／星級遠超其他區域，勝利報酬也更豐厚。需累積足夠勝場才解鎖。',
+    unlock:25, danger:6,
+    pets:['shen_huobao_xiong','hai_shuibo_bao','xiangsu_diandian_zhu','shen_diandian_zhu','huobao_xiong','shuibo_bao'],
+    hellTrial:true, elevated:true, x:22, y:14}
 ];
 
 /* ===== 遊戲時間（隨現實時間流動）=====
@@ -1978,24 +2013,33 @@ function pickZoneEncounter(zone) {
   return { id: picked.id, spawnMeta: null };
 }
 
-/** 野生等級：一般約玩家±1~2；彩虹山脈 25% 出現很高級 */
+/** 野生等級：一般約玩家+2~+6；危險區／彩虹更容易出現更高級 */
 function rollWildLevelForZone(base, zone) {
   zone = zone || S.currentZone;
-  let lv = Math.max(1, (S.level || 1) + rand(-1, 2));
+  const pl = Math.max(1, Number(S.level) || 1);
+  const danger = (zone && zone.danger) ? Number(zone.danger) : 0;
+  // 基礎就略高於玩家（危險區再抬高）
+  let lv = Math.max(1, pl + rand(2, 5) + Math.min(3, danger));
   if (base && base.minWildLevel != null) {
     lv = Math.max(lv, Number(base.minWildLevel) || 1);
   }
-  const pl = Math.max(1, Number(S.level) || 1);
-  // 全地圖都有機率出現「偏高一級」的野生；彩虹更高
-  // 玩家等級越高，高等遭遇機率略增（例：39 級更容易遇高的）
-  let highChance = 0.08 + Math.min(0.12, Math.floor(pl / 10) * 0.02);
-  if (zone && zone.id === 'rainbow') highChance = 0.38 + Math.min(0.12, Math.floor(pl / 12) * 0.02);
-  else if (zone && (zone.danger || 0) >= 3) highChance += 0.06;
+  // 全地圖都有機率出現「偏高一級」的野生；彩虹／高危／地獄更高
+  let highChance = 0.18 + Math.min(0.18, Math.floor(pl / 8) * 0.025) + danger * 0.04;
+  if (zone && zone.hellTrial) highChance = 0.92;
+  else if (zone && zone.id === 'rainbow') highChance = 0.48 + Math.min(0.15, Math.floor(pl / 10) * 0.025);
+  else if (danger >= 3) highChance += 0.10;
   if (Math.random() < highChance) {
-    // 高等：玩家+5~+18（彩虹可更高）
-    const pad = (zone && zone.id === 'rainbow') ? rand(10, 28) : rand(5, 16);
-    const high = Math.max(pl + pad, Math.floor(pl * 1.15) + rand(0, 6));
+    // 高等：玩家+8~+22（彩虹可更高；地獄更誇張）
+    let pad;
+    if (zone && zone.hellTrial) pad = rand(18, 45);
+    else if (zone && zone.id === 'rainbow') pad = rand(12, 32);
+    else pad = rand(8, 20);
+    const high = Math.max(pl + pad, Math.floor(pl * (zone && zone.hellTrial ? 1.45 : 1.22)) + rand(2, 10));
     lv = Math.max(lv, high);
+  }
+  // 地獄最低也比玩家高一截
+  if (zone && zone.hellTrial) {
+    lv = Math.max(lv, pl + 12, 40);
   }
   return lv;
 }
@@ -2055,6 +2099,18 @@ function getBattleRewardTargets() {
   return (S.wild && S.wild.id) ? [S.wild] : [];
 }
 
+/** 敵方等級／星級越高，經驗與金幣倍率越高 */
+function rewardScaleFromEnemy(wild) {
+  if (!wild) return 1;
+  const lv = Math.max(1, Number(wild.level) || 1);
+  const star = Math.max(0, Number(wild.starLevel) || 0);
+  // 等級：Lv.1 = ×1.00，每級 +4%（Lv.25 ≈ ×1.96，Lv.50 ≈ ×2.96）
+  const lvMul = 1 + (lv - 1) * 0.04;
+  // 星級：每星 +5%（5★ = ×1.25，10★ = ×1.50，20★ = ×2.00）
+  const starMul = 1 + star * 0.05;
+  return Math.max(1, lvMul * starMul);
+}
+
 /** 單隻敵的經驗區間 */
 function calcExpForOneEnemy(wild, win) {
   const danger = (S.currentZone && S.currentZone.danger) ? S.currentZone.danger : 1;
@@ -2078,11 +2134,16 @@ function calcExpForOneEnemy(wild, win) {
   }
   if (!petExp || petExp <= 0) petExp = 12 + rand(5, 15) + danger * 2;
   if (!playerExp || playerExp <= 0) playerExp = 12 + rand(5, 15) + danger * 3;
+  // 依敵方等級、星級加成
+  let scale = rewardScaleFromEnemy(wild);
+  if (S.currentZone && S.currentZone.hellTrial) scale *= 1.55;
+  petExp = Math.max(1, Math.floor(petExp * scale));
+  playerExp = Math.max(1, Math.floor(playerExp * scale));
   if (!win) {
     petExp = Math.max(1, Math.floor(petExp * 0.25));
     playerExp = Math.max(1, Math.floor(playerExp * 0.25));
   }
-  return { petExp, playerExp };
+  return { petExp, playerExp, scale };
 }
 
 /** 戰利品經驗：本場每隻敵各自計算後加總 */
@@ -2120,14 +2181,19 @@ function calcBattleExpRewards(win) {
 function calcCoinForOneEnemy(wild) {
   const meta = wild && wild._spawnMeta ? wild._spawnMeta : null;
   const base = wild && wild.id ? getBase(wild.id) : null;
+  let coins = 0;
   if (base && base.dropCoins && base.dropCoins.length >= 2) {
-    return rand(base.dropCoins[0], base.dropCoins[1]);
+    coins = rand(base.dropCoins[0], base.dropCoins[1]);
+  } else if (meta && meta.coinMin != null) {
+    coins = rand(meta.coinMin, meta.coinMax);
+  } else {
+    const danger = (S.currentZone && S.currentZone.danger) ? S.currentZone.danger : 1;
+    coins = 15 + rand(5, 25) + danger * 8;
   }
-  if (meta && meta.coinMin != null) {
-    return rand(meta.coinMin, meta.coinMax);
-  }
-  const danger = (S.currentZone && S.currentZone.danger) ? S.currentZone.danger : 1;
-  return 15 + rand(5, 25) + danger * 8;
+  // 依敵方等級、星級加成；絕對試煉地獄額外加成
+  let scale = (typeof rewardScaleFromEnemy === 'function') ? rewardScaleFromEnemy(wild) : 1;
+  if (S.currentZone && S.currentZone.hellTrial) scale *= 1.55;
+  return Math.max(1, Math.floor(coins * scale));
 }
 
 /** 戰利品金幣：本場每隻敵各自計算後加總 */
@@ -2150,7 +2216,7 @@ const SHOP_ITEMS = [
 /* ===== 寶物系統 =====
  * 全部靠收集「該寶物碎片」合成／升階（數量依手稿）
  * 白 3 → 綠 15 → 藍 35 → 紫 60 → 金 80 → 紅 100
- * 目前開放：雷刀（有效果）、冰刀、沙甲（暫無效果）
+ * 目前開放：雷刀、冰刀（手稿效果）、沙暴系列（沙刀／沙甲／沙盾／沙杖／沙冠）
  */
 const TREASURE_GRADE_COSTS = [3, 15, 35, 60, 80, 100]; // 各階所需碎片
 
@@ -2159,6 +2225,7 @@ const ALL_TREASURES = [
     id: 'lei_dao',
     name: '雷刀',
     emoji: '⚔️',
+    slot: '劍',
     desc: '雷屬寶刀。配戴後強化電系技能。',
     grades: [
       { name:'白', cost:3,   bonuses:{ force:5 } },
@@ -2168,7 +2235,6 @@ const ALL_TREASURES = [
       { name:'金', cost:80,  bonuses:{ force:6 } },
       { name:'紅', cost:100, bonuses:{ atk:40 } }
     ],
-    // 首次合成＝湊滿白階碎片
     craft: { frags: 3 },
     special: {
       petId: 'shen_diandian_zhu',
@@ -2182,14 +2248,15 @@ const ALL_TREASURES = [
     id: 'bing_dao',
     name: '冰刀',
     emoji: '🧊',
+    slot: '劍',
     desc: '寒冰寶刀。水波豹系列掉落碎片可合成。',
     grades: [
-      { name:'白', cost:3,   bonuses:{ force:5 } },
-      { name:'綠', cost:15,  bonuses:{ intel:2 } },
-      { name:'藍', cost:35,  bonuses:{ force:4 } },
-      { name:'紫', cost:60,  bonuses:{ force:2 } },
-      { name:'金', cost:80,  bonuses:{ force:6 } },
-      { name:'紅', cost:100, bonuses:{ atk:40 } }
+      { name:'白', cost:3,   bonuses:{ intel:6 } },
+      { name:'綠', cost:15,  bonuses:{ intel:6 } },
+      { name:'藍', cost:35,  bonuses:{ intel:4 }, dealTypeMul:{ types:['火'], mul:1.1 } },
+      { name:'紫', cost:60,  bonuses:{ intel:2 }, onceNullifyOverHpPct:0.5 },
+      { name:'金', cost:80,  bonuses:{ intel:6 } },
+      { name:'紅', cost:100, bonuses:{ intel:9 }, takenTypeMul:{ types:['電'], mul:0.9 } }
     ],
     craft: { frags: 3 },
     special: {
@@ -2199,18 +2266,89 @@ const ALL_TREASURES = [
       extraForce: 10
     }
   },
+  /* ===== 沙暴系列（刀／甲／盾／杖／冠）===== */
+  {
+    id: 'sha_dao',
+    name: '沙刀',
+    emoji: '🗡️',
+    slot: '刀',
+    series: '沙暴',
+    desc: '沙暴系列之刀。偏重速度與 MP。',
+    grades: [
+      { name:'白', cost:3,   bonuses:{ baseSpeed:10 } },
+      { name:'綠', cost:15,  bonuses:{ speed:40 } },
+      { name:'藍', cost:35,  pair:{ with:'sha_guan', bonuses:{ mp:60 } } },
+      { name:'紫', cost:60,  bonuses:{ baseSpeed:15 } },
+      { name:'金', cost:80,  bonuses:{ speed:30 } },
+      { name:'紅', cost:100, pair:{ with:'sha_jia', bonuses:{ mp:80 } } }
+    ],
+    craft: { frags: 3 }
+  },
   {
     id: 'sha_jia',
     name: '沙甲',
-    emoji: '🏜️',
-    desc: '沙漠甲殼鍛成的寶物。（效果尚未開放）',
+    emoji: '🦺',
+    slot: '甲',
+    series: '沙暴',
+    desc: '沙暴系列之甲。高防禦，與刀／盾成對更強。',
     grades: [
-      { name:'白', cost:3,   bonuses:{} },
-      { name:'綠', cost:15,  bonuses:{} },
-      { name:'藍', cost:35,  bonuses:{} },
-      { name:'紫', cost:60,  bonuses:{} },
-      { name:'金', cost:80,  bonuses:{} },
-      { name:'紅', cost:100, bonuses:{} }
+      { name:'白', cost:3,   bonuses:{ def:40 } },
+      { name:'綠', cost:15,  bonuses:{ baseDef:10 } },
+      { name:'藍', cost:35,  pair:{ with:'sha_dao', bonuses:{ force:6 } } },
+      { name:'紫', cost:60,  bonuses:{ def:50 } },
+      { name:'金', cost:80,  bonuses:{ baseDef:15 } },
+      { name:'紅', cost:100, pair:{ with:'sha_dun', bonuses:{ force:10 } } }
+    ],
+    craft: { frags: 3 }
+  },
+  {
+    id: 'sha_dun',
+    name: '沙盾',
+    emoji: '🛡️',
+    slot: '盾',
+    series: '沙暴',
+    desc: '沙暴系列之盾。依屬性減傷，與甲／杖成對加成。',
+    grades: [
+      { name:'白', cost:3,   takenTypeMul:{ types:['水','火'], mul:0.95 } },
+      { name:'綠', cost:15,  takenTypeMul:{ types:['電','土'], mul:0.90 } },
+      { name:'藍', cost:35,  pair:{ with:'sha_jia', bonuses:{ intel:6 } } },
+      { name:'紫', cost:60,  takenTypeMul:{ types:['神','暗','亮'], mul:0.85 } },
+      { name:'金', cost:80,  bonuses:{ baseDef:10 } },
+      { name:'紅', cost:100, pair:{ with:'sha_zhang', bonuses:{ intel:10 } } }
+    ],
+    craft: { frags: 3 }
+  },
+  {
+    id: 'sha_zhang',
+    name: '沙杖',
+    emoji: '🪄',
+    slot: '杖',
+    series: '沙暴',
+    desc: '沙暴系列之杖。智力與命中／暴擊輔助。',
+    grades: [
+      { name:'白', cost:3,   bonuses:{ intel:8 } },
+      { name:'綠', cost:15,  conditional:{ ifIntelGte:130, dealTypeMul:{ types:['水'], mul:1.15 } } },
+      { name:'藍', cost:35,  pair:{ with:'sha_dun', bonuses:{ charm:6 } } },
+      { name:'紫', cost:60,  bonuses:{ hit:0.10, enemyHit:-0.30 } },
+      { name:'金', cost:80,  bonuses:{ crit:0.20 } },
+      { name:'紅', cost:100, pair:{ with:'sha_guan', bonuses:{ charm:10 } } }
+    ],
+    craft: { frags: 3 }
+  },
+  {
+    id: 'sha_guan',
+    name: '沙冠',
+    emoji: '👑',
+    slot: '帽',
+    series: '沙暴',
+    desc: '沙暴系列之冠。提升攻擊與生命。',
+    grades: [
+      { name:'白', cost:3,   bonuses:{ atk:30 } },
+      { name:'綠', cost:15,  bonuses:{ baseAtk:10 } },
+      { name:'藍', cost:35,  pair:{ with:'sha_zhang', bonuses:{ hp:300 } } },
+      { name:'紫', cost:60,  bonuses:{ atk:40 } },
+      { name:'金', cost:80,  bonuses:{ baseAtk:20 } },
+      { name:'紅', cost:100, pair:{ with:'sha_dao', bonuses:{ hp:400 } } }
     ],
     craft: { frags: 3 }
   }
@@ -2308,24 +2446,67 @@ function bindPetNicknameModal() {
   }
 }
 
-/** 火爆熊碎片 → 神·火爆熊碎片：每 10 片換 1 片 */
-function exchangeHuobaoFragsToShen() {
-  const have = getFragmentCount('huobao_xiong');
-  const times = Math.floor(have / 10);
+/** 基礎型 → 高階型（寵物本體轉化 & 碎片兌換） */
+const PET_ASCEND_MAP = {
+  huobao_xiong: 'shen_huobao_xiong',
+  shuibo_bao: 'hai_shuibo_bao',
+  shen_diandian_zhu: 'xiangsu_diandian_zhu'
+};
+const PET_ASCEND_FRAG_RATE = 10; // 每 10 片基礎碎片 → 1 片高階碎片
+const PET_ASCEND_PET_COST = 10;  // 轉化一隻寵物消耗 10 片「基礎」碎片
+
+function getAscendTargetId(baseId) {
+  return (PET_ASCEND_MAP && PET_ASCEND_MAP[baseId]) || null;
+}
+function getAscendSourceId(targetId) {
+  if (!PET_ASCEND_MAP) return null;
+  const keys = Object.keys(PET_ASCEND_MAP);
+  for (let i = 0; i < keys.length; i++) {
+    if (PET_ASCEND_MAP[keys[i]] === targetId) return keys[i];
+  }
+  return null;
+}
+
+/** 通用：基礎碎片 → 高階碎片 */
+function exchangeAscendFragments(fromId) {
+  const toId = getAscendTargetId(fromId);
+  if (!toId) { alert('此寵物碎片無法兌換'); return; }
+  const fromBase = getBase(fromId) || { name: fromId };
+  const toBase = getBase(toId) || { name: toId };
+  const have = getFragmentCount(fromId);
+  const times = Math.floor(have / PET_ASCEND_FRAG_RATE);
   if (times <= 0) {
-    alert('需要至少 10 片火爆熊碎片才能兌換（目前 ' + have + '）');
+    alert('需要至少 ' + PET_ASCEND_FRAG_RATE + ' 片「' + fromBase.name + '」碎片才能兌換（目前 ' + have + '）');
     return;
   }
-  const cost = times * 10;
+  const cost = times * PET_ASCEND_FRAG_RATE;
   const gain = times;
-  if (!confirm('確定用 🔥 火爆熊碎片 ×' + cost + ' 兌換 ✨ 神·火爆熊碎片 ×' + gain + '？')) return;
+  if (!confirm('確定用 ' + (fromBase.emoji || '') + fromBase.name + ' 碎片 ×' + cost +
+      '\n兌換 ' + (toBase.emoji || '') + toBase.name + ' 碎片 ×' + gain + '？')) return;
   if (!S.fragments) S.fragments = {};
-  S.fragments['huobao_xiong'] = have - cost;
-  S.fragments['shen_huobao_xiong'] = (S.fragments['shen_huobao_xiong'] || 0) + gain;
+  S.fragments[fromId] = have - cost;
+  S.fragments[toId] = (S.fragments[toId] || 0) + gain;
   saveGame();
-  alert('🔄 兌換成功！\n扣除火爆熊碎片 ×' + cost + '\n獲得神·火爆熊碎片 ×' + gain + '\n（目前神·火爆熊碎片：' + getFragmentCount('shen_huobao_xiong') + '）');
+  alert('🔄 兌換成功！\n扣除 ' + fromBase.name + ' 碎片 ×' + cost +
+    '\n獲得 ' + toBase.name + ' 碎片 ×' + gain +
+    '\n（目前 ' + toBase.name + ' 碎片：' + getFragmentCount(toId) + '）');
   if (typeof renderBag === 'function') renderBag();
   if (typeof updateRedDots === 'function') updateRedDots();
+}
+
+/** 相容舊呼叫 */
+function exchangeHuobaoFragsToShen() {
+  exchangeAscendFragments('huobao_xiong');
+}
+
+/**
+ * 將擁有的基礎型寵物轉化為高階型（保留等級／經驗／星級／暱稱／寶物）
+ * 消耗 PET_ASCEND_PET_COST 片基礎碎片
+ */
+function ascendOwnedPet(ownedIdx) {
+  // 已停用：高階型只能靠碎片兌換或野外收服
+  alert('高階型只能用碎片兌換或野外收服，不能直接把寵物轉化。');
+  return false;
 }
 
 
@@ -2418,13 +2599,74 @@ function getTreasureBonuses(treasureId) {
   if (!def) return {};
   const g = getTreasureGrade(treasureId);
   if (g < 0) return {};
-  const out = { force:0, intel:0, charm:0, atk:0, def:0, hp:0 };
+  const out = {
+    force:0, intel:0, charm:0, atk:0, def:0, hp:0,
+    speed:0, baseSpeed:0, baseAtk:0, baseDef:0, mp:0, crit:0, hit:0, enemyHit:0
+  };
   for (let i = 0; i <= g; i++) {
-    const b = def.grades[i] && def.grades[i].bonuses;
-    if (!b) continue;
-    Object.keys(out).forEach(k => { if (b[k]) out[k] += b[k]; });
+    const gr = def.grades[i];
+    if (!gr) continue;
+    const b = gr.bonuses;
+    if (b) Object.keys(out).forEach(k => { if (b[k]) out[k] += Number(b[k]) || 0; });
   }
   return out;
+}
+
+/** 已解鎖品階的戰鬥／條件效果（成對、屬性倍率、一次性抵消等） */
+function getTreasureCombatEffects(pet) {
+  const list = (pet && pet.equippedTreasures) || [];
+  const effects = {
+    dealTypeMuls: [], // {types, mul}
+    takenTypeMuls: [],
+    onceNullifyOverHpPct: null,
+    pairLines: []
+  };
+  list.forEach(tid => {
+    const def = getTreasureDef(tid);
+    if (!def) return;
+    const g = getTreasureGrade(tid);
+    if (g < 0) return;
+    for (let i = 0; i <= g; i++) {
+      const gr = def.grades[i];
+      if (!gr) continue;
+      if (gr.dealTypeMul) effects.dealTypeMuls.push(gr.dealTypeMul);
+      if (gr.takenTypeMul) effects.takenTypeMuls.push(gr.takenTypeMul);
+      if (gr.onceNullifyOverHpPct != null) {
+        const v = Number(gr.onceNullifyOverHpPct);
+        if (effects.onceNullifyOverHpPct == null || v < effects.onceNullifyOverHpPct) {
+          effects.onceNullifyOverHpPct = v;
+        }
+      }
+      if (gr.conditional && gr.conditional.ifIntelGte != null) {
+        const intel = (Number(pet.intel) || 0) + (Number(pet._treasureIntel) || 0);
+        if (intel >= gr.conditional.ifIntelGte && gr.conditional.dealTypeMul) {
+          effects.dealTypeMuls.push(gr.conditional.dealTypeMul);
+        }
+      }
+      if (gr.pair && gr.pair.with && petHasTreasure(pet, gr.pair.with)) {
+        const pb = gr.pair.bonuses || {};
+        effects.pairLines.push({ from: tid, with: gr.pair.with, bonuses: pb });
+      }
+    }
+  });
+  return effects;
+}
+
+/** 把成對配戴的額外數值加總進 pet 的暫存欄位 */
+function applyTreasurePairBonuses(p) {
+  if (!p) return;
+  const fx = getTreasureCombatEffects(p);
+  (fx.pairLines || []).forEach(line => {
+    const b = line.bonuses || {};
+    if (b.force) p._treasureForce = (p._treasureForce || 0) + b.force;
+    if (b.intel) p._treasureIntel = (p._treasureIntel || 0) + b.intel;
+    if (b.charm) p._treasureCharm = (p._treasureCharm || 0) + b.charm;
+    if (b.atk) p.treasureAtk = (p.treasureAtk || 0) + b.atk;
+    if (b.def) p.treasureDef = (p.treasureDef || 0) + b.def;
+    if (b.hp) p.treasureHp = (p.treasureHp || 0) + b.hp;
+    if (b.mp) p.treasureMp = (p.treasureMp || 0) + b.mp;
+    if (b.speed) p.treasureSpeed = (p.treasureSpeed || 0) + b.speed;
+  });
 }
 function petHasTreasure(pet, treasureId) {
   if (!pet || !pet.equippedTreasures) return false;
@@ -2445,6 +2687,14 @@ function applyTreasureStatsToPet(p) {
   p.treasureAtk = 0;
   p.treasureDef = 0;
   p.treasureHp = 0;
+  p.treasureMp = 0;
+  p.treasureSpeed = 0;
+  p.treasureBaseAtk = 0;
+  p.treasureBaseDef = 0;
+  p.treasureBaseSpeed = 0;
+  p.treasureCrit = 0;
+  p.treasureHit = 0;
+  p.treasureEnemyHit = 0;
   p._treasureForce = 0;
   p._treasureIntel = 0;
   p._treasureCharm = 0;
@@ -2456,6 +2706,14 @@ function applyTreasureStatsToPet(p) {
     p.treasureAtk += b.atk || 0;
     p.treasureDef += b.def || 0;
     p.treasureHp += b.hp || 0;
+    p.treasureMp += b.mp || 0;
+    p.treasureSpeed += b.speed || 0;
+    p.treasureBaseAtk += b.baseAtk || 0;
+    p.treasureBaseDef += b.baseDef || 0;
+    p.treasureBaseSpeed += b.baseSpeed || 0;
+    p.treasureCrit += b.crit || 0;
+    p.treasureHit += b.hit || 0;
+    p.treasureEnemyHit += b.enemyHit || 0;
     p._treasureForce += b.force || 0;
     p._treasureIntel += b.intel || 0;
     p._treasureCharm += b.charm || 0;
@@ -2475,6 +2733,8 @@ function applyTreasureStatsToPet(p) {
       if (eb.hp) p.treasureHp += eb.hp;
     }
   });
+  // 成對配戴額外加成
+  if (typeof applyTreasurePairBonuses === 'function') applyTreasurePairBonuses(p);
   return p;
 }
 
@@ -2590,14 +2850,17 @@ function rollBattleDropsForOne(win, wild) {
   }
 
   if (base && base.dropLeiDaoFrags && base.dropLeiDaoFrags.length >= 2) {
-    const n = rand(base.dropLeiDaoFrags[0], base.dropLeiDaoFrags[1]);
-    if (n > 0) {
-      if (typeof addTreasureFragments === 'function') addTreasureFragments('lei_dao', n);
-      else {
-        if (!S.treasureFrags) S.treasureFrags = {};
-        S.treasureFrags.lei_dao = (S.treasureFrags.lei_dao || 0) + n;
+    const chance = (base.dropLeiDaoChance != null) ? base.dropLeiDaoChance : 0.25;
+    if (Math.random() < chance) {
+      const n = rand(base.dropLeiDaoFrags[0], base.dropLeiDaoFrags[1]);
+      if (n > 0) {
+        if (typeof addTreasureFragments === 'function') addTreasureFragments('lei_dao', n);
+        else {
+          if (!S.treasureFrags) S.treasureFrags = {};
+          S.treasureFrags.lei_dao = (S.treasureFrags.lei_dao || 0) + n;
+        }
+        drops.lines.push('⚔️ 雷刀碎片 ×' + n);
       }
-      drops.lines.push('⚔️ 雷刀碎片 ×' + n);
     }
   }
 
@@ -2624,9 +2887,37 @@ function rollBattleDropsForOne(win, wild) {
         if (!S.treasureFrags) S.treasureFrags = {};
         S.treasureFrags.sha_jia = (S.treasureFrags.sha_jia || 0) + n;
       }
-      drops.lines.push('🛡️ 沙甲碎片 ×' + n);
+      drops.lines.push('🦺 沙甲碎片 ×' + n);
     }
   }
+
+  // 沙漠／火山／地獄：沙暴系列碎片小機率掉落
+  try {
+    const zid = S.currentZone && S.currentZone.id;
+    if (zid === 'ashfield' || zid === 'volcano' || zid === 'abs_hell') {
+      const pool = [
+        { id:'sha_dao', name:'沙刀', emoji:'🗡️', chance:0.22 },
+        { id:'sha_jia', name:'沙甲', emoji:'🦺', chance:0.22 },
+        { id:'sha_dun', name:'沙盾', emoji:'🛡️', chance:0.18 },
+        { id:'sha_zhang', name:'沙杖', emoji:'🪄', chance:0.18 },
+        { id:'sha_guan', name:'沙冠', emoji:'👑', chance:0.15 }
+      ];
+      pool.forEach(row => {
+        let ch = row.chance;
+        if (zid === 'abs_hell') ch *= 1.6;
+        if (zid === 'volcano') ch *= 1.15;
+        if (Math.random() < ch) {
+          const n = zid === 'abs_hell' ? rand(2, 6) : rand(1, 4);
+          if (typeof addTreasureFragments === 'function') addTreasureFragments(row.id, n);
+          else {
+            if (!S.treasureFrags) S.treasureFrags = {};
+            S.treasureFrags[row.id] = (S.treasureFrags[row.id] || 0) + n;
+          }
+          drops.lines.push(row.emoji + ' ' + row.name + '碎片 ×' + n);
+        }
+      });
+    }
+  } catch (e) {}
 
   if (meta && meta.dropItem === 'hua_mi') {
     S.items = S.items || {};
@@ -3132,10 +3423,27 @@ const S = {
   battleHistory: [],
   _battleLog: [],
   _battleMeta: null,
-  metWildCount: 0 // 遇過幾隻野生（前 15 隻收服率 +20%）
+  metWildCount: 0, // 遇過幾隻野生（前 15 隻收服率 +20%）
+  playStreak: 0,       // 連續簽到天數
+  lastPlayDate: '',    // 上次遊玩日期 YYYY-MM-DD
+  streakClaimedDate: '' // 今日是否已領 YYYY-MM-DD
 };
 
 function expNeeded(lv){ return lv * 30; }
+/** 把溢出的玩家經驗結算成等級（載入存檔／顯示時保底） */
+function normalizePlayerLevel() {
+  if (S.level == null || S.level < 1) S.level = 1;
+  if (S.exp == null || S.exp < 0) S.exp = 0;
+  let gained = 0;
+  let guard = 0;
+  while (S.exp >= expNeeded(S.level) && guard < 500) {
+    S.exp -= expNeeded(S.level);
+    S.level++;
+    gained++;
+    guard++;
+  }
+  return gained;
+}
 
 const $ = id => document.getElementById(id);
 const roll = c => Math.random() < c;
@@ -3463,7 +3771,7 @@ function calcCombatPower(p) {
     hp * 0.4 + mp * 0.15 +
     atk * 2.2 + def * 1.6 + spd * 1.2 +
     force * 3.6 + intel * 3.2 + charm * 3.0 +
-    lv * 8 + stage * 25 + star * 12 +
+    lv * 8 + stage * 25 + star * 42 + star * star * 1.2 +
     crit * 180 + dodge * 150 + hit * 80;
   // 已解鎖技能數會提升戰力（被動也算）
   try {
@@ -3565,7 +3873,7 @@ function recalculatePetDefense(p) {
   if (!p) return 0;
   const base = getBase(p.id) || {};
   const number = value => Number.isFinite(Number(value)) ? Number(value) : 0;
-  const initialDef = number(p.baseDef ?? base.baseDef);
+  const initialDef = number(p.baseDef ?? base.baseDef) + number(p.treasureBaseDef || 0);
   const treasureDef = number(p.treasureDef ?? p.equipment?.treasureDef ?? 0);
   const intel = number(p.intel ?? base.intel);
   const charm = number(p.charm ?? base.charm);
@@ -3598,7 +3906,7 @@ function recalculatePetAttack(p) {
   const starLevel = number(p.starLevel ?? 0);
   // 每升 1 星：基礎攻擊 +1（加進基礎攻擊再走完整公式）
   const rawBaseAtk = number(p.baseAtk ?? base.baseAtk);
-  let initialAtk = rawBaseAtk + starLevel;
+  let initialAtk = rawBaseAtk + starLevel + number(p.treasureBaseAtk || 0);
   const treasureAtk = number(p.treasureAtk ?? p.equipment?.treasureAtk ?? 0);
   const force = number(p.force ?? base.force);
   const intel = number(p.intel ?? base.intel);
@@ -3688,8 +3996,9 @@ function recalculatePetMaxMp(p, { restoreFullMp = false } = {}) {
     { multiplier: 1.45, levelBonus: 11 },
     { multiplier: 1.6, levelBonus: 12 }
   ][stage];
+  const treasureMp = number(p.treasureMp || 0);
   const core = initialMp * 0.7 + intel * 0.4;
-  p.maxMp = Math.floor(evolution.multiplier * core + level * evolution.levelBonus);
+  p.maxMp = Math.floor(evolution.multiplier * core + level * evolution.levelBonus + treasureMp);
   if (restoreFullMp || oldMaxMp <= 0 || oldMp >= oldMaxMp) p.mp = p.maxMp;
   else p.mp = Math.max(0, Math.min(p.maxMp, Math.round(oldMp / oldMaxMp * p.maxMp)));
   return p.maxMp;
@@ -3711,8 +4020,9 @@ function recalculatePetSpeed(p) {
     { multiplier: 1.24, levelBonus: 6 },
     { multiplier: 1.26, levelBonus: 7 }
   ][stage];
-  const core = initialSpeed + 0.56 + charm * 0.4;
-  p.speed = Math.floor(evolution.multiplier * core + level * evolution.levelBonus);
+  const tSpd = number(p.treasureSpeed || 0) + number(p.treasureBaseSpeed || 0);
+  const core = initialSpeed + number(p.treasureBaseSpeed || 0) + 0.56 + charm * 0.4;
+  p.speed = Math.floor(evolution.multiplier * core + level * evolution.levelBonus + number(p.treasureSpeed || 0));
   return p.speed;
 }
 
@@ -3727,16 +4037,17 @@ function recalculatePetCombatRates(p) {
   const initCritPct = number(p.baseCrit ?? base.baseCrit ?? 0.08) * 100;
   const initDodgePct = number(p.baseDodge ?? base.baseDodge ?? 0.09) * 100;
   const initHitPct = number(p.baseHit ?? base.baseHit ?? 0.85) * 100;
-  let critPct = initCritPct * 0.9 + force * 0.02 + level;
+  let critPct = initCritPct * 0.9 + force * 0.02 + level + number(p.treasureCrit || 0) * 100;
   let dodgePct = initDodgePct * 0.9 + intel * 0.02 + level;
-  let hitPct = initHitPct * 0.8 + charm * 0.07 + level;
+  let hitPct = initHitPct * 0.8 + charm * 0.07 + level + number(p.treasureHit || 0) * 100;
   critPct = Math.max(1, Math.min(80, critPct));
   dodgePct = Math.max(1, Math.min(60, dodgePct));
   hitPct = Math.max(30, Math.min(100, hitPct));
   p.crit = critPct / 100;
   p.dodge = dodgePct / 100;
   p.hit = hitPct / 100;
-  p.critDmg = 1.3 + level * 0.03;
+  p._treasureEnemyHit = number(p.treasureEnemyHit || 0);
+  p.critDmg = 1.01 + level * 0.01;
   return p;
 }
 
@@ -4000,7 +4311,7 @@ function beginStarTutorial() {
     S.tutorialStep = 4;
   saveGame();
   // 關掉可能擋住點擊的殘留視窗
-  ['result-modal','capture-modal','lineup-modal','levelup-modal','tut-modal','app-confirm-modal','evo-modal','pet-nickname-modal','star-bonus-modal'].forEach(id => {
+  ['result-modal','capture-modal','lineup-modal','streak-modal','levelup-modal','tut-modal','app-confirm-modal','evo-modal','pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.classList.add('hidden');
@@ -4206,12 +4517,207 @@ function addLog(boxId, text) {
   box.appendChild(d);
   box.scrollTop = box.scrollHeight;
 }
+
+/* ===== 連續簽到獎勵 ===== */
+function getLocalDateStr(d) {
+  const x = d || new Date();
+  const y = x.getFullYear();
+  const m = String(x.getMonth() + 1).padStart(2, '0');
+  const day = String(x.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+function dateDiffDays(aStr, bStr) {
+  if (!aStr || !bStr) return null;
+  const a = new Date(aStr + 'T12:00:00');
+  const b = new Date(bStr + 'T12:00:00');
+  return Math.round((b - a) / 86400000);
+}
+/** 連續第 N 天的獎勵（7 天一循環，第 7 天大獎；超過 7 天仍依 (day-1)%7+1） */
+function getPlayStreakReward(day) {
+  const d = Math.max(1, Number(day) || 1);
+  const cycle = ((d - 1) % 7) + 1;
+  const week = Math.floor((d - 1) / 7); // 第幾週加成
+  const boost = 1 + week * 0.15;
+  const table = {
+    1: { coins: 50, playerExp: 20, huaMi: 0, leiDao: 0, label: '第 1 天' },
+    2: { coins: 80, playerExp: 30, huaMi: 0, leiDao: 0, label: '第 2 天' },
+    3: { coins: 120, playerExp: 40, huaMi: 1, leiDao: 0, label: '第 3 天' },
+    4: { coins: 160, playerExp: 50, huaMi: 0, leiDao: 0, label: '第 4 天' },
+    5: { coins: 200, playerExp: 60, huaMi: 1, leiDao: 0, label: '第 5 天' },
+    6: { coins: 260, playerExp: 80, huaMi: 1, leiDao: 0, label: '第 6 天' },
+    7: { coins: 400, playerExp: 120, huaMi: 2, leiDao: 1, label: '第 7 天大獎' }
+  };
+  const base = table[cycle];
+  return {
+    day: d,
+    cycle: cycle,
+    coins: Math.floor(base.coins * boost),
+    playerExp: Math.floor(base.playerExp * boost),
+    huaMi: base.huaMi,
+    leiDao: base.leiDao,
+    label: base.label + (week > 0 ? '（第' + (week + 1) + '週加成）' : '')
+  };
+}
+function formatStreakRewardHtml(rew) {
+  if (!rew) return '';
+  const lines = [];
+  if (rew.coins) lines.push('💰 金幣 +' + rew.coins);
+  if (rew.playerExp) lines.push('⭐ 玩家經驗 +' + rew.playerExp);
+  if (rew.huaMi) lines.push('🍯 花蜜 ×' + rew.huaMi);
+  if (rew.leiDao) lines.push('⚔️ 雷刀碎片 ×' + rew.leiDao);
+  return '<div style="font-size:0.95rem">' + (rew.label ? '<div style="margin-bottom:6px;color:#6a1b9a">' + rew.label + '</div>' : '') +
+    lines.map(l => '<div>' + l + '</div>').join('') + '</div>';
+}
+function updatePlayStreakOnLogin() {
+  const today = getLocalDateStr();
+  const last = S.lastPlayDate || '';
+  if (!last) {
+    S.playStreak = 1;
+    S.lastPlayDate = today;
+    return { isNewDay: true, canClaim: S.streakClaimedDate !== today };
+  }
+  const diff = dateDiffDays(last, today);
+  if (diff === 0) {
+    return { isNewDay: false, canClaim: S.streakClaimedDate !== today };
+  }
+  if (diff === 1) {
+    S.playStreak = (Number(S.playStreak) || 0) + 1;
+  } else if (diff > 1) {
+    S.playStreak = 1; // 中斷重算
+  }
+  S.lastPlayDate = today;
+  return { isNewDay: true, canClaim: S.streakClaimedDate !== today };
+}
+function canClaimPlayStreak() {
+  const today = getLocalDateStr();
+  return S.streakClaimedDate !== today && (Number(S.playStreak) || 0) >= 1;
+}
+function claimPlayStreakReward() {
+  if (!canClaimPlayStreak()) {
+    alert('今日獎勵已領取，明天再來！');
+    return false;
+  }
+  const today = getLocalDateStr();
+  // 確保 streak 至少 1
+  if (!S.lastPlayDate || S.lastPlayDate !== today) {
+    updatePlayStreakOnLogin();
+  }
+  const day = Math.max(1, Number(S.playStreak) || 1);
+  const rew = getPlayStreakReward(day);
+  S.coins = (S.coins || 0) + rew.coins;
+  if (rew.playerExp) {
+    S.exp = (S.exp || 0) + rew.playerExp;
+    let gained = 0;
+    while (S.exp >= expNeeded(S.level)) {
+      S.exp -= expNeeded(S.level);
+      S.level++;
+      gained++;
+      S.coins += 20;
+    }
+    if (gained) {
+      try { addLog('map-log', '🎊 連續獎勵使冒險者升到 Lv.' + S.level + '！'); } catch (e) {}
+    }
+  }
+  if (rew.huaMi) {
+    S.items = S.items || {};
+    S.items.hua_mi = (S.items.hua_mi || 0) + rew.huaMi;
+  }
+  if (rew.leiDao) {
+    if (typeof addTreasureFragments === 'function') addTreasureFragments('lei_dao', rew.leiDao);
+    else {
+      S.treasureFrags = S.treasureFrags || {};
+      S.treasureFrags.lei_dao = (S.treasureFrags.lei_dao || 0) + rew.leiDao;
+    }
+  }
+  S.streakClaimedDate = today;
+  if (typeof saveGame === 'function') saveGame();
+  if (typeof updateHeader === 'function') updateHeader();
+  return rew;
+}
+function renderStreakCalendar(box, currentDay) {
+  if (!box) return;
+  box.innerHTML = '';
+  for (let i = 1; i <= 7; i++) {
+    const r = getPlayStreakReward(i);
+    const cell = document.createElement('div');
+    const cycle = ((Math.max(1, currentDay) - 1) % 7) + 1;
+    const isToday = i === cycle;
+    const done = currentDay > 0 && i < cycle && S.streakClaimedDate === getLocalDateStr()
+      ? false : (currentDay > 0 && (i < cycle || (i === cycle && S.streakClaimedDate === getLocalDateStr())));
+    // simplify highlight: mark cycle day
+    cell.style.cssText = 'padding:6px 2px;border-radius:8px;border:2px solid ' +
+      (isToday ? '#ff9800' : '#e0e0e0') + ';background:' +
+      (isToday ? '#fff3e0' : '#fafafa') + ';text-align:center';
+    cell.innerHTML = '<div style="font-weight:800">D' + i + '</div><div style="color:#666">💰' + r.coins + '</div>';
+    box.appendChild(cell);
+  }
+}
+function openStreakModal(auto) {
+  updatePlayStreakOnLogin();
+  const modal = $('streak-modal');
+  if (!modal) return;
+  const day = Math.max(1, Number(S.playStreak) || 1);
+  const rew = getPlayStreakReward(day);
+  const claimed = S.streakClaimedDate === getLocalDateStr();
+  const msg = $('streak-msg');
+  if (msg) {
+    msg.innerHTML = '目前連續簽到 <b style="color:#e65100;font-size:1.2rem">' + day + '</b> 天<br>' +
+      (claimed ? '今日獎勵已領取，明天繼續來可延續連續天數！' : '今日獎勵尚未領取，點下方按鈕領取。') +
+      '<br><span style="font-size:0.8rem;color:#888">中斷一天會從頭計算；每滿 7 天有大獎，之後週循環並有加成。</span>';
+  }
+  const box = $('streak-reward-box');
+  if (box) box.innerHTML = formatStreakRewardHtml(rew);
+  renderStreakCalendar($('streak-calendar'), day);
+  const claimBtn = $('streak-claim');
+  if (claimBtn) {
+    claimBtn.disabled = claimed;
+    claimBtn.textContent = claimed ? '✅ 今日已領取' : '🎁 領取今日獎勵';
+    claimBtn.onclick = () => {
+      const got = claimPlayStreakReward();
+      if (!got) return;
+      if (box) box.innerHTML = formatStreakRewardHtml(got) +
+        '<div style="margin-top:8px;color:#2e7d32">已領取！</div>';
+      claimBtn.disabled = true;
+      claimBtn.textContent = '✅ 今日已領取';
+      if (msg) msg.innerHTML = '目前連續簽到 <b style="color:#e65100;font-size:1.2rem">' + day + '</b> 天<br>今日獎勵已領取！';
+      addLog('map-log', '🎁 連續簽到第 ' + day + ' 天獎勵已領取！');
+      updateStreakButtonUI();
+    };
+  }
+  const closeBtn = $('streak-close');
+  if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
+  modal.classList.remove('hidden');
+  updateStreakButtonUI();
+}
+function updateStreakButtonUI() {
+  const btn = $('streak-btn');
+  if (!btn) return;
+  const day = Math.max(0, Number(S.playStreak) || 0);
+  const can = canClaimPlayStreak();
+  btn.textContent = can ? ('🎁 連續簽到' + (day ? day : '')) : ('🎁 ' + day + '天');
+  btn.style.background = can ? 'rgba(255,183,77,0.85)' : 'rgba(255,255,255,0.4)';
+  if (can) {
+    if (!btn.querySelector('.red-dot')) {
+      const d = document.createElement('span');
+      d.className = 'red-dot';
+      btn.style.position = 'relative';
+      btn.appendChild(d);
+    }
+  } else {
+    const d = btn.querySelector('.red-dot');
+    if (d) d.remove();
+  }
+}
+
+
 function updateHeader() {
+  if (typeof normalizePlayerLevel === 'function') normalizePlayerLevel();
   const need = expNeeded(S.level);
   const clock = (typeof getGameClock === 'function') ? getGameClock() : null;
   $('player-chip').textContent = S.trainerEmoji + ' ' + (S.trainerName || '未取名') + ' Lv.' + S.level;
   $('exp-display').textContent = '✨ ' + S.exp + '/' + need;
   $('coin-display').textContent = '💰 '+S.coins;
+  if (typeof updateStreakButtonUI === 'function') updateStreakButtonUI();
   $('pet-count').textContent = '🐾 '+S.owned.length + (clock ? ('　🕒'+clock.label) : '');
   if (typeof updateRedDots === 'function') updateRedDots();
 }
@@ -4276,7 +4782,10 @@ function getSaveData() {
       tutorialStep: S.tutorialStep || 0,
       tutorialTargetDone: !!S.tutorialTargetDone,
       battleHistory: Array.isArray(S.battleHistory) ? S.battleHistory.slice(0, 50) : [],
-      metWildCount: Math.max(0, Number(S.metWildCount) || 0)
+      metWildCount: Math.max(0, Number(S.metWildCount) || 0),
+      playStreak: Math.max(0, Number(S.playStreak) || 0),
+      lastPlayDate: S.lastPlayDate || '',
+      streakClaimedDate: S.streakClaimedDate || ''
     },
     farm: (window.FarmGame ? window.FarmGame.getState() : null)
   };
@@ -4288,6 +4797,7 @@ function loadGameData(saved) {
     S.level = d.level ?? 1;
     S.exp = d.exp ?? 0;
     S.wins = d.wins ?? 0;
+    if (typeof normalizePlayerLevel === 'function') normalizePlayerLevel();
     S.trainerName = d.trainerName || '';
     S.trainerEmoji = d.trainerEmoji || '🧑‍🌾';
     S.nameSet = !!(d.nameSet && d.trainerName);
@@ -4320,6 +4830,9 @@ function loadGameData(saved) {
     S.tutorialTargetDone = !!d.tutorialTargetDone;
     S.battleHistory = Array.isArray(d.battleHistory) ? d.battleHistory.slice(0, 50) : [];
     S.metWildCount = Math.max(0, Number(d.metWildCount) || 0);
+    S.playStreak = Math.max(0, Number(d.playStreak) || 0);
+    S.lastPlayDate = d.lastPlayDate || '';
+    S.streakClaimedDate = d.streakClaimedDate || '';
     // 舊「水刀」碎片 → 冰刀
     if (S.treasureFrags && S.treasureFrags.shui_dao) {
       S.treasureFrags.bing_dao = (S.treasureFrags.bing_dao || 0) + (S.treasureFrags.shui_dao || 0);
@@ -4338,6 +4851,10 @@ function loadGameData(saved) {
     if (Array.isArray(S.unlocked) && S.unlocked.indexOf('coral_forge') < 0) {
       S.unlocked.push('coral_forge');
     }
+    // 依目前勝場補解鎖新地點（例如絕對試煉地獄）
+    if (typeof checkUnlocks === 'function') {
+      checkUnlocks();
+    }
     // 清理不存在的寵物碎片（佔位 id 等）
     if (S.fragments) {
       Object.keys(S.fragments).forEach(pid => {
@@ -4351,6 +4868,7 @@ function loadGameData(saved) {
       delete S.items.sha_jia;
     }
   }
+  if (typeof checkUnlocks === 'function') checkUnlocks();
   updateHeader();
   renderIsland();
   if (saved && saved.farm && window.FarmGame) window.FarmGame.loadState(saved.farm);
@@ -4419,6 +4937,23 @@ async function enterGame(username, userId, savedData) {
 
   if (autosaveTimer) clearInterval(autosaveTimer);
   autosaveTimer = setInterval(persistCurrentUser, 8000);
+
+  // 連續簽到：更新天數，未領則自動彈窗
+  try {
+    if (typeof updatePlayStreakOnLogin === 'function') {
+      const st = updatePlayStreakOnLogin();
+      if (typeof updateStreakButtonUI === 'function') updateStreakButtonUI();
+      if (typeof saveGame === 'function') saveGame();
+      // 教學中不搶焦點；否則今日未領就提示
+      if (st && st.canClaim && S.tutorialDone) {
+        setTimeout(() => { if (typeof openStreakModal === 'function') openStreakModal(true); }, 900);
+      }
+      // 沒跑過教學的玩家：補一次功能導覽
+      if (typeof maybeShowFeatureGuide === 'function') {
+        setTimeout(() => maybeShowFeatureGuide(), 1200);
+      }
+    }
+  } catch (e) { console.warn('streak', e); }
 }
 async function doLogin() {
   if (authBusy) return;
@@ -4532,6 +5067,21 @@ function enterAsGuest() {
       localStorage.setItem('bobodao_guest_v1', JSON.stringify(getSaveData()));
     } catch (e) {}
   }, 8000);
+
+  try {
+    if (typeof updatePlayStreakOnLogin === 'function') {
+      const st = updatePlayStreakOnLogin();
+      if (typeof updateStreakButtonUI === 'function') updateStreakButtonUI();
+      if (typeof saveGame === 'function') saveGame();
+      if (st && st.canClaim && S.tutorialDone) {
+        setTimeout(() => { if (typeof openStreakModal === 'function') openStreakModal(true); }, 900);
+      }
+      // 沒跑過教學的玩家：補一次功能導覽
+      if (typeof maybeShowFeatureGuide === 'function') {
+        setTimeout(() => maybeShowFeatureGuide(), 1200);
+      }
+    }
+  } catch (e) { console.warn('streak guest', e); }
 }
 
 function attachLoginHandlers() {
@@ -4547,6 +5097,12 @@ window.addEventListener('beforeunload', () => { if (currentUserId) persistCurren
 
 let _handlersBound = false;
 function bindGameHandlers() {
+  const streakBtn = document.getElementById('streak-btn');
+  if (streakBtn && !streakBtn._bound) {
+    streakBtn._bound = true;
+    streakBtn.onclick = () => openStreakModal(false);
+  }
+
   if (typeof bindBattleLogUI === 'function') bindBattleLogUI();
   if (_handlersBound) return;
   _handlersBound = true;
@@ -4615,6 +5171,11 @@ function bindGameHandlers() {
     if (window._petInfoIdx == null) return;
     doStageEvolve(window._petInfoIdx);
   };
+  const petAscendBtn = $('pet-info-ascend');
+  if (petAscendBtn) {
+    petAscendBtn.style.display = 'none';
+    petAscendBtn.onclick = null;
+  }
   const petDisBtn = $('pet-info-dismantle');
   if (petDisBtn) petDisBtn.onclick = () => {
     if (window._petInfoIdx == null) return;
@@ -4701,13 +5262,20 @@ function renderIsland() {
   ZONES.forEach(z => {
     const unlocked = (S.unlocked || []).includes(z.id);
     const spot = document.createElement('div');
-    spot.className = 'spot' + (unlocked ? '' : ' locked') + (z.elevated ? ' elevated' : '');
+    spot.className = 'spot' + (unlocked ? '' : ' locked') + (z.elevated ? ' elevated' : '') + (z.hellTrial ? ' hell-trial' : '');
     spot.style.left = z.x + '%';
     spot.style.top = z.y + '%';
     spot.style.transform = 'translate(-50%, -50%)';
-    const labelText = unlocked ? z.name : '未解鎖';
-    spot.innerHTML = '<span class="spot-icon">' + (unlocked ? z.emoji : '🔒') + '</span><span class="spot-label">' + labelText + '</span>';
-    if (unlocked) spot.onclick = (e) => { e.stopPropagation(); openZone(z); };
+    const labelText = unlocked ? z.name : (z.hellTrial ? '🔒 絕對試煉' : '未解鎖');
+    spot.innerHTML = '<span class="spot-icon">' + (unlocked ? z.emoji : (z.hellTrial ? '☠️' : '🔒')) + '</span><span class="spot-label">' + labelText + '</span>';
+    if (unlocked) {
+      spot.onclick = (e) => { e.stopPropagation(); openZone(z); };
+    } else if (z.hellTrial) {
+      spot.onclick = (e) => {
+        e.stopPropagation();
+        addLog('map-log', '☠️ 絕對試煉地獄：深淵裂縫尚未開啟。累積勝場後解鎖（目前勝場 ' + (S.wins || 0) + '／需要 ' + (z.unlock || 0) + '）。');
+      };
+    }
     land.appendChild(spot);
   });
 
@@ -4747,7 +5315,9 @@ function openZone(z) {
     b.onclick=()=>openShop(); actions.appendChild(b);
   }
   if(z.forge){
-    const b=document.createElement('button'); b.className='btn btn-purple'; b.textContent='🪸 進入鍛造坊';
+    const b=document.createElement('button'); b.className='btn btn-purple'; b.style.position='relative';
+    const forgeReady = typeof hasAnyCraftableTreasure === 'function' && hasAnyCraftableTreasure();
+    b.innerHTML = forgeReady ? '🪸 進入鍛造坊<span class="red-dot"></span>' : '🪸 進入鍛造坊';
     b.onclick=()=>openForge(); actions.appendChild(b);
   }
   if(z.pets&&z.pets.length){
@@ -4758,6 +5328,9 @@ function openZone(z) {
   back.onclick=()=>showScreen('map'); actions.appendChild(back);
   $('zone-log').innerHTML='';
   addLog('zone-log','你來到了 '+z.name+'。');
+  if (z.hellTrial) {
+    addLog('zone-log','☠️ 深淵的氣息撲面而來……此處敵人固定 3 隻，且能力大幅強化。做好萬全準備再探索！');
+  }
   showScreen('zone');
 }
 
@@ -5269,9 +5842,9 @@ function openLineupModal() {
     addLog('zone-log', '⚠️ 出戰寵物沒體力了，（戰鬥後會自動回滿）');
     return;
   }
-  // 預設選前 3 隻
+  // 一開始不預選，玩家自行點選
   const maxF = typeof BATTLE_FIELD_SLOTS === 'number' ? BATTLE_FIELD_SLOTS : 3;
-  S._lineupSelected = rosterLive.slice(0, maxF);
+  S._lineupSelected = [];
   S._lineupRoster = rosterLive.slice();
   $('capture-modal').classList.add('hidden');
   renderLineupModal();
@@ -5320,8 +5893,22 @@ function renderLineupModal() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'btn ' + (on ? 'btn-primary' : 'btn-back');
-    b.style.width = '100%';
+    b.style.width = '500px';
+    b.style.maxWidth = '100%';
+    b.style.minWidth = '500px';
+    b.style.height = 'auto';
     b.style.textAlign = 'left';
+    b.style.fontSize = '';
+    b.style.padding = '';
+    b.style.minHeight = '';
+    b.style.lineHeight = '';
+    b.style.whiteSpace = 'nowrap';
+    b.style.overflow = 'hidden';
+    b.style.textOverflow = 'ellipsis';
+    b.style.boxSizing = 'border-box';
+    b.style.display = 'block';
+    b.style.margin = '0 auto';
+    b.style.borderRadius = '';
     const name = (typeof getPetDisplayName === 'function' ? getPetDisplayName(p) : p.name);
     const type = p.type || base.type || '?';
     b.innerHTML = (on ? ('✅ 上場' + (pos + 1) + '　') : '⬜　') +
@@ -5408,33 +5995,30 @@ function startWildBattle() {
   // 敵方最多 3 隻（目前野生先 1 隻，之後可擴充）
   const ebase = getBase(S.wild.id) || {};
   function randomEnemyStar(level) {
-    // 野生星級隨機：等級越高越容易高星；整體機率已調高
+    // 野生星級：整體再調高，對手更硬
     const lv = Math.max(1, level || 1);
-    // 等級加成：提高高星區段權重（例：39 級明顯高星）
-    const lvBoost = Math.min(0.28, Math.floor(lv / 8) * 0.035);
+    const hell = !!(S.currentZone && S.currentZone.hellTrial);
+    const lvBoost = Math.min(0.35, Math.floor(lv / 6) * 0.04) + (hell ? 0.25 : 0);
     const roll = Math.random();
     let star = 0;
-    // 原：40/25/17/12/6 → 調高中高星
-    // 無星 28%、1-2星 22%、3-5星 20%、6-10星 16%、11+ 14%（再加等級偏移）
-    const t0 = Math.max(0.12, 0.28 - lvBoost);
-    const t1 = t0 + Math.max(0.14, 0.22 - lvBoost * 0.5);
-    const t2 = t1 + 0.20 + lvBoost * 0.3;
-    const t3 = t2 + 0.16 + lvBoost * 0.4;
-    // t4 剩餘 = 最高星段
+    // 無星 12%、1-2星 18%、3-5星 24%、6-10星 22%、11+ 其餘
+    const t0 = Math.max(0.06, 0.12 - lvBoost);
+    const t1 = t0 + Math.max(0.12, 0.18 - lvBoost * 0.4);
+    const t2 = t1 + 0.24 + lvBoost * 0.25;
+    const t3 = t2 + 0.22 + lvBoost * 0.35;
     if (roll < t0) star = 0;
     else if (roll < t1) star = rand(1, 2);
     else if (roll < t2) star = rand(3, 5);
     else if (roll < t3) star = rand(6, 10);
     else {
-      const hiCap = Math.min(25, 10 + Math.floor(lv / 2));
+      const hiCap = Math.min(28, 12 + Math.floor(lv / 2));
       star = rand(11, Math.max(11, hiCap));
     }
-    // 低等仍壓上限，但中高等放寬（39 級可到更高）
-    if (lv < 8) star = Math.min(star, 4);
-    else if (lv < 15) star = Math.min(star, 10);
-    else if (lv < 25) star = Math.min(star, 16);
-    else if (lv < 35) star = Math.min(star, 20);
-    // 35+ 幾乎不壓（最高 25）
+    if (lv < 8) star = Math.min(star, 5);
+    else if (lv < 15) star = Math.min(star, 12);
+    else if (lv < 25) star = Math.min(star, 18);
+    else if (lv < 35) star = Math.min(star, 22);
+    if (hell) star = Math.max(star, rand(8, 16));
     return star;
   }
   function makeEnemy(wildLike, lv) {
@@ -5445,6 +6029,24 @@ function startWildBattle() {
       w._starRandomized = true;
     }
     recalculatePetStats(w);
+    // 對手整體加強：血／攻／防／速略升（教學關不套用）
+    const isTut = !!(w && w._tutorialEnemy);
+    if (!isTut) {
+      const hell = !!(S.currentZone && S.currentZone.hellTrial);
+      const mulHp = hell ? 1.55 : 1.22;
+      const mulAtk = hell ? 1.42 : 1.18;
+      const mulDef = hell ? 1.35 : 1.15;
+      const mulSpd = hell ? 1.18 : 1.08;
+      w.maxHp = Math.max(1, Math.floor((Number(w.maxHp) || 1) * mulHp));
+      w.hp = w.maxHp;
+      w.attack = Math.max(1, Math.floor((Number(w.attack) || 1) * mulAtk));
+      w.defense = Math.max(0, Math.floor((Number(w.defense) || 0) * mulDef));
+      w.speed = Math.max(1, Math.floor((Number(w.speed) || 1) * mulSpd));
+      // 三圍也略抬，讓公式與戰力更貼近
+      w.force = Math.max(0, Math.floor((Number(w.force) || 0) * 1.08));
+      w.intel = Math.max(0, Math.floor((Number(w.intel) || 0) * 1.08));
+      w.charm = Math.max(0, Math.floor((Number(w.charm) || 0) * 1.08));
+    }
     const eb = getBase(w.id) || {};
     const maxMpE = Math.floor((w.baseMp || eb.baseMp || 10) + (w.level || 1) * 5);
     return Object.assign({}, w, {
@@ -5454,6 +6056,8 @@ function startWildBattle() {
       dodge: w.dodge != null ? w.dodge : (eb.baseDodge || 0.09),
       hit: w.hit != null ? w.hit : (eb.baseHit || 0.85),
       attack: w.attack, defense: w.defense, speed: w.speed,
+      force: w.force, intel: w.intel, charm: w.charm,
+      maxHp: w.maxHp, hp: w.hp,
       mp: maxMpE, maxMp: maxMpE
     });
   }
@@ -5471,7 +6075,7 @@ function startWildBattle() {
     }
     // 後備：同第一隻種類
     if (!w) {
-      const lv = Math.max(1, (S.level || 1) + rand(-1, 2));
+      const lv = Math.max(1, (S.level || 1) + rand(2, 6));
       w = clonePet(baseWild, lv);
       w.level = lv;
       if (baseWild.minWildLevel != null) {
@@ -5489,13 +6093,17 @@ function startWildBattle() {
     return w;
   }
 
-  // 數量：1 隻 50%／2 隻 35%／3 隻 15%（教學固定 1）
+  // 數量：一般 1～3；絕對試煉地獄固定 3 隻
   let enemyCount = 1;
   if (!isTutBattle) {
-    const cr = Math.random();
-    if (cr < 0.50) enemyCount = 1;
-    else if (cr < 0.85) enemyCount = 2;
-    else enemyCount = 3;
+    if (S.currentZone && S.currentZone.hellTrial) {
+      enemyCount = 3;
+    } else {
+      const cr = Math.random();
+      if (cr < 0.30) enemyCount = 1;
+      else if (cr < 0.70) enemyCount = 2;
+      else enemyCount = 3;
+    }
   }
 
   S.battleEnemies = [];
@@ -7082,6 +7690,24 @@ function calcAtk(atk,def,sk,isP){
   const typeMul = getTypeMul(aType, dType);
   if (typeMul !== 1) dmg = Math.max(1, Math.floor(dmg * typeMul));
 
+  // 寶物：對特定屬性增傷／減傷（累乘）
+  try {
+    if (typeof getTreasureCombatEffects === 'function') {
+      const atkFx = getTreasureCombatEffects(atk);
+      (atkFx.dealTypeMuls || []).forEach(m => {
+        if (m && Array.isArray(m.types) && m.types.indexOf(dType) >= 0) {
+          dmg = Math.max(1, Math.floor(dmg * (Number(m.mul) || 1)));
+        }
+      });
+      const defFx = getTreasureCombatEffects(def);
+      (defFx.takenTypeMuls || []).forEach(m => {
+        if (m && Array.isArray(m.types) && m.types.indexOf(aType) >= 0) {
+          dmg = Math.max(1, Math.floor(dmg * (Number(m.mul) || 1)));
+        }
+      });
+    }
+  } catch (e) {}
+
   // 三隻同屬性上場羈絆
   const bond = (typeof getSameTypeAllyBonus === 'function') ? getSameTypeAllyBonus() : { active: false, atkMul: 1, defMul: 1 };
   if (bond.active) {
@@ -7096,10 +7722,12 @@ function calcAtk(atk,def,sk,isP){
   if (!isP && S.eSelfEffects && S.eSelfEffects.critBonus) critRate += S.eSelfEffects.critBonus;
   let crit = S.forceCrit || roll(critRate);
   if (S.forceCrit && isP) S.forceCrit = false;
+  let critMulUsed = 1;
   if (crit) {
-    let cd = atk.critDmg != null ? atk.critDmg : 1.75;
+    let cd = atk.critDmg != null ? atk.critDmg : (1.01 + Math.max(1, Number(atk.level) || 1) * 0.01);
     if (isP && S.pEffects && S.pEffects.critDmgMul) cd *= S.pEffects.critDmgMul;
     if (!isP && S.eSelfEffects && S.eSelfEffects.critDmgMul) cd *= S.eSelfEffects.critDmgMul;
+    critMulUsed = cd;
     dmg = Math.floor(dmg * cd);
   }
 
@@ -7112,7 +7740,7 @@ function calcAtk(atk,def,sk,isP){
     if (isP) dmg = Math.floor(dmg * 1.8);
     else dmg = Math.max(1, Math.floor(dmg * 0.25));
   }
-  return { type: crit ? 'crit' : 'hit', dmg: Math.max(1, dmg), typeMul: typeMul };
+  return { type: crit ? 'crit' : 'hit', dmg: Math.max(1, dmg), typeMul: typeMul, critMul: critMulUsed };
 }
 
 /** 敵方自動選技 */
@@ -7706,47 +8334,88 @@ function executeSkill(pl, sk, onDone, isEnemy){
       }
       const r = calcAtk(pl, defender, hitSk, !isEnemy);
       if (r.type === 'miss') {
-        if (hits === 1) { addBLog(sk.name + ' 沒打中！', 'miss'); showPop(isEnemy ? 'p' : 'e', 'MISS', 'm'); }
+        if (hits === 1) {
+          const an = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name||''));
+          const dn = defender ? (typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : defender.name) : '目標';
+          addBLog(an + ' 用 ' + ((sk.emoji||'') + (sk.name||'技能')) + ' → ' + dn + '　沒打中', 'miss');
+          showPop(isEnemy ? 'p' : 'e', 'MISS', 'm');
+        }
         continue;
       }
       if (r.type === 'dodge') {
-        if (hits === 1) { addBLog(defender.name + ' 閃過了！', 'miss'); showPop(isEnemy ? 'p' : 'e', '閃避', 'm'); }
+        if (hits === 1) {
+          const an = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name||''));
+          const dn = (typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : defender.name);
+          addBLog(an + ' 用 ' + ((sk.emoji||'') + (sk.name||'技能')) + ' → ' + dn + '　被閃避', 'miss');
+          showPop(isEnemy ? 'p' : 'e', '閃避', 'm');
+        }
         continue;
       }
       anyHit = true;
-      totalDmg += r.dmg;
       let realDmg = r.dmg;
+      // 冰刀紫階：第一次受到超過 50% 最大血的攻擊 → 抵消
+      try {
+        if (typeof getTreasureCombatEffects === 'function' && defender && !defender._iceNullifyUsed) {
+          const dfx = getTreasureCombatEffects(defender);
+          if (dfx.onceNullifyOverHpPct != null) {
+            const maxHp = Math.max(1, Number(defender.maxHp) || 1);
+            if (realDmg > maxHp * dfx.onceNullifyOverHpPct) {
+              defender._iceNullifyUsed = true;
+              addBLog((typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : defender.name) + ' 的冰刀發出寒光，抵消了本次重擊！', 'heal');
+              realDmg = 0;
+              r.type = 'nullify';
+            }
+          }
+        }
+      } catch (e) {}
       if (defender._shield && defender._shield > 0) {
         const absorbed = Math.min(defender._shield, realDmg);
         defender._shield -= absorbed;
         realDmg -= absorbed;
         if (absorbed > 0) addBLog(defender.name + ' 的護盾吸收了 ' + absorbed + ' 傷害！', 'sys');
       }
-      defender.hp = Math.max(0, defender.hp - realDmg);
+      // 過量傷害不會溢出到其他寵物：只扣本體剩餘血量
+      const hpBefore = Math.max(0, Number(defender.hp) || 0);
+      const applied = Math.min(realDmg, hpBefore);
+      defender.hp = Math.max(0, hpBefore - applied);
+      totalDmg += applied;
+      // 目標倒地後停止連擊，剩餘段數不轉移到其他寵物
+      if (defender.hp <= 0) {
+        if (hits > 1 && h < hits - 1) {
+          addBLog(defender.name + ' 倒下了！剩餘連擊不會打到其他寵物。', 'sys');
+        }
+      }
       const side = isEnemy ? 'en' : 'p';
+      const atkName = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name || '攻擊者'));
+      const defName = (typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : (defender.name || '目標'));
+      const skLabel = ((skUse && (skUse.emoji || skUse.name)) ? ((skUse.emoji || '') + (skUse.name || '')) : ((sk.emoji || '') + (sk.name || '普通攻擊')));
       // 屬性相剋提示（每段攻擊只在第一下顯示一次）
       if (h === 0 && r.typeMul != null && r.typeMul > 1) {
         const aType = pl.type || '';
         const dType = defender.type || '';
-        addBLog('✨ 發現屬性相剋！（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'lucky');
+        addBLog('✨ 屬性相剋（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'lucky');
       } else if (h === 0 && r.typeMul != null && r.typeMul < 1) {
         const aType = pl.type || '';
         const dType = defender.type || '';
-        addBLog('💧 屬性不佳…（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'sys');
+        addBLog('💧 屬性不佳（' + aType + ' → ' + dType + ' ×' + r.typeMul + '）', 'sys');
       }
+      const hitTag = hits > 1 ? ('第' + (h + 1) + '/' + hits + '下　') : '';
+      const dmgShow = Math.round(applied);
       if (r.type === 'crit') {
-        addBLog('💥 CRITICAL HIT！對 ' + defender.name + ' 第' + (h+1) + '下 ' + r.dmg + ' 傷害！', 'crit');
-        showCritPop(isEnemy ? 'p' : 'e', r.dmg);
+        const mulTxt = (r.critMul != null) ? ('×' + (Math.round(r.critMul * 100) / 100)) : '';
+        addBLog(hitTag + atkName + ' 用 ' + skLabel + ' → ' + defName + '　💥暴擊 ' + dmgShow + ' 傷害' + (mulTxt ? '（' + mulTxt + '）' : ''), 'crit');
+        showCritPop(isEnemy ? 'p' : 'e', dmgShow);
         try { playBattleFx({ kind: skillFxType(skUse || sk), crit: true, isEnemy: !!isEnemy, skill: null, targetEl: targetEl, targetSlot: targetSlot }); } catch (e) {}
-      } else if (hits === 1) {
-        addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '，對 ' + defender.name + ' 造成 ' + r.dmg + ' 傷害', side);
-        showPop(isEnemy ? 'p' : 'e', '-' + r.dmg, 'd');
       } else {
-        addBLog('第' + (h+1) + '下對 ' + defender.name + ' 造成 ' + r.dmg + ' 傷害', side);
-        showPop(isEnemy ? 'p' : 'e', '-' + r.dmg, 'd');
+        addBLog(hitTag + atkName + ' 用 ' + skLabel + ' → ' + defName + '　造成 ' + dmgShow + ' 傷害', side);
+        showPop(isEnemy ? 'p' : 'e', '-' + dmgShow, 'd');
       }
     }
-    if (hits > 1 && totalDmg > 0) addBLog('合計傷害 ' + totalDmg, 'sys');
+    if (hits > 1 && totalDmg > 0) {
+      const atkName2 = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name || '攻擊者'));
+      const skLabel2 = ((skUse && (skUse.emoji || skUse.name)) ? ((skUse.emoji || '') + (skUse.name || '')) : ((sk.emoji || '') + (sk.name || '技能')));
+      addBLog(atkName2 + ' 的 ' + skLabel2 + '　合計傷害 ' + Math.round(totalDmg), 'sys');
+    }
 
     // 三叉戟等：對其餘敵人也打同樣技能傷害
     if ((skUse.hitAllEnemies || sk.hitAllEnemies) && defender) {
@@ -7760,7 +8429,11 @@ function executeSkill(pl, sk, onDone, isEnemy){
         oth.hp = Math.max(0, oth.hp - d2);
         totalDmg += r2.dmg;
         anyHit = true;
-        addBLog('🔱 同時擊中 ' + oth.name + '，造成 ' + r2.dmg + ' 傷害', isEnemy ? 'en' : 'p');
+        const atkN = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name || ''));
+        const defN = (typeof getPetDisplayName === 'function' ? getPetDisplayName(oth) : (oth.name || ''));
+        const skN = ((skUse && skUse.name) ? ((skUse.emoji||'') + skUse.name) : ((sk.emoji||'') + (sk.name||'技能')));
+        const isCrit2 = r2.type === 'crit';
+        addBLog(atkN + ' 用 ' + skN + ' → ' + defN + (isCrit2 ? '　💥暴擊 ' : '　造成 ') + Math.round(r2.dmg) + ' 傷害' + (isCrit2 && r2.critMul ? '（×' + (Math.round(r2.critMul*100)/100) + '）' : ''), isCrit2 ? 'crit' : (isEnemy ? 'en' : 'p'));
       });
     }
 
@@ -7777,7 +8450,11 @@ function executeSkill(pl, sk, onDone, isEnemy){
         }
         oth.hp = Math.max(0, oth.hp - d2);
         totalDmg += r2.dmg;
-        addBLog('🌊 餘波擊中 ' + oth.name + '，造成 ' + r2.dmg + ' 傷害', isEnemy ? 'en' : 'p');
+        const atkN = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name || ''));
+        const defN = (typeof getPetDisplayName === 'function' ? getPetDisplayName(oth) : (oth.name || ''));
+        const skN = ((skUse && skUse.name) ? ((skUse.emoji||'') + skUse.name) : ((sk.emoji||'') + (sk.name||'技能')));
+        const isCrit2 = r2.type === 'crit';
+        addBLog('🌊餘波　' + atkN + ' 用 ' + skN + ' → ' + defN + (isCrit2 ? '　💥暴擊 ' : '　造成 ') + Math.round(r2.dmg) + ' 傷害' + (isCrit2 && r2.critMul ? '（×' + (Math.round(r2.critMul*100)/100) + '）' : ''), isCrit2 ? 'crit' : (isEnemy ? 'en' : 'p'));
       });
     }
 
@@ -8269,7 +8946,7 @@ function showBattleExpScreen(entries, onDone) {
     return;
   }
   // 關閉其他遮罩、提到最上層
-  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
+  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal','streak-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = $(id);
     if (el) el.classList.add('hidden');
   });
@@ -8371,7 +9048,7 @@ function showLevelUpScreen(info) {
   if (!info) return;
   window._currentLevelUpInfo = info;
   // 關閉可能蓋住升級畫面的彈窗，並確保本層在最上面
-  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
+  ['pet-info-modal', 'evo-modal', 'result-modal', 'capture-modal','lineup-modal','streak-modal', 'player-modal', 'name-modal', 'pet-nickname-modal','star-bonus-modal'].forEach(id => {
     const el = $(id);
     if (el) el.classList.add('hidden');
   });
@@ -8515,19 +9192,24 @@ function getBattlePetExpMult(ownedIdx) {
       let toLv = fromLv;
       let petStatLines = null;
       let canEvo = false;
-      // 可能連升多級
+      // 可能連升多級：戰力／數值差值用「升級前 → 全部升完後」一次計算，與 toast 一致
+      let petBeforeAll = null;
       while (pet.exp >= (pet.level || 1) * 25) {
         pet.exp -= (pet.level || 1) * 25;
-        const petBefore = snapshotPetCombatStats(pet);
-        if (pet._lastPower == null) syncPetPowerBaseline(pet);
+        if (!petBeforeAll) {
+          petBeforeAll = snapshotPetCombatStats(pet);
+          // 基準設為升級前戰力，關閉畫面後 toast 的 +量會與清單一致
+          pet._lastPower = petBeforeAll.combatPower;
+        }
         pet.level = (pet.level || 1) + 1;
         toLv = pet.level;
         leveledUp = true;
         recalculatePetStats(pet, { restoreFullHp: true });
-        // 戰力通知延後到升級畫面關閉後
-        const petAfter = snapshotPetCombatStats(pet);
-        petStatLines = buildPetStatDeltaLines(petBefore, petAfter);
         if (canStageEvolve(pet)) canEvo = true;
+      }
+      if (leveledUp && petBeforeAll) {
+        const petAfterAll = snapshotPetCombatStats(pet);
+        petStatLines = buildPetStatDeltaLines(petBeforeAll, petAfterAll);
       }
       const needAfter = Math.max(1, (pet.level || 1) * 25);
       const expAfter = Math.max(0, Number(pet.exp) || 0);
@@ -8801,17 +9483,21 @@ function getBattlePetExpMult(ownedIdx) {
       const fromLv = pet.level || 1;
       pet.exp = expBefore + gain;
       let leveledUp = false, toLv = fromLv, petStatLines = null, canEvo = false;
+      let petBeforeAll = null;
       while (pet.exp >= (pet.level || 1) * 25) {
         pet.exp -= (pet.level || 1) * 25;
-        const petBefore = snapshotPetCombatStats(pet);
-        if (pet._lastPower == null) syncPetPowerBaseline(pet);
+        if (!petBeforeAll) {
+          petBeforeAll = snapshotPetCombatStats(pet);
+          pet._lastPower = petBeforeAll.combatPower;
+        }
         pet.level = (pet.level || 1) + 1;
         toLv = pet.level;
         leveledUp = true;
         recalculatePetStats(pet, { restoreFullHp: true });
-        // 戰力通知延後到升級畫面關閉後
-        petStatLines = buildPetStatDeltaLines(petBefore, snapshotPetCombatStats(pet));
         if (canStageEvolve(pet)) canEvo = true;
+      }
+      if (leveledUp && petBeforeAll) {
+        petStatLines = buildPetStatDeltaLines(petBeforeAll, snapshotPetCombatStats(pet));
       }
       expEntries.push({
         ownedIdx: oi, name: pet.name, emoji: pet.emoji || '🐾',
@@ -8841,7 +9527,8 @@ function getBattlePetExpMult(ownedIdx) {
     updateHeader(); saveGame();
     $('res-emoji').textContent='😿';
     $('res-title').textContent='敗北…';
-    let loseMsg = '寵物倒下了。回廣場休息再出發吧！\n（仍獲得少量經驗：玩家 +' + playerExpG + '　寵物 +' + expG + '）';
+    let loseMsg = '寵物倒下了……本場敗北。\n（戰鬥結束後 HP／MP 已自動回滿，可再戰！）\n仍獲得少量經驗：玩家 +' + playerExpG + '　寵物 +' + expG;
+
     if (drops.lines.length) loseMsg += '\n' + drops.lines.join('\n');
     $('res-msg').textContent = loseMsg;
     S.wild = null;
@@ -8895,8 +9582,52 @@ function openShop(){
 /* ===== 珊瑚鍛造坊 ===== */
 function formatTreasureBonuses(bonuses) {
   if (!bonuses) return '';
-  const map = { force:'武力', intel:'智力', charm:'魅力', atk:'攻擊', def:'防禦', hp:'HP' };
-  return Object.keys(bonuses).filter(k => bonuses[k]).map(k => map[k] + '+' + bonuses[k]).join('　');
+  const map = {
+    force:'武力', intel:'智力', charm:'魅力', atk:'攻擊', def:'防禦', hp:'HP',
+    speed:'速度', baseSpeed:'基礎速度', baseAtk:'基礎攻擊', baseDef:'基礎防禦',
+    mp:'MP', crit:'暴擊', hit:'命中', enemyHit:'敵命中'
+  };
+  return Object.keys(bonuses).filter(k => bonuses[k]).map(k => {
+    const v = bonuses[k];
+    const lab = map[k] || k;
+    if (k === 'crit' || k === 'hit' || k === 'enemyHit') {
+      const pct = (Math.round(Number(v) * 1000) / 10);
+      return lab + (pct >= 0 ? '+' : '') + pct + '%';
+    }
+    return lab + (v >= 0 ? '+' : '') + v;
+  }).join('　');
+}
+
+/** 單一品階的效果說明（含成對／屬性） */
+function formatGradeEffectText(gr) {
+  if (!gr) return '';
+  const parts = [];
+  if (gr.bonuses) {
+    const t = formatTreasureBonuses(gr.bonuses);
+    if (t) parts.push(t);
+  }
+  if (gr.dealTypeMul && gr.dealTypeMul.types) {
+    parts.push('對' + gr.dealTypeMul.types.join('/') + '傷害×' + gr.dealTypeMul.mul);
+  }
+  if (gr.takenTypeMul && gr.takenTypeMul.types) {
+    const mul = gr.takenTypeMul.mul;
+    const pct = Math.round((1 - mul) * 100);
+    parts.push('受' + gr.takenTypeMul.types.join('/') + '傷害-' + pct + '%');
+  }
+  if (gr.onceNullifyOverHpPct != null) {
+    parts.push('首次受>' + Math.round(gr.onceNullifyOverHpPct * 100) + '%最大HP傷害時抵消');
+  }
+  if (gr.conditional && gr.conditional.ifIntelGte != null && gr.conditional.dealTypeMul) {
+    const m = gr.conditional.dealTypeMul;
+    parts.push('智力≥' + gr.conditional.ifIntelGte + '時對' + (m.types || []).join('/') + '傷害×' + m.mul);
+  }
+  if (gr.pair && gr.pair.with) {
+    const other = getTreasureDef(gr.pair.with);
+    const oname = other ? other.name : gr.pair.with;
+    const pb = formatTreasureBonuses(gr.pair.bonuses || {});
+    parts.push('配戴「' + oname + '」時 ' + (pb || '額外加成'));
+  }
+  return parts.join('；') || '（暫無效果）';
 }
 
 function openForge() {
@@ -8905,7 +9636,6 @@ function openForge() {
   const logEl = $('zone-log');
   if (logEl) logEl.classList.add('forge-mode');
 
-  // 進入鍛造時收合上方說明，把空間留給列表
   const ze = $('zone-emoji'); if (ze) ze.style.display = 'none';
   const zn = $('zone-name'); if (zn) zn.style.display = 'none';
   const zd = $('zone-desc'); if (zd) zd.style.display = 'none';
@@ -8919,157 +9649,213 @@ function openForge() {
   actions.appendChild(back);
 
   logEl.innerHTML = '';
+
   const title = document.createElement('div');
   title.className = 'section-title';
-  title.style.margin = '4px 0 10px';
+  title.style.margin = '4px 0 8px';
   title.style.fontSize = '1.25rem';
   title.textContent = '🪸 珊瑚鍛造坊';
   logEl.appendChild(title);
 
-  const mat = document.createElement('div');
-  mat.style.cssText = 'text-align:center;font-size:0.9rem;color:#00695c;margin-bottom:8px;padding:8px 12px;background:#e0f2f1;border-radius:12px;border:2px solid #80cbc4';
-  mat.innerHTML = '全部寶物皆靠收集碎片合成／升階';
-  logEl.appendChild(mat);
+  const SLOT_ORDER = ['刀', '劍', '甲', '盾', '杖', '帽', '套'];
+  if (window._forgeSlot == null) window._forgeSlot = '刀';
+  if (window._forgeTreasureId == null) {
+    const first = ALL_TREASURES.find(t => (t.slot || '刀') === window._forgeSlot);
+    window._forgeTreasureId = first ? first.id : (ALL_TREASURES[0] && ALL_TREASURES[0].id);
+  }
 
-  const hint = document.createElement('p');
-  hint.style.cssText = 'text-align:center;font-size:0.82rem;color:#666;margin-bottom:12px';
-  hint.textContent = '白3 → 綠15 → 藍35 → 紫60 → 金80 → 紅100　（各階消耗該寶物碎片）';
-  logEl.appendChild(hint);
-
-  const grid = document.createElement('div');
-  grid.className = 'shop-grid forge-grid';
-
-  ALL_TREASURES.forEach(def => {
-    const grade = getTreasureGrade(def.id);
-    const owned = grade >= 0;
-    const frags = getTreasureFragment(def.id);
-    const card = document.createElement('div');
-    card.className = 'shop-item';
-    card.style.borderColor = owned ? (TREASURE_GRADE_COLORS[(def.grades[grade] || {}).name] || '#ffcc80') : '#80cbc4';
-    card.style.background = owned
-      ? 'linear-gradient(145deg, #fff8e1, #fce4ec)'
-      : 'linear-gradient(145deg, #e0f7fa, #e8f5e9)';
-    card.style.textAlign = 'left';
-
-    // 一階一階列出：已達顯示效果，未達顯示「達到OO階時開放」
-    let gradeRows = '';
-    (def.grades || []).forEach((g, i) => {
-      const color = TREASURE_GRADE_COLORS[g.name] || '#666';
-      const reached = owned && i <= grade;
-      const isCur = owned && i === grade;
-      const isDone = owned && i < grade;
-      let effectTxt;
-      if (reached) {
-        effectTxt = formatTreasureBonuses(g.bonuses) || '（暫無效果）';
-      } else {
-        effectTxt = '達到' + g.name + '階時開放';
-      }
-      let mark = '';
-      if (isCur) mark = ' ← 目前';
-      else if (isDone) mark = ' ✓';
-      const bg = isCur ? 'background:rgba(255,193,7,0.18);' : (isDone ? 'background:rgba(129,199,132,0.12);' : '');
-      const effectColor = reached ? '#333' : '#999';
-      gradeRows +=
-        '<div style="display:flex;justify-content:space-between;gap:6px;padding:4px 6px;border-radius:6px;margin:2px 0;' + bg + 'font-size:0.78rem;line-height:1.4">' +
-          '<span><b style="color:' + color + '">' + g.name + '</b>：' +
-            '<span style="color:' + effectColor + '">' + effectTxt + '</span>' + mark +
-          '</span>' +
-          '<span style="color:#666;white-space:nowrap">需 ' + g.cost + ' 片</span>' +
-        '</div>';
-    });
-
-    let headStatus = '';
-    if (!owned) {
-      const need = (def.craft && def.craft.frags) || 3;
-      headStatus = '<div class="desc" style="margin:4px 0 6px">未擁有　碎片 ' + frags + '/' + need + '</div>';
-    } else {
-      const gName = (def.grades[grade] || {}).name || '?';
-      const color = TREASURE_GRADE_COLORS[gName] || '#666';
-      headStatus = '<div class="desc" style="margin:4px 0 6px">持有碎片 ×' + frags +
-        '　目前 <b style="color:' + color + '">' + gName + '階</b></div>';
-    }
-
-    card.innerHTML =
-      '<div style="text-align:center">' +
-        '<div class="emoji">' + treasureFaceHtml(def, 48) + '</div>' +
-        '<div class="name">' + def.name + '</div>' +
-        '<div class="desc" style="margin-bottom:4px">' + def.desc + '</div>' +
-      '</div>' +
-      headStatus +
-      '<div style="border-top:1px dashed #ccc;padding-top:4px;margin-top:2px">' + gradeRows + '</div>';
-
+  // 部位分頁
+  const tabs = document.createElement('div');
+  tabs.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:10px';
+  SLOT_ORDER.forEach(slot => {
+    const list = ALL_TREASURES.filter(t => (t.slot || '刀') === slot);
     const btn = document.createElement('button');
-    btn.className = 'btn btn-purple';
-    btn.style.padding = '10px 18px';
-    btn.style.fontSize = '0.95rem';
-    btn.style.marginTop = '8px';
-    btn.style.width = '100%';
-
-    if (!owned) {
-      btn.textContent = '🔨 合成白階';
-      btn.onclick = () => craftTreasure(def.id);
-    } else if (grade >= 5) {
-      btn.textContent = '已滿階';
-      btn.disabled = true;
-    } else {
-      const nextName = (def.grades[grade + 1] || {}).name || '下一';
-      btn.textContent = '⬆️ 升至' + nextName + '階';
-      btn.onclick = () => upgradeTreasure(def.id);
-    }
-    card.appendChild(btn);
-    grid.appendChild(card);
+    btn.type = 'button';
+    btn.className = 'btn';
+    btn.style.cssText = 'padding:6px 12px;font-size:0.85rem;min-width:48px;' +
+      (window._forgeSlot === slot
+        ? 'background:linear-gradient(90deg,#26a69a,#00897b);color:#fff;'
+        : 'background:#e0f2f1;color:#00695c;');
+    const slotReady = list.some(t => canCraftOrUpgradeTreasure(t.id));
+    btn.style.position = 'relative';
+    btn.innerHTML = slot + (slotReady ? '<span class="red-dot"></span>' : '');
+    btn.disabled = list.length === 0;
+    if (!list.length) btn.style.opacity = '0.4';
+    btn.onclick = () => {
+      window._forgeSlot = slot;
+      window._forgeTreasureId = list[0] ? list[0].id : null;
+      openForge();
+    };
+    tabs.appendChild(btn);
   });
+  logEl.appendChild(tabs);
 
-  logEl.appendChild(grid);
-}
-
-function craftTreasure(treasureId) {
-  const def = getTreasureDef(treasureId);
-  if (!def) { addLog('zone-log', '無法製作此寶物'); return; }
-  if (getTreasureGrade(treasureId) >= 0) { addLog('zone-log', '已擁有「' + def.name + '」'); return; }
-  const needFrag = (def.craft && def.craft.frags) || (def.grades[0] && def.grades[0].cost) || 3;
-  const haveFrag = getTreasureFragment(treasureId);
-  if (haveFrag < needFrag) {
-    addLog('zone-log', '「' + def.name + '」碎片不足（' + haveFrag + '/' + needFrag + '），請先收集。');
+  const slotList = ALL_TREASURES.filter(t => (t.slot || '刀') === window._forgeSlot);
+  if (!slotList.length) {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'text-align:center;color:#888;padding:20px';
+    empty.textContent = '此部位尚無寶物（之後開放）';
+    logEl.appendChild(empty);
     return;
   }
-  if (!S.treasureFrags) S.treasureFrags = {};
-  S.treasureFrags[treasureId] = haveFrag - needFrag;
-  unlockTreasure(treasureId, 0);
-  updateHeader();
-  saveGame();
-  addLog('zone-log', '🎉 成功合成「' + def.emoji + def.name + '」（白階）！可在寵物資訊裝備。');
-  openForge();
+
+  // 同部位寶物選擇
+  const itemRow = document.createElement('div');
+  itemRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px';
+  slotList.forEach(def => {
+    const g = getTreasureGrade(def.id);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn';
+    const active = window._forgeTreasureId === def.id;
+    const col = g >= 0 ? (TREASURE_GRADE_COLORS[(def.grades[g] || {}).name] || '#26a69a') : '#90a4ae';
+    btn.style.cssText = 'padding:8px 12px;font-size:0.85rem;' +
+      (active ? 'background:linear-gradient(145deg,#fff8e1,#e0f2f1);border:2px solid ' + col + ';color:#333;font-weight:800;'
+              : 'background:#f5f5f5;color:#555;border:2px solid #ddd;');
+    const itemReady = canCraftOrUpgradeTreasure(def.id);
+    btn.style.position = 'relative';
+    btn.innerHTML = (def.emoji || '') + ' ' + def.name + (g >= 0 ? ' ·' + (def.grades[g] || {}).name : ' ·未擁有') +
+      (itemReady ? '<span class="red-dot"></span>' : '');
+    btn.onclick = () => { window._forgeTreasureId = def.id; openForge(); };
+    itemRow.appendChild(btn);
+  });
+  logEl.appendChild(itemRow);
+
+  const def = getTreasureDef(window._forgeTreasureId) || slotList[0];
+  if (!def) return;
+  window._forgeTreasureId = def.id;
+
+  const grade = getTreasureGrade(def.id);
+  const owned = grade >= 0;
+  const frags = getTreasureFragment(def.id);
+  const grades = def.grades || [];
+  const nextIdx = owned ? grade + 1 : 0;
+  const next = grades[nextIdx];
+  const needFrag = next ? (next.cost || TREASURE_GRADE_COSTS[nextIdx] || 0) : 0;
+  const isMax = owned && !next;
+
+  // 手稿表格：品階 × 效果
+  const tableWrap = document.createElement('div');
+  tableWrap.style.cssText = 'overflow-x:auto;margin:0 auto 12px;max-width:100%;';
+  let tableHtml =
+    '<table style="width:100%;border-collapse:collapse;font-size:0.82rem;background:#fffef9;border:2px solid #5d9a6e;border-radius:12px;overflow:hidden">' +
+    '<thead><tr style="background:linear-gradient(90deg,#e8f5e9,#e0f2f1)">' +
+    '<th style="padding:8px;border:1px solid #c8e6c9;min-width:52px">品階</th>' +
+    '<th style="padding:8px;border:1px solid #c8e6c9;text-align:left">' + (def.emoji || '') + ' ' + def.name +
+      '　<span style="color:#666;font-weight:600">（' + (def.slot || '') + (def.series ? ' ·' + def.series : '') + '）</span></th>' +
+    '</tr></thead><tbody>';
+
+  grades.forEach((g, i) => {
+    const color = TREASURE_GRADE_COLORS[g.name] || '#666';
+    const reached = owned && i <= grade;
+    const isCur = owned && i === grade;
+    const effectTxt = (typeof formatGradeEffectText === 'function')
+      ? formatGradeEffectText(g)
+      : (formatTreasureBonuses(g.bonuses) || '—');
+    let rowBg = '#fff';
+    if (!owned) rowBg = '#f5f5f5';
+    else if (isCur) rowBg = 'rgba(255,193,7,0.2)';
+    else if (reached) rowBg = 'rgba(129,199,132,0.12)';
+    else rowBg = '#fafafa';
+    const mark = isCur ? ' ←目前' : (reached ? ' ✓' : '');
+    // 未擁有：不可預覽任何品階效果；已擁有：已達顯示效果，未達顯示鎖定
+    let cellTxt, cellColor;
+    if (!owned) {
+      cellTxt = '🔒 擁有後才能查看';
+      cellColor = '#9e9e9e';
+    } else if (reached) {
+      cellTxt = effectTxt;
+      cellColor = '#333';
+    } else {
+      cellTxt = '達到' + g.name + '階時開放';
+      cellColor = '#999';
+    }
+    tableHtml +=
+      '<tr style="background:' + rowBg + '">' +
+        '<td style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:900;color:' + color + '">' + g.name + mark + '</td>' +
+        '<td style="padding:8px;border:1px solid #e0e0e0;color:' + cellColor + ';line-height:1.45">' + cellTxt + '</td>' +
+      '</tr>';
+  });
+  tableHtml += '</tbody></table>';
+  tableWrap.innerHTML = tableHtml;
+  logEl.appendChild(tableWrap);
+
+  // 碎片進度
+  const prog = document.createElement('div');
+  prog.style.cssText = 'text-align:center;margin:10px 0;padding:12px;background:#e0f2f1;border:2px solid #80cbc4;border-radius:14px;font-weight:800;color:#00695c;font-size:0.95rem';
+  if (isMax) {
+    prog.innerHTML = '當前碎片：' + frags + '　／　已滿階（紅）';
+  } else if (!owned) {
+    prog.innerHTML = '當前碎片：<b style="color:#e65100">' + frags + '</b>　／　共需 <b>' + needFrag + '</b>（合成白階）';
+  } else {
+    prog.innerHTML = '當前碎片：<b style="color:#e65100">' + frags + '</b>　／　共需 <b>' + needFrag + '</b>（升至' + next.name + '階）';
+  }
+  logEl.appendChild(prog);
+
+  // 進化／合成按鈕
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0 8px';
+  const evoBtn = document.createElement('button');
+  evoBtn.type = 'button';
+  evoBtn.className = 'btn btn-purple';
+  evoBtn.style.cssText = 'min-width:160px;font-size:1.05rem;padding:12px 28px';
+  if (isMax) {
+    evoBtn.textContent = '已達最高階';
+    evoBtn.disabled = true;
+  } else if (!owned) {
+    evoBtn.textContent = '✨ 合成';
+    evoBtn.disabled = frags < needFrag;
+    evoBtn.onclick = () => craftOrUpgradeTreasure(def.id);
+  } else {
+    evoBtn.textContent = '✨ 進化';
+    evoBtn.disabled = frags < needFrag;
+    evoBtn.onclick = () => craftOrUpgradeTreasure(def.id);
+  }
+  btnRow.appendChild(evoBtn);
+  logEl.appendChild(btnRow);
+
+  const tip = document.createElement('p');
+  tip.style.cssText = 'text-align:center;font-size:0.78rem;color:#888;margin-top:4px';
+  tip.textContent = '白3 → 綠15 → 藍35 → 紫60 → 金80 → 紅100（消耗該寶物碎片）';
+  logEl.appendChild(tip);
 }
 
-function upgradeTreasure(treasureId) {
+function craftOrUpgradeTreasure(treasureId) {
   const def = getTreasureDef(treasureId);
   if (!def) return;
   const grade = getTreasureGrade(treasureId);
-  if (grade < 0) { addLog('zone-log', '尚未擁有此寶物，請先合成'); return; }
-  if (grade >= 5) { addLog('zone-log', '已達最高紅階'); return; }
-  const next = def.grades[grade + 1];
-  if (!next) return;
-  const needFrag = next.cost || 0;
+  const owned = grade >= 0;
+  const grades = def.grades || [];
+  const nextIdx = owned ? grade + 1 : 0;
+  const next = grades[nextIdx];
+  if (!next) { alert('已是最高階'); return; }
+  const needFrag = next.cost || TREASURE_GRADE_COSTS[nextIdx] || 0;
   const haveFrag = getTreasureFragment(treasureId);
   if (haveFrag < needFrag) {
-    addLog('zone-log', '碎片不足（' + haveFrag + '/' + needFrag + '）。請繼續收集「' + def.name + '」碎片。');
+    alert('碎片不足（' + haveFrag + '/' + needFrag + '）。請繼續收集「' + def.name + '」碎片。');
     return;
   }
   if (!S.treasureFrags) S.treasureFrags = {};
   S.treasureFrags[treasureId] = haveFrag - needFrag;
-  S.treasures[treasureId].grade = grade + 1;
-  (S.owned || []).forEach(p => {
-    if (p && p.equippedTreasures && p.equippedTreasures.indexOf(treasureId) >= 0) {
-      if (p._lastPower == null) syncPetPowerBaseline(p);
-      recalculatePetStats(p);
-      notifyIfPowerUp(p, '寶物升階');
-    }
-  });
+  if (!S.treasures) S.treasures = {};
+  if (!owned) {
+    unlockTreasure(treasureId, 0);
+    addLog('zone-log', '🎉 合成了「' + def.emoji + def.name + '」【白階】！');
+  } else {
+    S.treasures[treasureId].grade = grade + 1;
+    (S.owned || []).forEach(p => {
+      if (p && p.equippedTreasures && p.equippedTreasures.indexOf(treasureId) >= 0) {
+        if (p._lastPower == null) syncPetPowerBaseline(p);
+        recalculatePetStats(p);
+        notifyIfPowerUp(p, '寶物升階');
+      }
+    });
+    const bonTxt = formatTreasureBonuses(getTreasureBonuses(treasureId));
+    addLog('zone-log', '✨ 「' + def.emoji + def.name + '」升至【' + next.name + '階】！' + (bonTxt || ''));
+  }
   updateHeader();
   saveGame();
-  const bonTxt = formatTreasureBonuses(getTreasureBonuses(treasureId));
-  addLog('zone-log', '✨ 「' + def.emoji + def.name + '」升至【' + next.name + '階】！' + (bonTxt || '（暫無效果）'));
+  if (typeof updateRedDots === 'function') updateRedDots();
   openForge();
 }
 
@@ -9387,7 +10173,7 @@ function getDamageFormulaBreakdown(p) {
   const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const atk = n(p.attack);
   const defExample = 50;
-  const critDmg = n(p.critDmg) || (1.3 + Math.max(1, n(p.level) || 1) * 0.03);
+  const critDmg = n(p.critDmg) || (1.01 + Math.max(1, n(p.level) || 1) * 0.01);
   const html =
     '<div style="margin:4px 0 8px;padding:8px 10px;background:#fce4ec;border:1px solid #f48fb1;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#880e4f">' +
     '<b style="color:#ad1457">⚔️ 技能傷害公式</b><br>' +
@@ -9404,7 +10190,7 @@ function getDamageFormulaBreakdown(p) {
     '傷害 = 攻擊 × (技能%/100) − 防禦×0.25<br><br>' +
     '<span style="color:#ad1457;font-weight:800">④ 暴擊</span><br>' +
     '若觸發暴擊：最終傷害 = ⌊傷害 × 暴擊倍率⌋<br>' +
-    '你的暴擊倍率 = <b>×' + critDmg.toFixed(2) + '</b>（公式：1.3 + 等級×0.03）<br><br>' +
+    '你的暴擊倍率 = <b>×' + critDmg.toFixed(2) + '</b>（公式：1.01 + 等級×0.01）<br><br>' +
     '<span style="color:#ad1457;font-weight:800">⑤ 其他倍率</span><br>' +
     '力量糖果 ×1.5　｜　敵人減速 ×1.2　｜　敵人魅惑 ×0.7　｜　防護泡泡 ×0.5' +
     '</div>';
@@ -9460,7 +10246,7 @@ function getCombatRatesFormulaBreakdown(p) {
   critPct = Math.max(1, Math.min(80, critPct));
   dodgePct = Math.max(1, Math.min(60, dodgePct));
   hitPct = Math.max(30, Math.min(100, hitPct));
-  const critDmg = 1.3 + level * 0.03;
+  const critDmg = 1.01 + level * 0.01;
   const html =
     '<div style="margin:4px 0 8px;padding:8px 10px;background:#fff3e0;border:1px solid #ffcc80;border-radius:8px;font-size:0.78rem;line-height:1.55;color:#e65100">' +
     '<b style="color:#ef6c00">🎯 暴擊／閃避／命中公式</b><br>' +
@@ -9470,7 +10256,7 @@ function getCombatRatesFormulaBreakdown(p) {
     '　= ' + initDodgePct.toFixed(1) + '×0.9 + ' + intel + '×0.02 + ' + level + ' = ' + dodgeRaw.toFixed(2) + '% → <b>限制 1～60 → ' + dodgePct.toFixed(2) + '%</b><br>' +
     '命中% = 基礎命中%×0.8 + 魅力×0.07 + 等級<br>' +
     '　= ' + initHitPct.toFixed(1) + '×0.8 + ' + charm + '×0.07 + ' + level + ' = ' + hitRaw.toFixed(2) + '% → <b>限制 30～100 → ' + hitPct.toFixed(2) + '%</b><br>' +
-    '暴擊傷害倍率 = 1.3 + 等級×0.03 = 1.3 + ' + level + '×0.03 = <b>×' + critDmg.toFixed(2) + '</b>' +
+    '暴擊傷害倍率 = 1.01 + 等級×0.01 = 1.01 + ' + level + '×0.01 = <b>×' + critDmg.toFixed(2) + '</b>' +
     '</div>';
   return { html: html };
 }
@@ -9799,6 +10585,9 @@ function openPetInfo(idx) {
       }
     }
   }
+  // 本體不再轉化高階；僅碎片可兌換（背包）
+  const ascendBtn = $('pet-info-ascend');
+  if (ascendBtn) ascendBtn.style.display = 'none';
   // 在詳情區補一行進化條件
   try {
     const detailEl = $('pet-info-detail');
@@ -10023,17 +10812,22 @@ function renderBag(){
     d.style.borderColor = '#81c784';
     let extra = '用於升星／召喚';
     let exchangeBtn = '';
-    // 火爆熊碎片：每 10 片可換 1 片神·火爆熊碎片
-    if (pid === 'huobao_xiong') {
-      const canEx = Math.floor(n / 10);
-      extra = '每 10 片可換 1 片神·火爆熊碎片';
+    // 基礎碎片 → 高階碎片
+    const ascendTo = (typeof getAscendTargetId === 'function') ? getAscendTargetId(pid) : null;
+    if (ascendTo) {
+      const toB = getBase(ascendTo);
+      const rate = (typeof PET_ASCEND_FRAG_RATE === 'number') ? PET_ASCEND_FRAG_RATE : 10;
+      const canEx = Math.floor(n / rate);
+      extra = '每 ' + rate + ' 片可換 1 片' + ((toB && toB.name) || '高階') + '碎片';
       if (canEx > 0) {
-        exchangeBtn = '<button class="btn btn-pink" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-ex-huobao="1">🔄 兌換（可換 ' + canEx + ' 片）</button>';
+        exchangeBtn = '<button class="btn btn-pink" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-ex-ascend="' + pid + '">🔄 兌換（可換 ' + canEx + ' 片）</button>';
       }
     }
     d.innerHTML = '<div class="emoji">' + petFaceHtml(base, 40) + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + extra + '</div>' + exchangeBtn;
-    const exBtn = d.querySelector('[data-ex-huobao]');
-    if (exBtn) exBtn.onclick = () => exchangeHuobaoFragsToShen();
+    const exBtn = d.querySelector('[data-ex-ascend]');
+    if (exBtn) {
+      exBtn.onclick = () => exchangeAscendFragments(exBtn.getAttribute('data-ex-ascend'));
+    }
     box.appendChild(d);
   });
 
@@ -10134,6 +10928,8 @@ function openCodexDetail(petId) {
   if (equipBar) equipBar.innerHTML = '<span style="color:#888">尚未擁有此寵物，無法裝備寶物</span>';
   const evoBtn = $('pet-info-evo');
   if (evoBtn) evoBtn.style.display = 'none';
+  const ascendBtnC = $('pet-info-ascend');
+  if (ascendBtnC) ascendBtnC.style.display = 'none';
   const starBtn = $('pet-info-star');
   if (starBtn) starBtn.style.display = 'none';
   const disBtn = $('pet-info-dismantle');
@@ -10289,6 +11085,26 @@ function hasExploreZone() {
 function hasInjuredPet() {
   return (S.owned || []).some(p => p.hp < p.maxHp);
 }
+
+/** 該寶物目前是否可合成（未擁有）或升階（已擁有未滿） */
+function canCraftOrUpgradeTreasure(treasureId) {
+  const def = typeof getTreasureDef === 'function' ? getTreasureDef(treasureId) : null;
+  if (!def || !def.grades || !def.grades.length) return false;
+  const grade = typeof getTreasureGrade === 'function' ? getTreasureGrade(treasureId) : -1;
+  const frags = typeof getTreasureFragment === 'function' ? getTreasureFragment(treasureId) : 0;
+  const nextIdx = grade < 0 ? 0 : grade + 1;
+  if (nextIdx >= def.grades.length) return false;
+  const need = def.grades[nextIdx].cost != null
+    ? def.grades[nextIdx].cost
+    : (typeof TREASURE_GRADE_COSTS !== 'undefined' ? TREASURE_GRADE_COSTS[nextIdx] : 999);
+  return frags >= need;
+}
+
+function hasAnyCraftableTreasure() {
+  if (typeof ALL_TREASURES === 'undefined') return false;
+  return ALL_TREASURES.some(t => t && canCraftOrUpgradeTreasure(t.id));
+}
+
 function setNavDot(screen, on) {
   const btn = document.querySelector('.nav-btn[data-screen="'+screen+'"]');
   if (!btn) return;
@@ -10299,8 +11115,9 @@ function setNavDot(screen, on) {
 }
 function updateRedDots() {
   try {
+    const forgeReady = typeof hasAnyCraftableTreasure === 'function' && hasAnyCraftableTreasure();
     setNavDot('team', hasAnyStageEvolve() || hasAnyStarUp());
-    setNavDot('map', hasExploreZone() || hasInjuredPet());
+    setNavDot('map', hasExploreZone() || hasInjuredPet() || forgeReady);
     // 島嶼地點紅點
     document.querySelectorAll('.spot').forEach(s => {
       const d = s.querySelector('.red-dot');
@@ -10311,8 +11128,8 @@ function updateRedDots() {
         if (!(S.unlocked || []).includes(z.id)) return;
         const canExplore = z.pets && z.pets.length;
         const canRest = z.rest && hasInjuredPet();
-        if (!canExplore && !canRest) return;
-        // 找對應 spot（用 label 文字）
+        const canForge = z.forge && forgeReady;
+        if (!canExplore && !canRest && !canForge) return;
         document.querySelectorAll('.spot').forEach(spot => {
           const lab = spot.querySelector('.spot-label');
           if (lab && lab.textContent === z.name) {
@@ -10349,6 +11166,10 @@ const HELP_CONTENT = {
     <h3>🕒 遊戲時間</h3>
     <p>島上有早上／下午／晚上，部分地點（如陽光草原、貓島）出沒的寵物會依時段改變。</p>
     <div class="tip">💡 右上角「❓ 說明」可隨時再打開本頁。</div>
+    <h3>🎁 連續簽到獎勵</h3>
+    <p>每天登入／遊玩可累積連續天數，領取金幣、經驗、花蜜等；第 7 天有大獎（含雷刀碎片）。中斷一天會重新從第 1 天計算。右上角「🎁 連續簽到」可查看。</p>
+    <div class="tip">💡 若當初跳過教學，請看「🧭 功能導覽」；也可按下方重玩戰鬥教學。</div>
+    <p style="text-align:center;margin-top:10px"><button type="button" class="btn btn-primary" id="help-replay-tut" style="font-size:0.85rem">🎓 重玩戰鬥教學</button></p>
   `,
   type: `
     <h3>⚔️ 屬性相剋（手稿循環）</h3>
@@ -10422,8 +11243,8 @@ const HELP_CONTENT = {
       <li>教學戰收服<b>必定成功</b>，並會進入取名流程。</li>
     </ul>
     <h3>🧩 碎片與戰利品</h3>
-    <p>勝利後會掉落寵物碎片、經驗、金幣；部分區域還會掉寶物碎片（如雷刀、冰刀）。</p>
-    <p>🎒 背包中：火爆熊碎片每 <b>10</b> 片可兌換 1 片神·火爆熊碎片（湊滿時會出現「🔄 兌換」按鈕，一次兌換目前可換的全部份數）。</p>
+    <p>勝利後會掉落寵物碎片、經驗、金幣；敵方等級與星級越高，經驗與金幣越多。部分區域還會掉寶物碎片（如雷刀、冰刀）。</p>
+    <p>🎒 背包中：基礎寵物碎片每 <b>10</b> 片可兌換 1 片對應高階碎片（火爆熊→神·火爆熊、水波豹→海·水波豹、電電豬→像素·電電豬）。高階型<strong>只能靠碎片兌換／野外收服</strong>，不能把已擁有的基礎寵物直接轉成高階。</p>
     <div class="tip">💡 敗戰仍有少量經驗，可練習操作與熟悉技能。</div>
     <h3>🔥 同屬性羈絆</h3>
     <p>場上<strong>3 隻存活且同屬性</strong>（例如三隻火、三隻水）時啟動羈絆：</p>
@@ -10463,6 +11284,39 @@ const HELP_CONTENT = {
     <h3>♻️ 換成碎片</h3>
     <p>不需要的寵物可換成碎片，用來幫主力升星或再次合成。</p>
     <div class="tip">💡 隊伍頁可點寵物卡片查看詳細數值、公式展開、升星與進化按鈕。</div>
+  `,
+  features: `
+    <h3>🧭 功能導覽（補課）</h3>
+    <p>若你沒跑過完整新手教學，這裡快速補上重點操作：</p>
+    <h3>1️⃣ 遇敵 → 選上場三隻</h3>
+    <ul>
+      <li>探索地點遇到野生寵物後按「⚔️ 戰鬥」。</li>
+      <li>會先進入<strong>選擇上場三隻</strong>：預設不選，請自行點選最多 3 隻。</li>
+      <li>選滿 3 隻<strong>同屬性</strong>可觸發羈絆（攻擊×1.2、受傷×0.9）。</li>
+    </ul>
+    <h3>2️⃣ 戰鬥中換人</h3>
+    <ul>
+      <li>按「🔄 換人」可一次換多隻；換下幾隻就要換上幾隻。</li>
+      <li>若有陣亡空位，可直接補人。</li>
+      <li>換人後本回合結束，輪到敵方。</li>
+    </ul>
+    <h3>3️⃣ 收服與升星</h3>
+    <ul>
+      <li>戰鬥勝利後有一次收服機會，可用球提高機率。</li>
+      <li>碎片可升星；隊伍頁點寵物 → ⭐ 升星。</li>
+    </ul>
+    <h3>☠️ 絕對試煉地獄</h3>
+    <ul>
+      <li>位於<strong>本島左上角</strong>的深淵裂縫，是全島最難的區域。</li>
+      <li>需累積足夠<strong>勝場</strong>才會解鎖（地圖上會顯示 🔒）。</li>
+      <li>探索時固定遭遇 <b>3</b> 隻強化敵人，等級與星級遠高於其他地點。</li>
+      <li>勝利後經驗、金幣與碎片報酬更豐厚——適合練成強隊後挑戰。</li>
+    </ul>
+    <h3>4️⃣ 連續簽到</h3>
+    <ul>
+      <li>右上角「🎁 連續簽到」每天可領獎勵，連續天數越高越好。</li>
+    </ul>
+    <div class="tip">💡 想完整重走一遍戰鬥教學，到「🌱 新手引導」按「🎓 重玩戰鬥教學」。</div>
   `
 };
 
@@ -10501,6 +11355,18 @@ function showHelpTab(key) {
     t.classList.toggle('active', t.dataset.htab === key);
   });
   if (key === 'type') setTimeout(fillTypeChartTable, 0);
+  const replay = document.getElementById('help-replay-tut');
+  if (replay) {
+    replay.onclick = () => {
+      if (S.battling) { alert('戰鬥中無法開始教學'); return; }
+      if (!confirm('將開始戰鬥教學（水波豹 vs 火爆熊）。目前冒險進度不會被清空，是否開始？')) return;
+      try { document.getElementById('help-modal').classList.add('hidden'); } catch (e) {}
+      S.tutorialDone = false;
+      S.tutorialStep = 0;
+      S.tutorialTargetDone = false;
+      if (typeof startNewbieTutorial === 'function') startNewbieTutorial();
+    };
+  }
 }
 
 function openHelp(tab) {
@@ -10511,6 +11377,21 @@ function openHelp(tab) {
 function closeHelp() {
   const modal = document.getElementById('help-modal');
   if (modal) modal.classList.add('hidden');
+}
+
+
+function maybeShowFeatureGuide() {
+  try {
+    if (!S.tutorialDone) return; // 真正新手會走強制教學
+    if (localStorage.getItem('bobodao_feature_guide_v1') === '1') return;
+    // 延遲彈出功能導覽（說明 modal 的 features 分頁）
+    setTimeout(() => {
+      try {
+        localStorage.setItem('bobodao_feature_guide_v1', '1');
+      } catch (e) {}
+      if (typeof openHelp === 'function') openHelp('features');
+    }, 500);
+  } catch (e) {}
 }
 
 function maybeShowNewbieGuide() {
