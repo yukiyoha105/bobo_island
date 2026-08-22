@@ -595,6 +595,19 @@
       100% { opacity: 0; transform: translateX(-50%) translateY(-36px) scale(0.95); }
     }
 
+    
+    #treasure-pick-list .treasure-pick-item {
+      display: block;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    #treasure-pick-list .treasure-pick-item:active,
+    #treasure-pick-list .treasure-pick-item:focus {
+      opacity: 0.92;
+      transform: none !important;
+    }
+
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
     .overlay.hidden { display: none; }
     /* 升級／升星／進化畫面永遠蓋在其他彈窗之上 */
@@ -764,6 +777,57 @@
     .skill-slots, .treasure-slots { display: grid; gap: 8px; }
     .skill-slots { grid-template-columns: repeat(2, 1fr); }
     .treasure-slots { grid-template-columns: repeat(3, 1fr); }
+    .info-slot.treasure-equipped {
+      border-style: solid !important;
+      border-width: 2.5px !important;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #fffef9, #fff8e1) !important;
+    }
+    .info-slot.treasure-equipped:active,
+    .info-slot.treasure-equipped:focus {
+      border-style: solid !important;
+      border-width: 2.5px !important;
+      outline: none;
+      transform: none;
+    }
+    .info-slot.series-set {
+      /* 外框顏色由品質色決定（inline --grade-color），套裝只加光暈 */
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--grade-color, #ffb300) 45%, transparent),
+                  0 0 12px color-mix(in srgb, var(--grade-color, #ffb300) 55%, transparent);
+      animation: seriesGlow 2.2s ease-in-out infinite;
+    }
+    .info-slot.series-set:active,
+    .info-slot.series-set:focus {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--grade-color, #ffb300) 45%, transparent),
+                  0 0 12px color-mix(in srgb, var(--grade-color, #ffb300) 55%, transparent);
+    }
+    .treasure-slots.series-complete {
+      padding: 8px;
+      border-radius: 14px;
+      border: 2px solid #ffb300;
+      background: linear-gradient(145deg, rgba(255,248,225,0.9), rgba(255,236,179,0.5));
+      box-shadow: inset 0 0 20px rgba(255,193,7,0.2);
+    }
+    .treasure-slots .series-badge {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 900;
+      color: #e65100;
+      margin-bottom: 2px;
+      text-shadow: 0 0 6px rgba(255,193,7,0.5);
+    }
+    @keyframes seriesGlow {
+      0%,100% {
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--grade-color, #ffb300) 40%, transparent),
+                    0 0 10px color-mix(in srgb, var(--grade-color, #ffb300) 45%, transparent);
+      }
+      50% {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--grade-color, #ffb300) 55%, transparent),
+                    0 0 16px color-mix(in srgb, var(--grade-color, #ffb300) 65%, transparent);
+      }
+    }
+
     .info-slot { min-height: 48px; display: flex; align-items: center; justify-content: center; border: 2px dashed #a5d6a7; border-radius: 9px; color: #78909c; background: white; font-size: 0.78rem; text-align: center; padding: 4px; }
 
     @media (max-width: 560px) {
@@ -774,6 +838,14 @@
       .spot-label { font-size: 0.58rem; }
       .island-wrap { aspect-ratio: 1 / 1; }
     }
+
+    .farm-wrap { max-width: 900px; margin: 0 auto; }
+    #farm-game {
+      display: block; width: 100%; height: auto; aspect-ratio: 1000 / 700;
+      background: #7fae5a; border-radius: 14px; border: 3px solid #5d9a6e;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15); touch-action: none;
+    }
+    .farm-footer { text-align: center; padding: 8px; font-size: 0.8rem; color: #555; }
 
     .star-row { line-height: 1; }
     .star-icon { display: inline-block; line-height: 1; }
@@ -1170,48 +1242,6 @@
 </style>
 </head>
 <body>
-  <!-- 左側廣告（電腦） -->
-  <div id="ad-left" style="
-    position: fixed;
-    left: 8px;
-    top: 100px;
-    width: 160px;
-    height: 600px;
-    z-index: 50;
-    background: rgba(255,255,255,0.35);
-    border: 1px dashed rgba(0,0,0,0.2);
-    display: none;
-  ">
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:160px;height:600px"
-         data-ad-client="ca-pub-4837269887561375"
-         data-ad-slot="3622372158"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
-
-  <!-- 右側廣告（電腦） -->
-  <div id="ad-right" style="
-    position: fixed;
-    right: 8px;
-    top: 100px;
-    width: 160px;
-    height: 600px;
-    z-index: 50;
-    background: rgba(255,255,255,0.35);
-    border: 1px dashed rgba(0,0,0,0.2);
-    display: none;
-  ">
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:160px;height:600px"
-         data-ad-client="ca-pub-4837269887561375"
-         data-ad-slot="3622372158"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
-
   <div class="game">
     <div class="header">
       <h1>🏝️ 波波島</h1>
@@ -1234,26 +1264,6 @@
       <button class="nav-btn" data-screen="bag">🎒 背包</button>
     </div>
 
-    <!-- 手機／平板橫幅廣告（窄螢幕顯示） -->
-    <div id="ad-mobile" style="
-      display: none;
-      padding: 8px 10px;
-      text-align: center;
-      background: #f0f7f0;
-      border-bottom: 1px solid #c8e6c9;
-    ">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-4837269887561375"
-           data-ad-slot="3622372158"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-
-	
     <div id="map" class="screen active">
       <div class="island-wrap" id="island-wrap">
         <div class="cat-island" id="cat-island" title="貓島">
@@ -1487,6 +1497,32 @@
     </div>
   </div>
 
+  
+  
+  <div class="overlay hidden" id="battle-foe-modal" style="z-index:750">
+    <div class="modal" style="max-width:min(420px,94vw);width:100%;text-align:left">
+      <div style="text-align:center">
+        <div class="big" id="bf-emoji" style="font-size:2.8rem;margin-bottom:4px">🐾</div>
+        <h2 id="bf-name" style="margin-bottom:2px">敵方資訊</h2>
+        <p id="bf-sub" style="font-size:0.85rem;color:#c62828;margin:0 0 8px"></p>
+      </div>
+      <div id="bf-body" style="font-size:0.86rem;line-height:1.55;color:#444;max-height:55vh;overflow-y:auto"></div>
+      <button type="button" class="btn btn-back" id="bf-close" style="width:100%;margin-top:12px">關閉</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="treasure-pick-modal" style="z-index:800">
+    <div class="modal" style="max-width:min(560px,94vw);width:100%;overflow:visible">
+      <h2 id="treasure-pick-title">選擇寶物</h2>
+      <p id="treasure-pick-hint" style="font-size:0.85rem;color:#666;margin:6px 0 10px"></p>
+      <div id="treasure-pick-list" style="display:flex;flex-direction:column;gap:12px;max-height:50vh;overflow-x:hidden;overflow-y:auto;text-align:left;max-width:400px;margin:0 auto;width:100%;box-sizing:border-box;padding:12px 14px"></div>
+      <div style="max-width:360px;margin:0 auto;width:100%">
+        <button type="button" class="btn btn-pink" id="treasure-pick-unequip" style="width:100%;margin-top:10px;display:none">卸下目前裝備</button>
+        <button type="button" class="btn btn-back" id="treasure-pick-close" style="width:100%;margin-top:8px">取消</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay hidden" id="pet-info-modal">
     <div class="modal pet-info-modal">
       <div class="pet-info-scroll" id="pet-info-scroll">
@@ -1500,7 +1536,7 @@
             <div class="skill-slots" id="pet-info-skills"></div>
           </section>
           <section class="pet-info-section">
-            <h3>🎒 寶物（6 格）</h3>
+            <h3>🎒 寶物（點格裝備）</h3>
             <div class="treasure-slots" id="pet-info-treasures"></div>
           </section>
         </div>
@@ -1961,12 +1997,12 @@ const ALL_PETS = [
 const ZONES = [
   /* 依截圖紅圈：標記落在各區域正中央；家在池塘右下方 */
   {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以整理隊伍與查看資訊。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
-  {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。', unlock:0, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76},
+  {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76, timeSpawns:true},
   {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
-  {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24},
-  {id:'volcano',  name:'火山',      emoji:'🌋', desc:'島中央偏右的火山，隨時可能噴發。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40},
-  {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！有 25% 機率遇到等級很高的野生。', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52},
-  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。', unlock:5, danger:2, pets:['shuibo_bao','hai_shuibo_bao'], x:62, y:65},
+  {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。出沒隨早／午／晚改變。', unlock:4, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24, timeSpawns:true},
+  {id:'volcano',  name:'熾熱火山',  emoji:'🌋', desc:'島中央偏右的熾熱火山，隨時可能噴發。出沒隨早／午／晚改變。', unlock:6, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40, timeSpawns:true},
+  {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！出沒隨早／午／晚改變，且較易遇到高等級野生。', unlock:9, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52, timeSpawns:true},
+  {id:'swamp',    name:'荷花池塘',  emoji:'🪷', desc:'石圈環繞的清澈池塘，荷花與小魚悠遊其間。出沒隨早／午／晚改變。', unlock:5, danger:2, pets:['shuibo_bao','hai_shuibo_bao'], x:62, y:65, timeSpawns:true},
   {id:'coral_forge', name:'珊瑚鍛造坊', emoji:'🪸', desc:'靠海的工坊，收集碎片即可合成與升階寶物。', unlock:0, danger:0, pets:[], forge:true, x:28, y:82},
   /* 本島左上角：絕對試煉地獄 — 全島最難終點 */
   {id:'abs_hell', name:'絕對試煉地獄', emoji:'☠️',
@@ -2002,39 +2038,151 @@ function getGameClock() {
   return { hour, min, period, periodName, label: periodName + ' ' + String(hour).padStart(2,'0') + ':' + String(min).padStart(2,'0') };
 }
 
-/** 陽光草原出沒表（完全依手稿；未實裝寵物暫用現有寵物代打，note＝正式名稱） */
-const MEADOW_SPAWNS = {
-  // 早上 6:00~13:00（合計 100%）— 未實裝寵物暫用火爆熊外觀
-  morning: [
-    { id:'huobao_xiong', weight:27, expTag:'少',   fragMin:1, fragMax:3, coinMin:1,  coinMax:6,  note:'抱枕怪' },
-    { id:'huobao_xiong', weight:23, expTag:'中',   fragMin:1, fragMax:4, coinMin:2,  coinMax:8,  note:'喵噗噗' },
-    { id:'huobao_xiong', weight:17, expTag:'多',   fragMin:2, fragMax:4, coinMin:8,  coinMax:18, note:'土・喵噗噗' },
-    { id:'huobao_xiong', weight:17, expTag:'中',   fragMin:1, fragMax:4, coinMin:8,  coinMax:18, note:'火烘培兔' },
-    { id:'huobao_xiong', weight:5,  expTag:'大量', fragMin:2, fragMax:6, shaJiaMin:1, shaJiaMax:8, note:'大・火烘培兔' },
-    { id:'huobao_xiong', weight:3,  expTag:'中',   fragMin:1, fragMax:3, coinMin:3,  coinMax:10, note:'沙袋袋' },
-    { id:'huobao_xiong', weight:3,  expTag:'大量', fragMin:2, fragMax:9, coinMin:3,  coinMax:12, note:'神・雪白犬' },
-    { id:'huobao_xiong', weight:4,  expTag:'煌',   fragMin:2, fragMax:6, dropItem:'hua_mi', note:'閃・金蜜蜂' },
-    { id:'huobao_xiong', weight:1,  expTag:'煌',   fragMin:4, fragMax:8, dropItem:'hua_mi', note:'亮・金蜜蜂' }
-  ],
-  // 下午 13:00~18:00（合計 100%）
-  afternoon: [
-    { id:'huobao_xiong', weight:60, expTag:'少',   fragMin:1, fragMax:3, coinMin:12, coinMax:28, note:'抱枕怪' },
-    { id:'huobao_xiong', weight:22, expTag:'中',   fragMin:2, fragMax:6, shaJiaMin:1, shaJiaMax:4, note:'黃昏鼠' },
-    { id:'huobao_xiong', weight:18, expTag:'煌',   fragMin:2, fragMax:9, coinMin:12, coinMax:28, note:'神・白雪犬' }
-  ],
-  // 晚上 18:00~6:00（合計 100%）
-  night: [
-    { id:'huobao_xiong', weight:40, expTag:'多',   fragMin:1, fragMax:7,  coinMin:3,  coinMax:12, note:'雪白犬' },
-    { id:'huobao_xiong', weight:11, expTag:'大量', fragMin:6, fragMax:12, shaJiaMin:1, shaJiaMax:19, note:'大・沙袋袋' },
-    { id:'huobao_xiong', weight:49, expTag:'中',   fragMin:8, fragMax:9,  coinMin:20, coinMax:40, note:'貓頭鷹' }
-  ]
+/**
+ * ===== 各地點 × 時段出沒機率表 =====
+ * 時段：morning 早上 6:00~13:00／afternoon 下午 13:00~18:00／night 晚上 18:00~6:00
+ * weight（或 rate）＝相對權重；同一時段加總建議 100，就等於百分比
+ * 例：weight:70 → 約 70% 機率
+ * 地點要啟用時段表：在 ZONES 該筆加上 timeSpawns:true，或把表掛在 ZONE_TIME_SPAWNS[地點id]
+ */
+const ZONE_TIME_SPAWNS = {
+  /* ---- 陽光草原（手稿；未實裝寵物暫用火爆熊外觀，note＝正式名稱）---- */
+  meadow: {
+    morning: [
+      { id:'huobao_xiong', weight:27, note:'抱枕怪' },
+      { id:'huobao_xiong', weight:23, note:'喵噗噗' },
+      { id:'huobao_xiong', weight:17, note:'土・喵噗噗' },
+      { id:'huobao_xiong', weight:17, note:'火烘培兔' },
+      { id:'huobao_xiong', weight:5, note:'大・火烘培兔' },
+      { id:'huobao_xiong', weight:3, note:'沙袋袋' },
+      { id:'huobao_xiong', weight:3, note:'神・雪白犬' },
+      { id:'huobao_xiong', weight:4, note:'閃・金蜜蜂' },
+      { id:'huobao_xiong', weight:1, note:'亮・金蜜蜂' }
+    ],
+    afternoon: [
+      { id:'huobao_xiong', weight:60, note:'抱枕怪' },
+      { id:'huobao_xiong', weight:22, note:'黃昏鼠' },
+      { id:'huobao_xiong', weight:18, note:'神・白雪犬' }
+    ],
+    night: [
+      { id:'huobao_xiong', weight:40, note:'雪白犬' },
+      { id:'huobao_xiong', weight:11, note:'大・沙袋袋' },
+      { id:'huobao_xiong', weight:49, note:'貓頭鷹' }
+    ]
+  },
+  /* ---- 沙灘：水系為主；晚上海系略多 ---- */
+  beach: {
+    morning: [
+      { id:'shuibo_bao', weight:70, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:30, note:'海・水波豹' }
+    ],
+    afternoon: [
+      { id:'shuibo_bao', weight:55, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:45, note:'海・水波豹' }
+    ],
+    night: [
+      { id:'shuibo_bao', weight:40, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:60, note:'海・水波豹' }
+    ]
+  },
+  /* ---- 荷花池塘 ---- */
+  swamp: {
+    morning: [
+      { id:'shuibo_bao', weight:75, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:25, note:'海・水波豹' }
+    ],
+    afternoon: [
+      { id:'shuibo_bao', weight:60, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:40, note:'海・水波豹' }
+    ],
+    night: [
+      { id:'shuibo_bao', weight:50, note:'水波豹' },
+      { id:'hai_shuibo_bao', weight:50, note:'海・水波豹' }
+    ]
+  },
+  /* ---- 沙漠：白天火系多，傍晚稀有略升 ---- */
+  ashfield: {
+    morning: [
+      { id:'huobao_xiong', weight:70, note:'火爆熊' },
+      { id:'shen_huobao_xiong', weight:20, note:'神・火爆熊' },
+      { id:'shen_diandian_zhu', weight:10, note:'神・電電豬' }
+    ],
+    afternoon: [
+      { id:'huobao_xiong', weight:55, note:'火爆熊' },
+      { id:'shen_huobao_xiong', weight:30, note:'神・火爆熊' },
+      { id:'shen_diandian_zhu', weight:15, note:'神・電電豬' }
+    ],
+    night: [
+      { id:'huobao_xiong', weight:45, note:'火爆熊' },
+      { id:'shen_huobao_xiong', weight:35, note:'神・火爆熊' },
+      { id:'shen_diandian_zhu', weight:20, note:'神・電電豬' }
+    ]
+  },
+  /* ---- 熾熱火山 ---- */
+  volcano: {
+    /* 早上 6:00~13:00（合計 100%）— 依指定機率；未實裝 id 暫用火爆熊 */
+    morning: [
+      { id:'huobao_xiong', weight:12, note:'炎・抱枕怪' },
+      { id:'shen_huobao_xiong', weight:0.1, note:'神・火爆熊' },
+      { id:'huobao_xiong', weight:42, note:'火爆熊' },
+      { id:'huobao_xiong', weight:20, note:'火靈' },
+      { id:'huobao_xiong', weight:25.9, note:'小火魚' }
+    ],
+    /* 下午 13:00~18:00（合計 100%）*/
+    afternoon: [
+      { id:'huobao_xiong', weight:53, note:'火爆熊' },
+      { id:'huobao_xiong', weight:27, note:'炎豬' },
+      { id:'huobao_xiong', weight:20, note:'小火魚' }
+    ],
+    /* 晚上 18:00~6:00（合計約 100%）*/
+    night: [
+      { id:'shen_huobao_xiong', weight:0.3, note:'神・火爆熊' },
+      { id:'huobao_xiong', weight:1.6, note:'大・炎豬' },
+      { id:'huobao_xiong', weight:3.8, note:'炎炎鳥' },
+      { id:'huobao_xiong', weight:4.6, note:'火山龍' },
+      { id:'huobao_xiong', weight:6.2, note:'山皇鷹' },
+      { id:'huobao_xiong', weight:3.2, note:'大火魚' },
+      { id:'huobao_xiong', weight:2.8, note:'晚紅鬼' },
+      { id:'huobao_xiong', weight:6, note:'祝熊' },
+      { id:'huobao_xiong', weight:6, note:'融熊' },
+      { id:'huobao_xiong', weight:8, note:'緋羊' },
+      { id:'huobao_xiong', weight:12, note:'焰氣蛇' },
+      { id:'huobao_xiong', weight:6, note:'金鳳' },
+      { id:'huobao_xiong', weight:6, note:'金凰' },
+      { id:'huobao_xiong', weight:22, note:'火爆熊' },
+      { id:'huobao_xiong', weight:10.5, note:'炎豬' },
+      { id:'huobao_xiong', weight:1, note:'炎噗嚕' }
+    ]
+  },
+  /* ---- 彩虹山脈：稀有為主 ---- */
+  rainbow: {
+    morning: [
+      { id:'shen_diandian_zhu', weight:40, note:'神・電電豬' },
+      { id:'xiangsu_diandian_zhu', weight:25, note:'像素・電電豬' },
+      { id:'shen_huobao_xiong', weight:35, note:'神・火爆熊' }
+    ],
+    afternoon: [
+      { id:'shen_diandian_zhu', weight:35, note:'神・電電豬' },
+      { id:'xiangsu_diandian_zhu', weight:35, note:'像素・電電豬' },
+      { id:'shen_huobao_xiong', weight:30, note:'神・火爆熊' }
+    ],
+    night: [
+      { id:'shen_diandian_zhu', weight:30, note:'神・電電豬' },
+      { id:'xiangsu_diandian_zhu', weight:40, note:'像素・電電豬' },
+      { id:'shen_huobao_xiong', weight:30, note:'神・火爆熊' }
+    ]
+  }
 };
+/** 相容舊名稱 */
+const MEADOW_SPAWNS = ZONE_TIME_SPAWNS.meadow;
 
 function pickWeighted(list) {
-  const total = list.reduce((s, x) => s + (x.weight || 1), 0);
+  // weight 或 rate 都可（建議同一時段加總 100＝百分比）
+  const w = (x) => (x.weight != null ? Number(x.weight) : (x.rate != null ? Number(x.rate) : 1)) || 1;
+  const total = list.reduce((s, x) => s + w(x), 0);
   let r = Math.random() * total;
   for (const item of list) {
-    r -= (item.weight || 1);
+    r -= w(item);
     if (r <= 0) return item;
   }
   return list[list.length - 1];
@@ -2125,9 +2273,17 @@ function createWildPetFromEncounter(enc) {
 
 function getZoneSpawnTable(zone) {
   if (!zone) return null;
-  if (zone.id === 'meadow' || zone.timeSpawns) {
-    const clock = getGameClock();
-    return MEADOW_SPAWNS[clock.period] || MEADOW_SPAWNS.morning;
+  const clock = (typeof getGameClock === 'function') ? getGameClock() : { period: 'morning' };
+  const period = clock.period || 'morning';
+  // 1) 專用地點時段表 ZONE_TIME_SPAWNS[地點id]
+  if (typeof ZONE_TIME_SPAWNS !== 'undefined' && ZONE_TIME_SPAWNS[zone.id]) {
+    const byPeriod = ZONE_TIME_SPAWNS[zone.id];
+    const table = byPeriod[period] || byPeriod.morning || byPeriod.afternoon || byPeriod.night;
+    if (table && table.length) return table;
+  }
+  // 2) 舊：timeSpawns 旗標且只有草原表時
+  if (zone.timeSpawns && typeof MEADOW_SPAWNS !== 'undefined') {
+    return MEADOW_SPAWNS[period] || MEADOW_SPAWNS.morning;
   }
   return null;
 }
@@ -2280,7 +2436,7 @@ const ALL_TREASURES = [
     id: 'lei_dao',
     name: '雷刀',
     emoji: '⚔️',
-    slot: '劍',
+    slot: '刀',
     desc: '雷屬寶刀。配戴後強化電系技能。',
     grades: [
       { name:'白', cost:3,   bonuses:{ force:5 } },
@@ -2303,7 +2459,7 @@ const ALL_TREASURES = [
     id: 'bing_dao',
     name: '冰刀',
     emoji: '🧊',
-    slot: '劍',
+    slot: '刀',
     desc: '寒冰寶刀。水波豹系列掉落碎片可合成。',
     grades: [
       { name:'白', cost:3,   bonuses:{ intel:6 } },
@@ -2588,10 +2744,22 @@ function equipTreasureOnPet(petIdx, treasureId) {
   if (!p) return false;
   if (getTreasureGrade(treasureId) < 0) { alert('尚未擁有此寶物'); return false; }
   if (!p.equippedTreasures) p.equippedTreasures = [];
-  // 每隻最多 6 格；同 ID 不重複
+  // 同 ID 不重複
   if (p.equippedTreasures.indexOf(treasureId) >= 0) {
     alert('已裝備');
     return false;
+  }
+  const def = getTreasureDef(treasureId);
+  const slot = (def && def.slot) ? def.slot : null;
+  // 每一種部位只能裝一個：同 slot 先卸下舊的
+  if (slot) {
+    const sameSlotIds = p.equippedTreasures.filter(id => {
+      const d = getTreasureDef(id);
+      return d && d.slot === slot;
+    });
+    sameSlotIds.forEach(id => {
+      p.equippedTreasures = p.equippedTreasures.filter(x => x !== id);
+    });
   }
   if (p.equippedTreasures.length >= 6) { alert('寶物格已滿'); return false; }
   // 一個寶物同一時間只能給一隻寵物裝備：先從其他寵物卸下
@@ -2614,6 +2782,101 @@ function equipTreasureOnPet(petIdx, treasureId) {
   }
   return true;
 }
+
+function closeTreasurePickModal() {
+  const m = document.getElementById('treasure-pick-modal');
+  if (m) m.classList.add('hidden');
+}
+
+/** 點寶物格：彈窗選擇該部位可裝備的寶物 */
+function openTreasurePickModal(petIdx, slot) {
+  const p = S.owned && S.owned[petIdx];
+  if (!p) return;
+  const modal = document.getElementById('treasure-pick-modal');
+  if (!modal) return;
+  const title = document.getElementById('treasure-pick-title');
+  const hint = document.getElementById('treasure-pick-hint');
+  const list = document.getElementById('treasure-pick-list');
+  const unequipBtn = document.getElementById('treasure-pick-unequip');
+  const closeBtn = document.getElementById('treasure-pick-close');
+  if (title) title.textContent = '裝備「' + slot + '」';
+  if (hint) hint.textContent = '同一部位只能裝備一件；點選要裝上的寶物。';
+
+  const eq = Array.isArray(p.equippedTreasures) ? p.equippedTreasures : [];
+  const currentId = eq.find(tid => {
+    const d = getTreasureDef(tid);
+    return d && (d.slot || '刀') === slot;
+  }) || null;
+
+  if (unequipBtn) {
+    if (currentId) {
+      unequipBtn.style.display = 'block';
+      unequipBtn.onclick = () => {
+        unequipTreasureOnPet(petIdx, currentId);
+        closeTreasurePickModal();
+        openPetInfo(petIdx);
+      };
+    } else {
+      unequipBtn.style.display = 'none';
+      unequipBtn.onclick = null;
+    }
+  }
+  if (closeBtn) closeBtn.onclick = closeTreasurePickModal;
+
+  const candidates = (ALL_TREASURES || []).filter(t =>
+    getTreasureGrade(t.id) >= 0 && (t.slot || '刀') === slot
+  );
+  if (!list) return;
+  if (!candidates.length) {
+    list.innerHTML = '<div style="text-align:center;color:#888;padding:16px">此部位尚無已擁有的寶物<br><span style="font-size:0.8rem">可至珊瑚鍛造坊合成</span></div>';
+  } else {
+    list.innerHTML = candidates.map(t => {
+      const g = getTreasureGrade(t.id);
+      const gName = (t.grades[g] && t.grades[g].name) || '';
+      const onThis = currentId === t.id;
+      const onOther = !onThis && (S.owned || []).some((op, oi) =>
+        oi !== petIdx && op && (op.equippedTreasures || []).indexOf(t.id) >= 0
+      );
+      let status = '';
+      if (onThis) status = '<span style="color:#2e7d32;font-weight:800">（裝備中）</span>';
+      else if (onOther) status = '<span style="color:#e65100">（其他寵物使用中，選取將轉移）</span>';
+      const gColor = (TREASURE_GRADE_COLORS && TREASURE_GRADE_COLORS[gName]) || '#ffcc80';
+      const fx = (typeof formatTreasureFullEffect === 'function')
+        ? formatTreasureFullEffect(t.id)
+        : ((typeof formatGradeEffectText === 'function' && t.grades[g]) ? formatGradeEffectText(t.grades[g]) : '');
+      const frame = onThis ? '#66bb6a' : gColor;
+      return '<button type="button" class="btn treasure-pick-item" data-pick="' + t.id + '" style="' +
+        'width:100%;box-sizing:border-box;text-align:left;padding:12px 14px;' +
+        'background:' + (onThis ? 'linear-gradient(90deg,#e8f5e9,#fff8e1)' : '#fff') + ';' +
+        'color:#333;border:none;border-radius:12px;white-space:normal;height:auto;min-height:0;' +
+        'box-shadow: inset 0 0 0 3px ' + frame + ';' +
+        '">' +
+        '<div style="font-weight:800;font-size:0.95rem">' + (t.emoji || '') + ' ' + t.name + ' ·' + gName + ' ' + status + '</div>' +
+        (fx ? '<div style="font-size:0.75rem;color:#666;margin-top:4px;line-height:1.35;word-break:break-word">' + fx + '</div>' : '') +
+        '</button>';
+    }).join('');
+    list.querySelectorAll('[data-pick]').forEach(btn => {
+      btn.onclick = () => {
+        const tid = btn.dataset.pick;
+        if (currentId === tid) {
+          closeTreasurePickModal();
+          return;
+        }
+        if (equipTreasureOnPet(petIdx, tid)) {
+          closeTreasurePickModal();
+          openPetInfo(petIdx);
+        }
+      };
+    });
+  }
+  // 提到最上層，避免被寵物資訊等彈窗蓋住
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
+  modal.style.zIndex = '800';
+  modal.classList.remove('hidden');
+  modal.onclick = (e) => { if (e.target === modal) closeTreasurePickModal(); };
+}
+
+
 function unequipTreasureOnPet(petIdx, treasureId) {
   const p = S.owned[petIdx];
   if (!p || !p.equippedTreasures) return false;
@@ -2627,6 +2890,36 @@ function unequipTreasureOnPet(petIdx, treasureId) {
     syncPetPowerBaseline(p);
   }
   return true;
+}
+
+
+/** 取得某系列在圖鑑中的全部寶物 id（不管品質） */
+function getSeriesTreasureIds(seriesName) {
+  if (!seriesName || typeof ALL_TREASURES === 'undefined') return [];
+  return ALL_TREASURES.filter(t => t && t.series === seriesName).map(t => t.id);
+}
+
+/** 寵物是否湊滿某系列（每件至少裝備一件，不限品階） */
+function petHasFullSeries(pet, seriesName) {
+  if (!pet || !seriesName) return false;
+  const ids = getSeriesTreasureIds(seriesName);
+  if (!ids.length) return false;
+  const eq = pet.equippedTreasures || [];
+  return ids.every(id => eq.indexOf(id) >= 0);
+}
+
+/** 寵物目前湊滿的系列名稱列表 */
+function getPetCompletedSeries(pet) {
+  if (!pet || typeof ALL_TREASURES === 'undefined') return [];
+  const names = [];
+  const seen = Object.create(null);
+  ALL_TREASURES.forEach(t => {
+    if (t && t.series && !seen[t.series]) {
+      seen[t.series] = true;
+      if (petHasFullSeries(pet, t.series)) names.push(t.series);
+    }
+  });
+  return names;
 }
 
 function getTreasureDef(id) {
@@ -3520,7 +3813,7 @@ const S = {
   streakClaimedDate: '' // 今日是否已領 YYYY-MM-DD
 };
 
-function expNeeded(lv){ return lv * 30; }
+function expNeeded(lv){ return lv * 48; }  // 我方升級略難
 /** 把溢出的玩家經驗結算成等級（載入存檔／顯示時保底） */
 function normalizePlayerLevel() {
   if (S.level == null || S.level < 1) S.level = 1;
@@ -3840,7 +4133,12 @@ function doStageEvolveConfirmed(idx, p, fromName, toName) {
   });
   return true;
 }
-/** 戰力（僅供排序／寵物資訊內顯示，不進公式展開） */
+/** 戰力（僅供排序／寵物資訊內顯示，不進公式展開）
+ * [(武+智+魅)*724 + 等級*586 + 攻擊*19 + 防禦*17 + 速度*26
+ *  + 暴擊率*80 + 閃避率*80 + 命中率*70 + HP*1.2 + MP*2.3 + 星階*1039]
+ *  × 進化倍率（基礎1.0、初始1.05、中階1.10… 每階 +0.05）
+ * 暴擊／閃避／命中以「百分比數值」計入（例如 15% → 15）
+ */
 function calcCombatPower(p) {
   if (!p) return 0;
   const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
@@ -3853,38 +4151,28 @@ function calcCombatPower(p) {
   const intel = n(p.intel) + n(p._treasureIntel);
   const charm = n(p.charm) + n(p._treasureCharm);
   const lv = Math.max(1, n(p.level) || 1);
-  const stage = Math.max(0, n(p.evoStage));
+  const stage = Math.max(0, Math.floor(n(p.evoStage)));
   const star = Math.max(0, n(p.starLevel));
-  const crit = Math.max(0, Math.min(1, n(p.crit)));
-  const dodge = Math.max(0, Math.min(1, n(p.dodge)));
-  const hit = Math.max(0, Math.min(1, n(p.hit)));
-  let power =
-    hp * 0.4 + mp * 0.15 +
-    atk * 2.2 + def * 1.6 + spd * 1.2 +
-    force * 3.6 + intel * 3.2 + charm * 3.0 +
-    lv * 8 + stage * 25 + star * 42 + star * star * 1.2 +
-    crit * 180 + dodge * 150 + hit * 80;
-  // 已解鎖技能數會提升戰力（被動也算）
-  try {
-    const base = (typeof getBase === 'function') ? getBase(p.id) : null;
-    const skills = (p.skills && p.skills.length) ? p.skills : ((base && base.skills) || []);
-    let unlocked = 0;
-    skills.forEach(sk => {
-      if (!sk) return;
-      if (typeof canUseSkill === 'function') {
-        if (canUseSkill(p, sk)) unlocked++;
-      } else {
-        const needLv = sk.unlockLv != null ? sk.unlockLv : 0;
-        const needEvo = sk.evoReq != null ? sk.evoReq : 0;
-        if (lv >= needLv && stage >= needEvo) unlocked++;
-      }
-    });
-    // 每解鎖 1 個技能約 +3.5% 基礎戰力（遞減感用固定加成）
-    power += unlocked * 48;
-  } catch (e) {}
+  // 存檔內為 0~1，轉成百分比數值再乘係數
+  const critPct = Math.max(0, Math.min(100, n(p.crit) * 100));
+  const dodgePct = Math.max(0, Math.min(100, n(p.dodge) * 100));
+  const hitPct = Math.max(0, Math.min(100, n(p.hit) * 100));
+  const core =
+    (force + intel + charm) * 724 +
+    lv * 586 +
+    atk * 19 +
+    def * 17 +
+    spd * 26 +
+    critPct * 80 +
+    dodgePct * 80 +
+    hitPct * 70 +
+    hp * 1.2 +
+    mp * 2.3 +
+    star * 1039;
+  const evoMul = 1 + stage * 0.05; // 0→1.00, 1→1.05, 2→1.10 …
   const petType = (p.type || (typeof getBase === 'function' && getBase(p.id) && getBase(p.id).type) || '');
-  if (petType === '神') power *= (1.18 + Math.min(0.12, stage * 0.02));
-  return Math.round(power * 16);
+  const typeMul = (petType === '神') ? 1.3 : 1;
+  return Math.round(core * evoMul * typeMul);
 }
 
 function showPowerToast(html) {
@@ -3902,13 +4190,27 @@ function showPowerToast(html) {
 }
 
 /** 若戰力上升則跳出通知，並記住目前戰力 */
+/** 戰力是否排在目前擁有寵物的前 6 名（含自己這次更新後） */
+function isAmongTopPowerPets(pet, topN) {
+  topN = topN == null ? 6 : topN;
+  if (!pet || !S.owned || !S.owned.length) return false;
+  const scores = S.owned.map(p => ({
+    p,
+    cp: (p === pet) ? calcCombatPower(pet) : ((typeof calcCombatPower === 'function') ? calcCombatPower(p) : 0)
+  }));
+  scores.sort((a, b) => b.cp - a.cp);
+  const top = scores.slice(0, topN);
+  return top.some(x => x.p === pet);
+}
+
 function notifyIfPowerUp(pet, reason) {
   if (!pet) return 0;
   const now = calcCombatPower(pet);
   const prev = (pet._lastPower != null) ? pet._lastPower : now;
   pet._lastPower = now;
   const delta = now - prev;
-  if (delta > 0) {
+  // 只有當前最強 6 隻提升戰力才跳通知
+  if (delta > 0 && isAmongTopPowerPets(pet, 6)) {
     const name = (pet.emoji || '') + (pet.name || '寵物');
     const why = reason ? ('（' + reason + '）') : '';
     showPowerToast(
@@ -6495,6 +6797,102 @@ function applyDuplicateEnemyLabels(enemies) {
   });
 }
 
+
+function closeBattleFoeModal() {
+  const m = document.getElementById('battle-foe-modal');
+  if (m) m.classList.add('hidden');
+}
+
+/** 戰鬥中查看敵方（或任意寵物）詳細數值與寶物 */
+function openBattleFoeInfo(pet, titlePrefix) {
+  if (!pet) return;
+  const modal = document.getElementById('battle-foe-modal');
+  if (!modal) return;
+  if (typeof recalculatePetStats === 'function') {
+    try { recalculatePetStats(pet); } catch (e) {}
+  }
+  const base = (typeof getBase === 'function') ? (getBase(pet.id) || {}) : {};
+  const name = (typeof battlePetName === 'function') ? battlePetName(pet) : (pet.name || '？');
+  const emojiEl = document.getElementById('bf-emoji');
+  const nameEl = document.getElementById('bf-name');
+  const subEl = document.getElementById('bf-sub');
+  const body = document.getElementById('bf-body');
+  const closeBtn = document.getElementById('bf-close');
+  if (emojiEl) emojiEl.innerHTML = (typeof petFaceHtml === 'function') ? petFaceHtml(pet, 64) : (pet.emoji || '🐾');
+  if (nameEl) nameEl.textContent = (titlePrefix || '敵方') + '　' + name;
+  const stage = Math.max(0, Number(pet.evoStage) || 0);
+  const stageName = (typeof EVO_STAGE_NAMES !== 'undefined' && EVO_STAGE_NAMES[stage]) ? EVO_STAGE_NAMES[stage] : ('階段' + stage);
+  const starHtml = (typeof renderStarsHtml === 'function') ? renderStarsHtml(pet.starLevel || 0, { size: 14 }) : ('★' + (pet.starLevel || 0));
+  const cp = (typeof calcCombatPower === 'function') ? calcCombatPower(pet) : 0;
+  if (subEl) {
+    subEl.innerHTML = (pet.type || base.type || '?') + '屬性　Lv.' + (pet.level || 1) + '　' + starHtml +
+      '<br>⚔️ 戰力 <b>' + cp.toLocaleString() + '</b>　' + stageName;
+  }
+  const n = v => (v == null || v === '') ? '—' : (typeof formatPetStat === 'function' ? formatPetStat(v) : String(v));
+  const pct = v => {
+    const x = Number(v);
+    if (!Number.isFinite(x)) return '—';
+    return (x <= 1 ? (x * 100) : x).toFixed(1) + '%';
+  };
+  const force = (Number(pet.force) || 0) + (Number(pet._treasureForce) || 0);
+  const intel = (Number(pet.intel) || 0) + (Number(pet._treasureIntel) || 0);
+  const charm = (Number(pet.charm) || 0) + (Number(pet._treasureCharm) || 0);
+
+  // 寶物
+  const eq = Array.isArray(pet.equippedTreasures) ? pet.equippedTreasures : [];
+  let treHtml = '';
+  if (!eq.length) {
+    treHtml = '<div style="color:#999">（未裝備寶物）</div>';
+  } else {
+    treHtml = eq.map(tid => {
+      const def = (typeof getTreasureDef === 'function') ? getTreasureDef(tid) : null;
+      if (!def) return '<div>・' + tid + '</div>';
+      const g = (typeof getTreasureGrade === 'function') ? getTreasureGrade(tid) : -1;
+      const gName = (g >= 0 && def.grades[g]) ? def.grades[g].name : '?';
+      const col = (TREASURE_GRADE_COLORS && TREASURE_GRADE_COLORS[gName]) || '#666';
+      const fx = (typeof formatTreasureFullEffect === 'function') ? formatTreasureFullEffect(tid) : '';
+      return '<div style="padding:6px 8px;margin:4px 0;border-radius:10px;border:2px solid ' + col + ';background:#fffef9">' +
+        '<b style="color:' + col + '">' + (def.emoji || '') + ' ' + def.name + ' ·' + gName + '</b>' +
+        (def.slot ? ' <span style="font-size:0.75rem;color:#888">（' + def.slot + '）</span>' : '') +
+        (fx ? '<div style="font-size:0.78rem;color:#555;margin-top:2px">' + fx + '</div>' : '') +
+        '</div>';
+    }).join('');
+  }
+
+  // 技能名稱
+  const skills = Array.isArray(pet.skills) && pet.skills.length ? pet.skills : (base.skills || []);
+  const skHtml = (skills || []).filter(s => s && !s.passive).slice(0, 6).map(s =>
+    (s.emoji || '💥') + s.name
+  ).join('　') || '—';
+
+  if (body) {
+    body.innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:10px">' +
+        '<div>💪 武力 <b>' + n(force) + '</b></div>' +
+        '<div>🧠 智力 <b>' + n(intel) + '</b></div>' +
+        '<div>✨ 魅力 <b>' + n(charm) + '</b></div>' +
+        '<div>⚡ 速度 <b>' + n(pet.speed) + '</b></div>' +
+        '<div>💥 攻擊 <b>' + n(pet.attack) + '</b></div>' +
+        '<div>🛡️ 防禦 <b>' + n(pet.defense) + '</b></div>' +
+        '<div>❤️ HP <b>' + n(pet.hp) + '</b> / ' + n(pet.maxHp) + '</div>' +
+        '<div>💙 MP <b>' + n(pet.mp) + '</b> / ' + n(pet.maxMp) + '</div>' +
+        '<div>🎯 暴擊 <b>' + pct(pet.crit) + '</b></div>' +
+        '<div>💨 閃避 <b>' + pct(pet.dodge) + '</b></div>' +
+        '<div>📍 命中 <b>' + pct(pet.hit) + '</b></div>' +
+        '<div>⭐ 星階 <b>' + (pet.starLevel || 0) + '</b></div>' +
+      '</div>' +
+      '<div style="font-weight:800;color:#6a1b9a;margin:8px 0 4px">💥 技能</div>' +
+      '<div style="font-size:0.82rem;margin-bottom:8px">' + skHtml + '</div>' +
+      '<div style="font-weight:800;color:#e65100;margin:8px 0 4px">🎒 寶物</div>' +
+      treHtml;
+  }
+  if (closeBtn) closeBtn.onclick = closeBattleFoeModal;
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
+  modal.classList.remove('hidden');
+  modal.onclick = (e) => { if (e.target === modal) closeBattleFoeModal(); };
+}
+
+
 function renderEnemyCard(pet, slot) {
   if (!pet) {
     return '<div class="bcard enemy-card empty"><div class="bc-name">敵方' + (slot+1) + '</div><div style="text-align:center;color:#999;padding:16px 0">空</div></div>';
@@ -6514,7 +6912,8 @@ function renderEnemyCard(pet, slot) {
     ? '<div style="text-align:center;font-size:0.68rem;font-weight:900;color:#fff;background:#d50000;border-radius:8px;padding:2px 6px;margin:2px 0">⚠️ 高等級</div>'
     : '';
   return '<div class="bcard enemy-card' + extraCls + '" id="enemy-card-' + slot + '" data-enemy-slot="' + slot + '">' +
-    '<div class="bc-name">敵方' + (slot+1) + '　' + battlePetName(pet) + '</div>' +
+    '<div class="bc-name">敵方' + (slot+1) + '　' + battlePetName(pet) +
+      ' <button type="button" class="bf-info-btn" data-info-slot="' + slot + '" title="查看詳細" style="border:none;background:#ffebee;color:#c62828;font-weight:900;font-size:0.7rem;padding:1px 6px;border-radius:8px;cursor:pointer;vertical-align:middle">詳</button></div>' +
     '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#b71c1c;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
     highBadge +
     '<div class="bc-face">' + petFaceHtml(pet, 40) + '</div>' +
@@ -6581,12 +6980,36 @@ function renderBattleBoard() {
   }
   if (enemiesBox) {
     enemiesBox.innerHTML = [0,1,2].map(i => renderEnemyCard(S.battleEnemies && S.battleEnemies[i], i)).join('');
+    enemiesBox.querySelectorAll('.bf-info-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const eSlot = Number(btn.dataset.infoSlot);
+        const foe = S.battleEnemies && S.battleEnemies[eSlot];
+        if (foe) openBattleFoeInfo(foe, '敵方');
+      };
+    });
     enemiesBox.querySelectorAll('.enemy-card[data-enemy-slot]').forEach(card => {
       card.onclick = () => {
-        if (!S.playerTurn || !S.battling) return;
         const eSlot = Number(card.dataset.enemySlot);
         const foe = S.battleEnemies && S.battleEnemies[eSlot];
         if (!foe || foe.hp <= 0) return;
+        // 非選目標狀態：點卡片也開資訊
+        if (!S.playerTurn || !S.battling || S._pickingTargetFor == null) {
+          // 若本回合有人需要選目標則仍走選目標；否則開資訊
+          const needTarget = S.playerTurn && S.battling && S.selectedActions && Object.keys(S.selectedActions).some(k => {
+            const sk = S.selectedActions[k];
+            return sk && sk.id !== 'defend' && !(typeof isSupportSkill === 'function' && isSupportSkill(sk)) &&
+              (S.selectedTargets == null || S.selectedTargets[k] == null);
+          });
+          if (!needTarget && !(S._pickingTargetFor != null)) {
+            openBattleFoeInfo(foe, '敵方');
+            return;
+          }
+        }
+        if (!S.playerTurn || !S.battling) {
+          openBattleFoeInfo(foe, '敵方');
+          return;
+        }
         // 優先：正在選目標的那隻；否則找任一需要目標的攻擊技能
         let allySlot = (S._pickingTargetFor != null) ? S._pickingTargetFor : -1;
         if (allySlot < 0) {
@@ -9252,7 +9675,7 @@ function getBattlePetExpMult(ownedIdx) {
       if (!pet) return;
       const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
       const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult));
-      const need = Math.max(1, (pet.level || 1) * 25);
+      const need = Math.max(1, (pet.level || 1) * 40);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
       pet.exp = expBefore + gain;
@@ -9262,8 +9685,8 @@ function getBattlePetExpMult(ownedIdx) {
       let canEvo = false;
       // 可能連升多級：戰力／數值差值用「升級前 → 全部升完後」一次計算，與 toast 一致
       let petBeforeAll = null;
-      while (pet.exp >= (pet.level || 1) * 25) {
-        pet.exp -= (pet.level || 1) * 25;
+      while (pet.exp >= (pet.level || 1) * 40) {
+        pet.exp -= (pet.level || 1) * 40;
         if (!petBeforeAll) {
           petBeforeAll = snapshotPetCombatStats(pet);
           // 基準設為升級前戰力，關閉畫面後 toast 的 +量會與清單一致
@@ -9279,7 +9702,7 @@ function getBattlePetExpMult(ownedIdx) {
         const petAfterAll = snapshotPetCombatStats(pet);
         petStatLines = buildPetStatDeltaLines(petBeforeAll, petAfterAll);
       }
-      const needAfter = Math.max(1, (pet.level || 1) * 25);
+      const needAfter = Math.max(1, (pet.level || 1) * 40);
       const expAfter = Math.max(0, Number(pet.exp) || 0);
       expEntries.push({
         ownedIdx: oi,
@@ -9546,14 +9969,14 @@ function getBattlePetExpMult(ownedIdx) {
       if (!pet) return;
       const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
       const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult));
-      const need = Math.max(1, (pet.level || 1) * 25);
+      const need = Math.max(1, (pet.level || 1) * 40);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
       pet.exp = expBefore + gain;
       let leveledUp = false, toLv = fromLv, petStatLines = null, canEvo = false;
       let petBeforeAll = null;
-      while (pet.exp >= (pet.level || 1) * 25) {
-        pet.exp -= (pet.level || 1) * 25;
+      while (pet.exp >= (pet.level || 1) * 40) {
+        pet.exp -= (pet.level || 1) * 40;
         if (!petBeforeAll) {
           petBeforeAll = snapshotPetCombatStats(pet);
           pet._lastPower = petBeforeAll.combatPower;
@@ -9572,7 +9995,7 @@ function getBattlePetExpMult(ownedIdx) {
         expGain: gain, expMult: mult, fromLv, toLv, leveledUp,
         expBefore, needBefore: need,
         expAfter: Math.max(0, Number(pet.exp) || 0),
-        needAfter: Math.max(1, (pet.level || 1) * 25),
+        needAfter: Math.max(1, (pet.level || 1) * 40),
         canEvo
       });
       if (leveledUp) {
@@ -9696,6 +10119,43 @@ function formatGradeEffectText(gr) {
     parts.push('配戴「' + oname + '」時 ' + (pb || '額外加成'));
   }
   return parts.join('；') || '（暫無效果）';
+}
+
+/** 已擁有品階為止的完整效果摘要（累計數值 + 各階特殊效果） */
+function formatTreasureFullEffect(treasureId) {
+  const def = getTreasureDef(treasureId);
+  if (!def) return '';
+  const g = getTreasureGrade(treasureId);
+  if (g < 0) return '尚未擁有';
+  const parts = [];
+  const bon = (typeof getTreasureBonuses === 'function') ? getTreasureBonuses(treasureId) : {};
+  const bonTxt = formatTreasureBonuses(bon);
+  if (bonTxt) parts.push(bonTxt);
+  // 已解鎖品階的特殊效果（屬性倍率、成對、抵消等）
+  for (let i = 0; i <= g; i++) {
+    const gr = def.grades[i];
+    if (!gr) continue;
+    const specialOnly = Object.assign({}, gr);
+    delete specialOnly.bonuses;
+    delete specialOnly.name;
+    delete specialOnly.cost;
+    const hasSpecial = specialOnly.dealTypeMul || specialOnly.takenTypeMul ||
+      specialOnly.onceNullifyOverHpPct != null || specialOnly.conditional || specialOnly.pair;
+    if (hasSpecial) {
+      const t = formatGradeEffectText({
+        dealTypeMul: gr.dealTypeMul,
+        takenTypeMul: gr.takenTypeMul,
+        onceNullifyOverHpPct: gr.onceNullifyOverHpPct,
+        conditional: gr.conditional,
+        pair: gr.pair
+      });
+      if (t && t !== '（暫無效果）') parts.push(t);
+    }
+  }
+  // 去重
+  const uniq = [];
+  parts.forEach(p => { if (p && uniq.indexOf(p) < 0) uniq.push(p); });
+  return uniq.join('；') || '（暫無效果）';
 }
 
 function openForge() {
@@ -10565,55 +11025,54 @@ function openPetInfo(idx) {
       if (sk && canUseSkill(p, sk)) openSkillDetail(sk, p);
     };
   });
+  // 寶物格：依部位顯示，點擊開彈窗選擇／卸下；湊滿系列則特殊外框
+  const TREASURE_SLOT_ORDER = ['刀', '劍', '甲', '盾', '杖', '帽'];
   const eq = Array.isArray(p.equippedTreasures) ? p.equippedTreasures : [];
-  $('pet-info-treasures').innerHTML = Array.from({ length: 6 }, (_, i) => {
-    const tid = eq[i];
+  const completedSeries = (typeof getPetCompletedSeries === 'function') ? getPetCompletedSeries(p) : [];
+  const completedSet = Object.create(null);
+  completedSeries.forEach(s => { completedSet[s] = true; });
+  function equippedInSlot(slot) {
+    return eq.find(tid => {
+      const d = getTreasureDef(tid);
+      return d && (d.slot || '刀') === slot;
+    }) || null;
+  }
+  const gridEl = $('pet-info-treasures');
+  let slotsHtml = TREASURE_SLOT_ORDER.map(slot => {
+    const tid = equippedInSlot(slot);
     const def = tid ? getTreasureDef(tid) : null;
+    const inFullSeries = def && def.series && completedSet[def.series];
     if (def) {
       const g = getTreasureGrade(tid);
       const gName = (def.grades[g] && def.grades[g].name) || '';
-      return '<div class="info-slot" style="cursor:pointer;border-style:solid" data-unequip="'+tid+'">' +
-        treasureFaceHtml(def, 28) + '<br>' + def.name + (gName ? ('·'+gName) : '') + '</div>';
+      const gColor = (TREASURE_GRADE_COLORS && TREASURE_GRADE_COLORS[gName]) || '#ffb74d';
+      const cls = 'info-slot treasure-equipped' + (inFullSeries ? ' series-set' : '');
+      return '<div class="' + cls + '" style="cursor:pointer;border-color:' + gColor + ';--grade-color:' + gColor + '" data-t-slot="' + slot + '">' +
+        '<div style="font-size:0.65rem;color:' + gColor + ';font-weight:800">' + slot + ' ·' + gName + '</div>' +
+        treasureFaceHtml(def, 26) + '<br><b>' + def.name + '</b>' +
+        '</div>';
     }
-    return '<div class="info-slot">寶物格 ' + (i + 1) + '<br>空</div>';
+    return '<div class="info-slot" style="cursor:pointer" data-t-slot="' + slot + '">' +
+      '<div style="font-size:0.7rem;font-weight:800;color:#78909c">' + slot + '</div>' +
+      '＋<br><span style="font-size:0.68rem;color:#999">點擊裝備</span></div>';
   }).join('');
-  // 點擊卸下
-  $('pet-info-treasures').querySelectorAll('[data-unequip]').forEach(el => {
+  if (completedSeries.length) {
+    const badge = '<div class="series-badge">✨ 套裝啟動：' + completedSeries.map(s => s + '系列').join('、') + '</div>';
+    gridEl.innerHTML = badge + slotsHtml;
+    gridEl.classList.add('series-complete');
+  } else {
+    gridEl.innerHTML = slotsHtml;
+    gridEl.classList.remove('series-complete');
+  }
+  gridEl.querySelectorAll('[data-t-slot]').forEach(el => {
     el.onclick = (e) => {
       e.stopPropagation();
-      if (confirm('卸下「' + (getTreasureDef(el.dataset.unequip)||{}).name + '」？')) {
-        unequipTreasureOnPet(window._petInfoIdx, el.dataset.unequip);
-        openPetInfo(window._petInfoIdx);
-      }
+      openTreasurePickModal(window._petInfoIdx, el.dataset.tSlot);
     };
   });
-  // 可裝備列表（已擁有且未裝在此寵）
-  let equipBar = document.getElementById('pet-info-equip-bar');
-  if (!equipBar) {
-    equipBar = document.createElement('div');
-    equipBar.id = 'pet-info-equip-bar';
-    equipBar.style.cssText = 'margin-top:8px;text-align:left;font-size:0.82rem';
-    const grid = document.querySelector('.pet-info-grid');
-    if (grid && grid.parentNode) grid.parentNode.insertBefore(equipBar, grid.nextSibling);
-  }
-  const ownedT = ALL_TREASURES.filter(t => getTreasureGrade(t.id) >= 0);
-  if (!ownedT.length) {
-    equipBar.innerHTML = '<span style="color:#888">尚未擁有寶物</span>';
-  } else {
-    equipBar.innerHTML = '<div style="font-weight:700;color:#2e7d32;margin-bottom:4px">可裝備寶物（點擊裝備）</div>' +
-      ownedT.map(t => {
-        const g = getTreasureGrade(t.id);
-        const gName = t.grades[g].name;
-        const on = eq.indexOf(t.id) >= 0;
-        return '<button class="btn btn-shop" style="padding:4px 10px;font-size:0.75rem;margin:2px'+(on?';opacity:0.5':'')+'" data-equip="'+t.id+'" '+(on?'disabled':'')+'>' +
-          treasureFaceHtml(t, 22) + ' ' + t.name + '·' + gName + '</button>';
-      }).join('');
-    equipBar.querySelectorAll('[data-equip]').forEach(btn => {
-      btn.onclick = () => {
-        if (equipTreasureOnPet(window._petInfoIdx, btn.dataset.equip)) openPetInfo(window._petInfoIdx);
-      };
-    });
-  }
+  // 隱藏舊的底部裝備列
+  const equipBar = document.getElementById('pet-info-equip-bar');
+  if (equipBar) equipBar.innerHTML = '';
   // 進化／升星紅點（有條件時才可按；否則顯示還缺什麼）
   const evoBtn = $('pet-info-evo');
   if (evoBtn) {
@@ -11568,19 +12027,865 @@ tryRestoreSession();
 
 </script>
 <script>
-(function () {
-  function updateAdsLayout() {
-    var wide = window.innerWidth >= 1100;
-    var left = document.getElementById('ad-left');
-    var right = document.getElementById('ad-right');
-    var mobile = document.getElementById('ad-mobile');
-    if (left) left.style.display = wide ? 'block' : 'none';
-    if (right) right.style.display = wide ? 'block' : 'none';
-    if (mobile) mobile.style.display = wide ? 'none' : 'block';
+(() => {
+  const canvas = document.getElementById('farm-game');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const WIDTH = 1000, HEIGHT = 700;
+  const FONT_FAMILY = "'Noto Sans TC','Microsoft JhengHei','PingFang TC','Heiti TC',sans-serif";
+  const FONT_S = `17px ${FONT_FAMILY}`;
+  const FONT_M = `21px ${FONT_FAMILY}`;
+  const FONT_B = `bold 30px ${FONT_FAMILY}`;
+
+  // ---------- 顏色（沿用原本 pygame 版本的配色）----------
+  const GRASS_LIGHT=[150,210,105], GRASS_DARK=[108,168,75];
+  const DIRT_LIGHT=[176,128,82], DIRT_DARK=[118,80,48];
+  const WET_DIRT=[105,85,75], WET_DIRT_LIGHT=[128,104,92];
+  const WATER=[80,170,220], WATER_DEEP=[45,120,175];
+  const WOOD=[150,95,50], ROOF=[120,60,50], ROOF_LIGHT=[165,90,70];
+  const BLACK=[35,35,35], WHITE=[245,245,245];
+  const PANEL=[250,245,220], PANEL_SHADE=[232,220,185], PANEL_BORDER=[120,85,45];
+  const PLAYER_COLOR=[70,100,210], PLAYER_COLOR_DARK=[48,72,165];
+  const GOLD=[235,185,70];
+  const LEAF_FALL_COLORS=[[210,150,60],[225,175,70],[195,120,55],[170,195,90]];
+  const FLOWER_COLORS=[[240,130,160],[250,220,100],[200,150,235],[255,255,255]];
+
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+  const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const lerp = (a,b,t) => a + (b-a)*t;
+  const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+  const lerpColor = (c1,c2,t) => [
+    Math.round(clamp(lerp(c1[0],c2[0],t),0,255)),
+    Math.round(clamp(lerp(c1[1],c2[1],t),0,255)),
+    Math.round(clamp(lerp(c1[2],c2[2],t),0,255))
+  ];
+
+  // ---------- Rect 工具（模仿 pygame.Rect）----------
+  class Rect {
+    constructor(x,y,w,h){ this.x=x; this.y=y; this.w=w; this.h=h; }
+    get right(){ return this.x+this.w; }
+    get bottom(){ return this.y+this.h; }
+    get centerx(){ return this.x+this.w/2; }
+    get centery(){ return this.y+this.h/2; }
+    inflate(dx,dy){ return new Rect(this.x-dx, this.y-dy, this.w+dx*2, this.h+dy*2); }
+    collide(o){ return !(o.x>this.x+this.w || o.x+o.w<this.x || o.y>this.y+this.h || o.y+o.h<this.y); }
+    contains(px,py){ return px>=this.x && px<=this.x+this.w && py>=this.y && py<=this.y+this.h; }
   }
-  updateAdsLayout();
-  window.addEventListener('resize', updateAdsLayout);
+
+  // ---------- 繪圖輔助 ----------
+  function roundRectPath(x,y,w,h,r){
+    r = Math.max(0, Math.min(r, w/2, h/2));
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);
+    ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);
+    ctx.arcTo(x,y,x+r,y,r);
+    ctx.closePath();
+  }
+
+  function drawGradientRect(x,y,w,h,top,bottom,radius=0){
+    if (w<=0||h<=0) return;
+    const grad = ctx.createLinearGradient(0,y,0,y+h);
+    grad.addColorStop(0, rgb(top));
+    grad.addColorStop(1, rgb(bottom));
+    ctx.save();
+    if (radius>0){ roundRectPath(x,y,w,h,radius); ctx.clip(); }
+    ctx.fillStyle = grad;
+    ctx.fillRect(x,y,w,h);
+    ctx.restore();
+  }
+
+  function drawShadow(cx,bottomY,w,h,alpha=75){
+    if (w<=0||h<=0) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, bottomY-h/2, w/2, h/2, 0, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(15,20,15,${alpha/255})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGlow(cx,cy,radius,color,maxAlpha=90,layers=4){
+    if (radius<=0) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i=layers;i>=1;i--){
+      const r = Math.max(1, radius*i/layers);
+      const alpha = clamp((maxAlpha*(1-i/layers)+6)/255, 0, 1);
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle = rgba(color, alpha);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function roundedPanel(x,y,w,h, fillTop, fillBottom, borderColor, radius=12, borderWidth=3){
+    ctx.save();
+    roundRectPath(x+3, y+6, w, h, radius);
+    ctx.fillStyle = 'rgba(20,15,10,0.25)';
+    ctx.fill();
+    ctx.restore();
+    drawGradientRect(x,y,w,h,fillTop,fillBottom,radius);
+    ctx.save();
+    roundRectPath(x,y,w,h,radius);
+    ctx.lineWidth = borderWidth;
+    ctx.strokeStyle = rgb(borderColor);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawText(text, font, color, x, y){
+    ctx.fillStyle = Array.isArray(color) ? rgb(color) : color;
+    ctx.font = font;
+    ctx.textBaseline = 'top';
+    ctx.fillText(text, x, y);
+  }
+
+  // ---------- 場景座標（沿用原始版面配置）----------
+  const farm_x=250, farm_y=175, tile_size=55, rows=4, cols=6;
+  const house = new Rect(705,105,190,145);
+  const house_door = new Rect(house.centerx-23, house.bottom-45, 46,45);
+  const shop = new Rect(55,210,145,130);
+  const shipping_bin = new Rect(825,420,105,70);
+  const river_y = 575;
+  const inside_room = new Rect(95,90,810,500);
+  const inside_door = new Rect(450,520,100,45);
+  const bed = new Rect(650,160,165,95);
+
+  let player = new Rect(262,184,30,36);
+  const WALK_SPEED = 230; // px / 秒
+  let target_x = player.x, target_y = player.y;
+  let scene = "outside";
+
+  let anim_clock = 0, facing = "down";
+  let leaf_particles = [], firefly_particles = [], near_glow_phase = 0;
+
+  let crops = [], watered = [];
+  for (let r=0;r<rows;r++){
+    const cr=[], wr=[];
+    for (let c=0;c<cols;c++){ cr.push(null); wr.push(false); }
+    crops.push(cr); watered.push(wr);
+  }
+
+  const crop_data = {
+    carrot: { name:"紅蘿蔔", seed_name:"紅蘿蔔種子", buy:10, sell:25, grow_minutes:80, color:[240,120,45] },
+    corn: { name:"玉米", seed_name:"玉米種子", buy:18, sell:45, grow_minutes:130, color:[245,210,60] },
+    pumpkin: { name:"南瓜", seed_name:"南瓜種子", buy:30, sell:80, grow_minutes:190, color:[230,125,35] }
+  };
+  const crop_order = ["carrot","corn","pumpkin"];
+  const inventory = { seeds:{carrot:0,corn:0,pumpkin:0}, produce:{carrot:0,corn:0,pumpkin:0} };
+
+  let selected_crop = "carrot";
+  let day = 1, day_minutes = 7*60;
+  let time_accumulator = 0;
+  const seconds_per_game_minute = 0.15;
+  let money = 100;
+  let show_help = false;
+  let message = "先到左邊商店買種子，再回農田種植。";
+  let message_timer = 300/60; // 秒
+
+  // ---------- 對外存讀檔介面（供登入系統使用）----------
+  window.FarmGame = {
+    getState(){
+      return {
+        day, day_minutes, money, selected_crop,
+        inventory: JSON.parse(JSON.stringify(inventory)),
+        crops: crops.map(row => row.map(c => c ? { kind:c.kind, growth:c.growth } : null)),
+        watered: watered.map(row => row.slice())
+      };
+    },
+    loadState(state){
+      if (!state) return;
+      if (typeof state.day === "number") day = state.day;
+      if (typeof state.day_minutes === "number") day_minutes = state.day_minutes;
+      if (typeof state.money === "number") money = state.money;
+      if (state.selected_crop) selected_crop = state.selected_crop;
+      if (state.inventory){
+        Object.assign(inventory.seeds, state.inventory.seeds || {});
+        Object.assign(inventory.produce, state.inventory.produce || {});
+      }
+      if (state.crops){
+        for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+          const saved = state.crops[r] && state.crops[r][c];
+          crops[r][c] = saved ? { kind: saved.kind, growth: saved.growth } : null;
+        }
+      }
+      if (state.watered){
+        for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+          watered[r][c] = !!(state.watered[r] && state.watered[r][c]);
+        }
+      }
+    }
+  };
+
+  // ---------- 場景裝飾（草叢、花朵、樹）----------
+  function overlapsAny(rects, x, y, pad=6){
+    for (const r of rects){ if (r.inflate(pad,pad).contains(x,y)) return true; }
+    return false;
+  }
+  const decor_blockers = [house, shop, shipping_bin, new Rect(farm_x, farm_y, cols*tile_size, rows*tile_size)];
+
+  let grass_tufts = [];
+  for (let i=0;i<240;i++){
+    const tx = 4 + Math.random()*(WIDTH-8);
+    const ty = 4 + Math.random()*(river_y-16);
+    if (overlapsAny(decor_blockers, tx, ty, 4)) continue;
+    const tsize = 2 + Math.floor(Math.random()*4);
+    const shade = [GRASS_LIGHT, GRASS_DARK, GRASS_DARK][Math.floor(Math.random()*3)];
+    grass_tufts.push([tx,ty,tsize,shade]);
+  }
+
+  let flower_spots = [];
+  for (let i=0;i<22;i++){
+    const fx = 15 + Math.random()*(WIDTH-30);
+    const fy = 15 + Math.random()*(river_y-40);
+    if (overlapsAny(decor_blockers, fx, fy, 10)) continue;
+    flower_spots.push([fx, fy, FLOWER_COLORS[Math.floor(Math.random()*FLOWER_COLORS.length)]]);
+  }
+
+  const tree_spots = [[80,420],[150,500],[650,420],[690,480],[940,315]];
+
+  // ---------- 遊戲邏輯函式 ----------
+  function setMessage(text){ message = text; message_timer = 4; }
+
+  function isNear(target, distance=28){
+    return player.collide(target.inflate(distance, distance));
+  }
+
+  function getFieldTile(){
+    if (scene !== "outside") return null;
+    const cx = player.centerx, cy = player.centery;
+    if (!(farm_x <= cx && cx < farm_x + cols*tile_size)) return null;
+    if (!(farm_y <= cy && cy < farm_y + rows*tile_size)) return null;
+    const col = Math.floor((cx-farm_x)/tile_size);
+    const row = Math.floor((cy-farm_y)/tile_size);
+    return [row,col];
+  }
+
+  const cropIsMature = crop => crop.growth >= crop_data[crop.kind].grow_minutes*3;
+  const cropStage = crop => Math.min(3, Math.floor(crop.growth / crop_data[crop.kind].grow_minutes));
+  const formatTime = () => {
+    const h = Math.floor(day_minutes/60), m = day_minutes%60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  };
+
+  function growCrops(minutes){
+    for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+      const crop = crops[r][c];
+      if (crop && watered[r][c] && !cropIsMature(crop)) crop.growth += minutes;
+    }
+  }
+
+  function advanceTime(minutes){
+    let remaining = minutes;
+    while (remaining > 0){
+      const untilMidnight = 24*60 - day_minutes;
+      const step = Math.min(remaining, untilMidnight);
+      growCrops(step);
+      day_minutes += step;
+      remaining -= step;
+      if (day_minutes >= 24*60){ day += 1; day_minutes = 6*60; }
+    }
+  }
+
+  const isNight = minutes => { const m = minutes % (24*60); return m >= 20*60 || m <= 4*60; };
+
+  function getTimePhase(minutes){
+    const m = minutes % (24*60);
+    if (m >= 0 && m <= 3*60) return [[20,25,65],140];
+    if (m > 3*60 && m <= 5*60){ const t=(m-3*60)/(2*60); return [lerpColor([20,25,65],[255,190,120],t), Math.round(lerp(140,90,t))]; }
+    if (m > 5*60 && m < 7*60){ const t=(m-5*60)/(2*60); return [[255,190,120], Math.round(lerp(90,0,t))]; }
+    if (m >= 7*60 && m <= 17*60) return null;
+    if (m > 17*60 && m <= 19*60){ const t=(m-17*60)/(2*60); return [[255,150,80], Math.round(lerp(0,90,t))]; }
+    if (m > 19*60 && m <= 22*60){ const t=(m-19*60)/(3*60); return [lerpColor([255,150,80],[20,25,65],t), Math.round(lerp(90,140,t))]; }
+    return [[20,25,65],140];
+  }
+
+  function plantOrHarvest(){
+    const tile = getFieldTile();
+    if (tile){
+      const [row,col] = tile;
+      const crop = crops[row][col];
+      if (!crop){
+        if (inventory.seeds[selected_crop] <= 0){ setMessage("背包裡沒有這種種子，去商店購買吧！"); return; }
+        crops[row][col] = { kind: selected_crop, growth: 0 };
+        watered[row][col] = false;
+        inventory.seeds[selected_crop] -= 1;
+        setMessage(`種下了${crop_data[selected_crop].name}，按 F 澆水後時間會讓它成長。`);
+        return;
+      }
+      if (cropIsMature(crop)){
+        const kind = crop.kind;
+        inventory.produce[kind] += 1;
+        crops[row][col] = null;
+        watered[row][col] = false;
+        setMessage(`收成了 1 個${crop_data[kind].name}，已放進背包！`);
+        return;
+      }
+      setMessage("這株作物還在成長中。");
+      return;
+    }
+    if (scene==="outside" && isNear(house_door,22)){ enterHouse(); return; }
+    if (scene==="outside" && isNear(shop)){ buySeed(); return; }
+    if (scene==="outside" && isNear(shipping_bin)){ sellProduce(); return; }
+    if (scene==="inside" && isNear(inside_door,18)){ leaveHouse(); return; }
+    setMessage("站到可互動的位置後再按 E。");
+  }
+
+  function waterCrop(){
+    const tile = getFieldTile();
+    if (!tile){ setMessage("站在有作物的農田上才能澆水。"); return; }
+    const [row,col] = tile;
+    const crop = crops[row][col];
+    if (!crop){ setMessage("這格是空地，先按 E 種植吧。"); return; }
+    if (cropIsMature(crop)){ setMessage("作物已成熟，可以按 E 收成！"); return; }
+    if (watered[row][col]){ setMessage("這格已經澆過水，等待時間讓它慢慢成長吧。"); return; }
+    watered[row][col] = true;
+    setMessage("澆水完成！遊戲時間會持續流動，作物會慢慢長大。");
+  }
+
+  function buySeed(){
+    const data = crop_data[selected_crop];
+    if (money < data.buy){ setMessage("金錢不夠，先去出貨箱販賣農產品吧！"); return; }
+    money -= data.buy;
+    inventory.seeds[selected_crop] += 1;
+    setMessage(`買了 1 包${data.seed_name}，花費 $${data.buy}。`);
+  }
+
+  function sellProduce(){
+    let total = 0, sold = 0;
+    for (const kind of crop_order){
+      const amount = inventory.produce[kind];
+      total += amount * crop_data[kind].sell;
+      sold += amount;
+      inventory.produce[kind] = 0;
+    }
+    if (sold === 0){ setMessage("背包裡沒有農產品可以販賣。"); return; }
+    money += total;
+    setMessage(`賣出了 ${sold} 個農產品，獲得 $${total}！`);
+  }
+
+  function enterHouse(){
+    scene = "inside";
+    player.x = 450; player.y = 490;
+    target_x = player.x; target_y = player.y;
+    setMessage("進入農舍。走到床邊後按 SPACE 睡覺。");
+  }
+
+  function leaveHouse(){
+    scene = "outside";
+    player.x = 757; player.y = 184;
+    target_x = player.x; target_y = player.y;
+    setMessage("回到農場了。");
+  }
+
+  function sleepNextDay(){
+    if (scene !== "inside" || !isNear(bed,35)){ setMessage("要進入農舍，站到床邊才能睡覺！"); return; }
+    const minutesUntilMorning = 24*60 - day_minutes;
+    advanceTime(minutesUntilMorning);
+    setMessage(`睡了一覺，現在是第 ${day} 天 ${formatTime()}。`);
+  }
+
+  function tryMove(key){
+    if (player.x !== target_x || player.y !== target_y) return;
+    let moveX = 0, moveY = 0;
+    if (key === "a" || key === "arrowleft"){ moveX = -tile_size; facing = "left"; }
+    else if (key === "d" || key === "arrowright"){ moveX = tile_size; facing = "right"; }
+    else if (key === "w" || key === "arrowup"){ moveY = -tile_size; facing = "up"; }
+    else if (key === "s" || key === "arrowdown"){ moveY = tile_size; facing = "down"; }
+    else return;
+    const newX = target_x + moveX, newY = target_y + moveY;
+    const boundary = scene === "outside"
+      ? new Rect(0,0,WIDTH, river_y-10)
+      : inside_room.inflate(-25,-25);
+    if (boundary.x <= newX && newX <= boundary.right - player.w &&
+        boundary.y <= newY && newY <= boundary.bottom - player.h){
+      target_x = newX; target_y = newY;
+    }
+  }
+
+  function updatePlayer(dt){
+    const step = WALK_SPEED * dt;
+    if (player.x < target_x) player.x = Math.min(player.x+step, target_x);
+    else if (player.x > target_x) player.x = Math.max(player.x-step, target_x);
+    else if (player.y < target_y) player.y = Math.min(player.y+step, target_y);
+    else if (player.y > target_y) player.y = Math.max(player.y-step, target_y);
+  }
+
+  // ---------- 落葉 / 螢火蟲 ----------
+  function spawnLeaf(){
+    if (leaf_particles.length >= 26) return;
+    const [tx,ty] = tree_spots[Math.floor(Math.random()*tree_spots.length)];
+    leaf_particles.push({
+      x: tx + 5 + Math.random()*50,
+      y: ty + 5 + Math.random()*30,
+      vy: 18 + Math.random()*14,
+      sway: 0.6 + Math.random(),
+      phase: Math.random()*Math.PI*2,
+      size: 3 + Math.floor(Math.random()*3),
+      color: LEAF_FALL_COLORS[Math.floor(Math.random()*4)]
+    });
+  }
+  function updateLeaves(dt){
+    if (scene !== "outside") return;
+    if (Math.random() < 0.02) spawnLeaf();
+    for (let i=leaf_particles.length-1;i>=0;i--){
+      const leaf = leaf_particles[i];
+      leaf.y += leaf.vy * dt;
+      leaf.phase += dt * leaf.sway * 3;
+      if (leaf.y > river_y) leaf_particles.splice(i,1);
+    }
+  }
+  function drawLeaves(){
+    for (const leaf of leaf_particles){
+      const swayX = Math.sin(leaf.phase) * 10;
+      ctx.fillStyle = rgb(leaf.color);
+      ctx.beginPath();
+      ctx.ellipse(leaf.x+swayX+leaf.size, leaf.y+leaf.size/2, leaf.size, leaf.size/2, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function updateFireflies(dt){
+    if (scene !== "outside" || !isNight(day_minutes)){ firefly_particles.length = 0; return; }
+    if (firefly_particles.length < 10 && Math.random() < 0.03){
+      const [tx,ty] = tree_spots[Math.floor(Math.random()*tree_spots.length)];
+      firefly_particles.push({ x: tx-10+Math.random()*70, y: ty-10+Math.random()*50, phase: Math.random()*Math.PI*2, drift: -8+Math.random()*16 });
+    }
+    for (const fly of firefly_particles){
+      fly.phase += dt*2;
+      fly.x += Math.sin(fly.phase) * fly.drift * dt;
+    }
+  }
+  function drawFireflies(){
+    for (const fly of firefly_particles){
+      const glow = (Math.sin(fly.phase*2)+1)/2;
+      const alpha = 70 + glow*130;
+      drawGlow(fly.x, fly.y, 8, [255,240,150], alpha, 3);
+    }
+  }
+
+  function drawNightOverlay(){
+    const result = getTimePhase(day_minutes);
+    if (!result) return;
+    const [color,alpha] = result;
+    if (alpha <= 0) return;
+    ctx.fillStyle = rgba(color, alpha/255);
+    ctx.fillRect(0,0,WIDTH,HEIGHT);
+  }
+
+  function drawInteractHighlight(rect, active, pad=6){
+    if (!active) return;
+    const pulse = (Math.sin(near_glow_phase)+1)/2;
+    const alpha = clamp((90 + pulse*90)/255, 0, 1);
+    const glowRect = rect.inflate(pad+3, pad+3);
+    ctx.save();
+    roundRectPath(glowRect.x, glowRect.y, glowRect.w, glowRect.h, 14);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = `rgba(255,245,190,${alpha})`;
+    ctx.fill();
+    ctx.restore();
+    const r2 = rect.inflate(pad,pad);
+    ctx.save();
+    roundRectPath(r2.x, r2.y, r2.w, r2.h, 10);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = rgb(GOLD);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------- 場景繪製 ----------
+  function circleFill(cx,cy,r,color){ ctx.fillStyle = rgb(color); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+
+  function drawTree(x,y){
+    drawShadow(x+27, y+66, 56, 16, 60);
+    ctx.fillStyle = 'rgb(95,160,75)';
+    ctx.beginPath(); ctx.ellipse(x+24, y+63, 29, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgb(125,78,40)'; ctx.fillRect(x+19,y+32,14,34);
+    ctx.fillStyle = 'rgb(160,100,48)'; ctx.fillRect(x+23,y+34,5,29);
+    circleFill(x+10,y+29,19,[45,115,60]);
+    circleFill(x+35,y+24,23,[45,115,60]);
+    circleFill(x+51,y+35,18,[45,115,60]);
+    circleFill(x+12,y+23,18,[75,160,78]);
+    circleFill(x+33,y+16,22,[80,175,82]);
+    circleFill(x+51,y+28,19,[75,165,78]);
+    circleFill(x+25,y+8,7,[125,205,100]);
+    circleFill(x+45,y+18,5,[125,205,100]);
+    circleFill(x+16,y+32,4,[225,75,65]);
+    circleFill(x+42,y+37,4,[225,75,65]);
+  }
+
+  function drawBackground(){
+    drawGradientRect(0,0,WIDTH,river_y,GRASS_LIGHT,GRASS_DARK);
+    for (const [tx,ty,tsize,shade] of grass_tufts){
+      ctx.fillStyle = rgb(shade);
+      ctx.beginPath(); ctx.ellipse(tx+tsize, ty+tsize/2, tsize, tsize/2, 0,0,Math.PI*2); ctx.fill();
+    }
+    for (const [fx,fy,fcolor] of flower_spots){
+      ctx.fillStyle = 'rgb(70,130,55)'; ctx.beginPath(); ctx.arc(fx,fy+2,2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = rgb(fcolor); ctx.beginPath(); ctx.arc(fx,fy,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgb(255,235,120)'; ctx.beginPath(); ctx.arc(fx,fy,1,0,Math.PI*2); ctx.fill();
+    }
+    drawGradientRect(0,river_y,WIDTH,HEIGHT-river_y,WATER,WATER_DEEP);
+    const waveOffset = (anim_clock*26) % 70;
+    ctx.strokeStyle = 'rgb(150,220,245)'; ctx.lineWidth = 2;
+    for (let x=-70; x<WIDTH+70; x+=70){
+      const wx = x + waveOffset;
+      ctx.beginPath();
+      ctx.ellipse(wx+25, river_y+15+9, 25, 9, 0, Math.PI, Math.PI*2);
+      ctx.stroke();
+    }
+    const shineOffset = (anim_clock*40) % (WIDTH+200) - 100;
+    for (let i=0;i<3;i++){
+      const sx = shineOffset + i*260;
+      const shineAlpha = Math.max(0, 70 + 40*Math.sin(anim_clock*2+i));
+      ctx.fillStyle = `rgba(200,235,250,${shineAlpha/255})`;
+      ctx.beginPath();
+      ctx.ellipse(sx+45, river_y+34+i*30+5, 45, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+    for (const [x,y] of tree_spots) drawTree(x,y);
+    drawLeaves();
+    drawFireflies();
+  }
+
+  function drawHouse(){
+    drawShadow(house.centerx, house.bottom+6, house.w+20, 22, 70);
+    drawGradientRect(house.x,house.y,house.w,house.h,[175,120,70],WOOD);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; ctx.strokeRect(house.x,house.y,house.w,house.h);
+    ctx.fillStyle = rgb(ROOF_LIGHT);
+    ctx.beginPath(); ctx.moveTo(house.x-15,house.y); ctx.lineTo(house.centerx,house.y-65); ctx.lineTo(house.right+15,house.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = rgb(ROOF);
+    ctx.beginPath(); ctx.moveTo(house.x-15,house.y); ctx.lineTo(house.centerx,house.y-65); ctx.lineTo(house.right+15,house.y); ctx.lineTo(house.centerx,house.y-20); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(95,60,35)'; ctx.fillRect(house_door.x,house_door.y,house_door.w,house_door.h);
+    ctx.strokeStyle = 'rgb(140,90,50)'; ctx.lineWidth = 2; ctx.strokeRect(house_door.x,house_door.y,house_door.w,house_door.h);
+    ctx.fillStyle = 'rgb(235,200,90)'; ctx.beginPath(); ctx.arc(house_door.right-8, house_door.centery, 2, 0, Math.PI*2); ctx.fill();
+    for (const wx of [house.x+25, house.right-60]){
+      const win = new Rect(wx, house.y+45, 35, 30);
+      const lit = isNight(day_minutes);
+      const topC = lit ? [255,235,170] : [200,230,250];
+      const botC = lit ? [250,200,110] : [150,195,225];
+      drawGradientRect(win.x,win.y,win.w,win.h,topC,botC);
+      ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 2; ctx.strokeRect(win.x,win.y,win.w,win.h);
+      ctx.beginPath(); ctx.moveTo(win.centerx,win.y); ctx.lineTo(win.centerx,win.bottom); ctx.stroke();
+    }
+    drawText("我的農舍", FONT_M, WHITE, house.x+48, house.y+8);
+    drawText("門口按 E 進入", FONT_S, BLACK, house.x+35, house.bottom+8);
+    drawInteractHighlight(house_door, scene==="outside" && isNear(house_door,22));
+  }
+
+  function drawShop(){
+    drawShadow(shop.centerx, shop.bottom+6, shop.w+16, 20, 70);
+    drawGradientRect(shop.x,shop.y,shop.w,shop.h,[250,205,115],[225,170,75]);
+    ctx.strokeStyle = 'rgb(150,100,40)'; ctx.lineWidth = 3; ctx.strokeRect(shop.x,shop.y,shop.w,shop.h);
+    ctx.fillStyle = 'rgb(200,100,75)';
+    ctx.beginPath(); ctx.moveTo(shop.x-10,shop.y); ctx.lineTo(shop.centerx,shop.y-45); ctx.lineTo(shop.right+10,shop.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(175,75,55)';
+    ctx.beginPath(); ctx.moveTo(shop.x-10,shop.y); ctx.lineTo(shop.centerx,shop.y-45); ctx.lineTo(shop.right+10,shop.y); ctx.lineTo(shop.centerx,shop.y-15); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgb(130,85,45)'; ctx.fillRect(shop.x+20, shop.y+52, 105, 42);
+    const boxColors = [[240,190,80],[100,170,80],[230,125,45]];
+    boxColors.forEach((bc,i)=>{
+      const bx = shop.x+30+i*31;
+      drawGradientRect(bx, shop.y+61, 18, 18, lerpColor(bc,[255,255,255],0.25), bc);
+      ctx.strokeStyle = 'rgb(90,60,30)'; ctx.lineWidth = 1; ctx.strokeRect(bx, shop.y+61, 18, 18);
+    });
+    drawText("種子商店", FONT_M, BLACK, shop.x+28, shop.y+12);
+    drawText("按 E 購買", FONT_S, BLACK, shop.x+33, shop.bottom+8);
+    drawInteractHighlight(shop, scene==="outside" && isNear(shop));
+  }
+
+  function drawShippingBin(){
+    drawShadow(shipping_bin.centerx, shipping_bin.bottom+5, shipping_bin.w+14, 18, 70);
+    drawGradientRect(shipping_bin.x,shipping_bin.y,shipping_bin.w,shipping_bin.h,[150,95,50],[110,68,32]);
+    ctx.strokeStyle = 'rgb(80,50,25)'; ctx.lineWidth = 3; ctx.strokeRect(shipping_bin.x,shipping_bin.y,shipping_bin.w,shipping_bin.h);
+    const inner = new Rect(shipping_bin.x+6, shipping_bin.y+8, 93, 52);
+    drawGradientRect(inner.x,inner.y,inner.w,inner.h,[215,150,75],[175,110,50]);
+    ctx.strokeStyle = 'rgb(100,60,30)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(shipping_bin.x+6, shipping_bin.y+32); ctx.lineTo(shipping_bin.right-6, shipping_bin.y+32); ctx.stroke();
+    drawText("出貨箱", FONT_M, WHITE, shipping_bin.x+20, shipping_bin.y+18);
+    drawText("按 E 販賣", FONT_S, BLACK, shipping_bin.x-2, shipping_bin.bottom+7);
+    drawInteractHighlight(shipping_bin, scene==="outside" && isNear(shipping_bin));
+  }
+
+  function drawFarm(){
+    for (let row=0; row<rows; row++){
+      for (let col=0; col<cols; col++){
+        const x = farm_x+col*tile_size, y = farm_y+row*tile_size;
+        const w = tile_size-3, h = tile_size-3;
+        const wet = watered[row][col];
+        const lightC = wet ? WET_DIRT_LIGHT : DIRT_LIGHT;
+        const darkC = wet ? WET_DIRT : DIRT_DARK;
+        drawGradientRect(x,y,w,h,lightC,darkC,4);
+        ctx.strokeStyle = 'rgb(105,70,40)'; ctx.lineWidth = 2;
+        roundRectPath(x,y,w,h,4); ctx.stroke();
+        const tillColor = wet ? 'rgb(75,50,30)' : 'rgb(120,82,48)';
+        ctx.strokeStyle = tillColor; ctx.lineWidth = 1;
+        for (let tx=x+7; tx<x+tile_size-8; tx+=9){
+          ctx.beginPath(); ctx.ellipse(tx+5, y+tile_size-18, 5, 4, 0, 3.4, 6.0); ctx.stroke();
+        }
+        const crop = crops[row][col];
+        if (!crop) continue;
+        const kind = crop.kind, data = crop_data[kind];
+        const stage = cropStage(crop);
+        const centerX = x + tile_size/2;
+        if (cropIsMature(crop)){
+          const pulse = (Math.sin(anim_clock*3+row+col)+1)/2;
+          drawGlow(centerX, y+tile_size/2, 20, data.color, 35+pulse*35, 3);
+        }
+        if (stage === 0){
+          circleFill(centerX, y+30, 5, data.color);
+        } else if (stage < 3){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+19, 8, 25);
+          ctx.fillStyle = 'rgb(65,155,65)';
+          ctx.beginPath(); ctx.ellipse(centerX-8, y+28, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(centerX+8, y+22, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+        } else if (kind === "carrot"){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          ctx.fillStyle = rgb(data.color);
+          ctx.beginPath(); ctx.moveTo(centerX,y+44); ctx.lineTo(centerX-11,y+29); ctx.lineTo(centerX+11,y+29); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = 'rgb(70,160,65)';
+          ctx.beginPath(); ctx.ellipse(centerX-4, y+22, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(centerX+6, y+20, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+        } else if (kind === "corn"){
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          ctx.fillStyle = rgb(data.color);
+          ctx.beginPath(); ctx.ellipse(centerX, y+31, 9, 13, 0, 0, Math.PI*2); ctx.fill();
+          ctx.strokeStyle = 'rgb(60,145,65)'; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(centerX-6,y+37); ctx.lineTo(centerX-17,y+29); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX+6,y+37); ctx.lineTo(centerX+17,y+29); ctx.stroke();
+        } else {
+          ctx.fillStyle = 'rgb(55,125,55)'; ctx.fillRect(centerX-4, y+20, 8, 22);
+          circleFill(centerX, y+35, 14, data.color);
+          ctx.strokeStyle = 'rgb(180,85,25)'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(centerX,y+22); ctx.lineTo(centerX,y+48); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX-8,y+25); ctx.lineTo(centerX-8,y+45); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(centerX+8,y+25); ctx.lineTo(centerX+8,y+45); ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function drawInside(){
+    ctx.fillStyle = 'rgb(60,48,42)'; ctx.fillRect(0,0,WIDTH,HEIGHT);
+    drawGradientRect(inside_room.x,inside_room.y,inside_room.w,inside_room.h,[240,208,152],[215,178,120]);
+    ctx.strokeStyle = 'rgb(120,82,48)'; ctx.lineWidth = 8; ctx.strokeRect(inside_room.x,inside_room.y,inside_room.w,inside_room.h);
+    ctx.strokeStyle = 'rgb(205,166,110)'; ctx.lineWidth = 2;
+    for (let x=inside_room.x+15; x<inside_room.right-15; x+=42){
+      ctx.beginPath(); ctx.moveTo(x,inside_room.y+10); ctx.lineTo(x,inside_room.bottom-10); ctx.stroke();
+    }
+    drawShadow(bed.centerx, bed.bottom+4, bed.w+10, 16, 60);
+    drawGradientRect(bed.x,bed.y,bed.w,bed.h,[170,115,68],[135,85,48],4);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; roundRectPath(bed.x,bed.y,bed.w,bed.h,4); ctx.stroke();
+    const pillow = new Rect(bed.x+15, bed.y+12, 58, 28);
+    drawGradientRect(pillow.x,pillow.y,pillow.w,pillow.h,[255,250,235],[230,220,195],6);
+    const blanket = new Rect(bed.x+10, bed.y+42, bed.w-20, 43);
+    drawGradientRect(blanket.x,blanket.y,blanket.w,blanket.h,[150,195,225],[105,150,190],6);
+    ctx.strokeStyle = 'rgb(90,135,175)'; ctx.lineWidth = 2;
+    for (let lx=blanket.x+8; lx<blanket.right-8; lx+=14){
+      ctx.beginPath(); ctx.moveTo(lx,blanket.y+4); ctx.lineTo(lx,blanket.bottom-4); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgb(95,60,35)'; ctx.fillRect(inside_door.x,inside_door.y,inside_door.w,inside_door.h);
+    ctx.strokeStyle = 'rgb(140,90,50)'; ctx.lineWidth = 2; ctx.strokeRect(inside_door.x,inside_door.y,inside_door.w,inside_door.h);
+
+    const win = new Rect(150,145,75,65);
+    const lit = isNight(day_minutes);
+    const topC = lit ? [140,150,190] : [200,230,250];
+    const botC = lit ? [60,70,110] : [150,195,225];
+    drawGradientRect(win.x,win.y,win.w,win.h,topC,botC);
+    ctx.strokeStyle = 'rgb(95,60,35)'; ctx.lineWidth = 3; ctx.strokeRect(win.x,win.y,win.w,win.h);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(win.centerx,win.y); ctx.lineTo(win.centerx,win.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(win.x,win.centery); ctx.lineTo(win.right,win.centery); ctx.stroke();
+
+    drawGlow(470,150,46,[255,225,140],70,4);
+    circleFill(470,150,25,[245,225,140]);
+    ctx.strokeStyle = 'rgb(255,245,200)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(470,150,25,0,Math.PI*2); ctx.stroke();
+
+    drawText("溫馨農舍", FONT_B, BLACK, 425,105);
+    drawText("床邊按 SPACE 睡覺", FONT_S, BLACK, bed.x, bed.bottom+8);
+    drawText("門口按 E 回農場", FONT_S, BLACK, inside_door.x-2, inside_door.bottom+8);
+    drawInteractHighlight(bed, scene==="inside" && isNear(bed,35), 4);
+    drawInteractHighlight(inside_door, scene==="inside" && isNear(inside_door,18));
+  }
+
+  function drawPlayer(){
+    const isMoving = player.x !== target_x || player.y !== target_y;
+    const bob = isMoving ? Math.sin(anim_clock*14)*2.4 : 0;
+    const cx = player.centerx;
+    const top = player.y + bob;
+    drawShadow(cx, player.bottom+4, 26, 10, 80);
+    ctx.fillStyle = rgb(PLAYER_COLOR_DARK);
+    ctx.beginPath(); ctx.ellipse(player.x+15, top+28.5, 12, 9.5, 0, 0, Math.PI*2); ctx.fill();
+    drawGradientRect(player.x+4, top+18, 22, 18, lerpColor(PLAYER_COLOR,[255,255,255],0.2), PLAYER_COLOR, 4);
+    ctx.fillStyle = 'rgb(45,70,150)'; ctx.fillRect(player.x+2, top+6, 26, 7);
+    circleFill(cx, top+11, 10, [230,195,155]);
+    circleFill(cx, top+9, 10, [255,225,190]);
+    const eyeDx = { down:[0,3], up:[0,-3], left:[-3,0], right:[3,0] }[facing] || [0,3];
+    if (facing !== "up"){
+      ctx.fillStyle = 'rgb(35,35,35)';
+      ctx.beginPath(); ctx.arc(cx-3+eyeDx[0]*0.3, top+9+eyeDx[1]*0.5, 1, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+3+eyeDx[0]*0.3, top+9+eyeDx[1]*0.5, 1, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  function drawHelp(){
+    ctx.fillStyle = 'rgba(10,10,15,0.43)'; ctx.fillRect(0,0,WIDTH,HEIGHT);
+    const panel = new Rect(245,180,510,330);
+    roundedPanel(panel.x,panel.y,panel.w,panel.h, PANEL,PANEL_SHADE,PANEL_BORDER,14,3);
+    drawText("操作說明", FONT_B, BLACK, 435,205);
+    drawText("WASD / 方向鍵：一次慢慢走一格", FONT_M, BLACK, 280,260);
+    drawText("1、2、3：選擇種子", FONT_M, BLACK, 280,300);
+    drawText("E：種植、收成、買種子、進出農舍、販賣", FONT_M, BLACK, 280,340);
+    drawText("F：澆水", FONT_M, BLACK, 280,380);
+    drawText("SPACE：站在房間床邊睡覺", FONT_M, BLACK, 280,420);
+    drawText("H：關閉這個說明", FONT_S, [90,90,90], 420,470);
+  }
+
+  function drawCoinIcon(x,y,r=9){
+    drawGradientRect(x-r,y-r,r*2,r*2,[255,225,120],GOLD,r);
+    ctx.strokeStyle = 'rgb(170,120,30)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    drawText("$", FONT_S, [120,80,15], x-3, y-8);
+  }
+
+  function drawClockIcon(x,y,r=9){
+    drawGradientRect(x-r,y-r,r*2,r*2,[255,255,255],[215,220,230],r);
+    ctx.strokeStyle = 'rgb(90,90,95)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    const angle = (day_minutes/(24*60))*2*Math.PI - Math.PI/2;
+    const hx = x + Math.cos(angle)*(r-3), hy = y + Math.sin(angle)*(r-3);
+    ctx.strokeStyle = 'rgb(60,60,65)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(hx,hy); ctx.stroke();
+  }
+
+  function drawUI(){
+    roundedPanel(12,12,330,142,PANEL,PANEL_SHADE,PANEL_BORDER,12,3);
+    drawClockIcon(300,30);
+    drawText(`第 ${day} 天  ${formatTime()}`, FONT_B, BLACK, 25,20);
+    drawCoinIcon(300,72);
+    drawText(`金錢：$${money}`, FONT_M, BLACK, 25,63);
+    const seedColor = crop_data[selected_crop].color;
+    ctx.fillStyle = rgb(seedColor); roundRectPath(293,95,15,15,3); ctx.fill();
+    ctx.strokeStyle = 'rgb(90,60,25)'; ctx.lineWidth = 1; roundRectPath(293,95,15,15,3); ctx.stroke();
+    drawText(`目前種子：${crop_data[selected_crop].seed_name}`, FONT_M, BLACK, 25,92);
+    drawText("按 H 查看操作說明", FONT_S, [95,85,60], 25,124);
+
+    roundedPanel(680,12,308,170,PANEL,PANEL_SHADE,PANEL_BORDER,12,3);
+    drawText("背包", FONT_B, BLACK, 695,22);
+    let y = 65;
+    crop_order.forEach((kind, idx) => {
+      const data = crop_data[kind];
+      const index = idx+1;
+      const textX = 720;
+      if (kind === selected_crop){
+        ctx.save();
+        roundRectPath(690, y-4, 288, 26, 8);
+        ctx.fillStyle = 'rgba(110,190,130,0.31)';
+        ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = 'rgb(55,145,70)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(698,y+10); ctx.lineTo(703,y+15); ctx.lineTo(714,y+3); ctx.stroke();
+      }
+      ctx.fillStyle = rgb(data.color); roundRectPath(695,y+2,14,14,3); ctx.fill();
+      ctx.strokeStyle = 'rgb(90,60,25)'; ctx.lineWidth = 1; roundRectPath(695,y+2,14,14,3); ctx.stroke();
+      drawText(`${index}. ${data.name}種子：${inventory.seeds[kind]}`, FONT_S, BLACK, textX, y);
+      drawText(`收成：${inventory.produce[kind]} 個`, FONT_S, BLACK, 850, y);
+      y += 30;
+    });
+    drawText("時間會持續流動", FONT_S, [95,85,60], 695,145);
+
+    if (message_timer > 0){
+      const totalMax = 5, fadeMargin = 0.4;
+      const fadeIn = message_timer > totalMax-fadeMargin ? clamp((message_timer-(totalMax-fadeMargin))/fadeMargin,0,1) : 1;
+      const fadeOut = message_timer < 0.5 ? clamp(message_timer/0.5,0,1) : 1;
+      const boxAlpha = Math.min(fadeIn, fadeOut);
+      const msgRect = new Rect(145,650,710,35);
+      ctx.save();
+      roundRectPath(msgRect.x,msgRect.y,msgRect.w,msgRect.h,8);
+      ctx.fillStyle = `rgba(245,245,245,${boxAlpha})`;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(100,75,45,${boxAlpha})`;
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = boxAlpha;
+      drawText(message, FONT_M, BLACK, 158,656);
+      ctx.restore();
+    }
+
+    if (show_help) drawHelp();
+  }
+
+  // ---------- 輸入 ----------
+  function handleKey(key){
+    tryMove(key);
+    if (key === "h") show_help = !show_help;
+    else if (key === "1"){ selected_crop = "carrot"; setMessage("已選擇紅蘿蔔種子。"); }
+    else if (key === "2"){ selected_crop = "corn"; setMessage("已選擇玉米種子。"); }
+    else if (key === "3"){ selected_crop = "pumpkin"; setMessage("已選擇南瓜種子。"); }
+    else if (key === "e"){ plantOrHarvest(); }
+    else if (key === "f"){ waterCrop(); }
+    else if (key === " "){ sleepNextDay(); }
+  }
+
+  const capturedKeys = new Set(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","e","f","h","1","2","3"," "]);
+  window.addEventListener('keydown', (e) => {
+    if (!document.getElementById('farm').classList.contains('active')) return;
+    const key = e.key.toLowerCase();
+    if (capturedKeys.has(key)) e.preventDefault();
+    handleKey(key);
+  }, { passive:false });
+
+  // ---------- 主迴圈 ----------
+  let lastTime = performance.now();
+  const farmScreenEl = document.getElementById('farm');
+  function loop(now){
+    if (!farmScreenEl.classList.contains('active')){
+      lastTime = now;
+      requestAnimationFrame(loop);
+      return;
+    }
+    const dt = Math.min(0.05, (now-lastTime)/1000);
+    lastTime = now;
+
+    time_accumulator += dt;
+    anim_clock += dt;
+    near_glow_phase += dt*4;
+    updateLeaves(dt);
+    updateFireflies(dt);
+
+    while (time_accumulator >= seconds_per_game_minute){
+      advanceTime(1);
+      time_accumulator -= seconds_per_game_minute;
+    }
+
+    updatePlayer(dt);
+    if (message_timer > 0) message_timer = Math.max(0, message_timer-dt);
+
+    if (scene === "outside"){
+      drawBackground();
+      drawShop();
+      drawHouse();
+      drawShippingBin();
+      drawFarm();
+      drawPlayer();
+      drawNightOverlay();
+    } else {
+      drawInside();
+      drawPlayer();
+    }
+    drawUI();
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 })();
+
 </script>
 </body>
 </html>
