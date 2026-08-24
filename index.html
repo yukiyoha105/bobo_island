@@ -50,6 +50,11 @@
       font-family: inherit; font-size: 0.8rem; font-weight: 700; color: #2e7d32; cursor: pointer;
     }
     .nav-btn:hover, .nav-btn.active { background: #a5d6a7; color: #1b5e20; }
+    #more.screen.active, #more .more-menu, #more .more-menu .btn {
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 6;
+    }
     .screen { display: none; padding: 10px; min-height: 520px; }
     .screen.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -1261,17 +1266,19 @@
         <span class="stat-chip" id="pet-count">🐾 0</span>
         <span class="stat-chip" id="user-display" style="display:none"></span>
         <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
-        <button class="stat-chip" id="streak-btn" title="連續簽到獎勵" style="border:none;cursor:pointer;font-family:inherit;font-weight:700;background:rgba(255,255,255,0.4);">🎁 連續簽到</button>
-        <button class="stat-chip" id="help-btn" title="新手引導／屬性相剋" style="border:none;cursor:pointer;font-family:inherit;font-weight:700;background:rgba(255,255,255,0.4);">❓ 說明</button>
+        <!-- 連續簽到／公告／說明 已移至「更多」 -->
+        <button class="stat-chip" id="streak-btn" style="display:none">🎁</button>
+        <button class="stat-chip" id="announce-btn" style="display:none;position:relative">📢</button>
+        <button class="stat-chip" id="help-btn" style="display:none">❓</button>
       </div>
     </div>
     <div class="nav">
       <button class="nav-btn active" data-screen="map">🗺️ 島嶼</button>
       <button class="nav-btn" data-screen="team">🐾 隊伍</button>
       <button class="nav-btn" data-screen="codex">📖 圖鑑</button>
-      <button class="nav-btn" data-screen="history">📜 紀錄</button>
+      <button class="nav-btn" data-screen="history">📜 戰鬥紀錄</button>
       <button class="nav-btn" data-screen="bag">🎒 背包</button>
-      <button class="nav-btn" data-screen="mail" id="nav-mail">📧 郵件</button>
+      <button class="nav-btn" data-screen="more" id="nav-more">⋯ 更多</button>
     </div>
 
     <div id="map" class="screen active">
@@ -1325,6 +1332,58 @@
       <div class="item-list" id="item-list"></div>
     </div>
 
+    
+    <div id="more" class="screen">
+      <div class="section-title">⋯ 更多</div>
+      <div class="more-menu" id="more-menu" style="display:flex;flex-direction:column;gap:10px;padding:4px 2px 20px;position:relative;z-index:5;pointer-events:auto">
+        <button type="button" class="btn btn-primary" id="more-gift" data-more-act="gift" onclick="try{openGiftCodeModal()}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;pointer-events:auto;cursor:pointer">🎁 輸入禮包碼</button>
+        <button type="button" class="btn btn-purple" id="more-help" data-more-act="help" onclick="try{if(typeof openHelp==='function')openHelp('guide')}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;pointer-events:auto;cursor:pointer">❓ 說明</button>
+        <button type="button" class="btn btn-pink" id="more-streak" data-more-act="streak" onclick="try{if(typeof openStreakModal==='function')openStreakModal(true)}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;pointer-events:auto;cursor:pointer">📅 連續簽到</button>
+        <button type="button" class="btn" id="more-announce" data-more-act="announce" onclick="try{if(typeof openAnnounceModal==='function')openAnnounceModal()}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;background:linear-gradient(90deg,#e3f2fd,#fff);color:#1565c0;position:relative;pointer-events:auto;cursor:pointer">📢 公告</button>
+        <button type="button" class="btn btn-explore" id="more-rank" data-more-act="rank" onclick="try{if(typeof openRankings==='function')openRankings()}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;pointer-events:auto;cursor:pointer">🏆 排行榜</button>
+        <button type="button" class="btn btn-shop" id="more-mail" data-more-act="mail" onclick="try{showScreen('mail')}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;position:relative;pointer-events:auto;cursor:pointer">📧 郵件</button>
+        <button type="button" class="btn btn-back" id="more-account" data-more-act="account" onclick="try{showScreen('account');if(typeof openAccountScreen==='function')openAccountScreen()}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;pointer-events:auto;cursor:pointer">⚙️ 帳號設定</button>
+      </div>
+    </div>
+
+    <div id="rankings" class="screen">
+      <div class="section-title">🏆 排行榜</div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:4px 2px 16px">
+        <button type="button" class="btn btn-pink" id="rank-top-pets" data-more-act="topPets" onclick="try{openTopPetRanking()}catch(e){alert(e)}" style="width:100%;height:auto;padding:14px;text-align:left;font-size:1rem;cursor:pointer">🐾 最強寵物排行榜</button>
+        <button type="button" class="btn btn-back" id="rank-back-more" data-more-act="backMore" onclick="try{showScreen('more')}catch(e){alert(e)}" style="width:100%;cursor:pointer">← 返回更多</button>
+      </div>
+      <div id="rank-pet-panel" style="display:none">
+        <div style="text-align:center;font-weight:800;color:#e65100;margin:6px 0 10px">🐾 全服寵物戰力排行（每位玩家每隻寵物）</div>
+        <div id="rank-pet-list" class="history-list"></div>
+        <button type="button" class="btn btn-back" id="rank-pet-back" data-more-act="petBack" onclick="try{var p=document.getElementById('rank-pet-panel');if(p)p.style.display='none'}catch(e){alert(e)}" style="width:100%;margin-top:10px;cursor:pointer">← 返回排行榜</button>
+      </div>
+    </div>
+
+    <div id="account" class="screen">
+      <div class="section-title">⚙️ 帳號設定</div>
+      <div style="padding:8px 4px 20px;display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;border-radius:12px;background:#f5f5f5;border:2px solid #e0e0e0">
+          <div style="font-weight:800;margin-bottom:6px">目前登入</div>
+          <div id="account-user-line" style="color:#555">—</div>
+        </div>
+        <button type="button" class="btn btn-primary" id="account-profile" data-more-act="profile" onclick="try{if(typeof showPlayerProfile==='function')showPlayerProfile()}catch(e){alert(e)}" style="width:100%;cursor:pointer">🧑 玩家資訊</button>
+        <button type="button" class="btn btn-back" id="account-logout" data-more-act="logout" onclick="try{if(typeof doLogout==='function')doLogout()}catch(e){alert(e)}" style="width:100%;cursor:pointer">🚪 登出</button>
+        <button type="button" class="btn" id="account-back-more" data-more-act="backMore" onclick="try{showScreen('more')}catch(e){alert(e)}" style="width:100%;background:#eee;color:#333;cursor:pointer">← 返回更多</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="gift-code-modal" style="z-index:730">
+      <div class="modal" style="max-width:min(400px,94vw);width:100%;text-align:left">
+        <h2 style="text-align:center">🎁 輸入禮包碼</h2>
+        <p style="text-align:center;font-size:0.82rem;color:#666;margin:4px 0 12px">請輸入官方發放的序號</p>
+        <input id="gift-code-input" type="text" placeholder="請輸入禮包碼" maxlength="32"
+          style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:2px solid #ffcc80;font-size:1rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase" />
+        <p id="gift-code-msg" style="font-size:0.85rem;color:#c62828;min-height:1.2em;margin:8px 0 4px;text-align:center"></p>
+        <button type="button" class="btn btn-pink" id="gift-code-submit" data-more-act="giftSubmit" onclick="try{submitGiftCode()}catch(e){alert(e)}" style="width:100%;margin-top:6px;cursor:pointer">兌換</button>
+        <button type="button" class="btn btn-back" id="gift-code-close" data-more-act="giftClose" onclick="try{var m=document.getElementById('gift-code-modal');if(m)m.classList.add('hidden')}catch(e){alert(e)}" style="width:100%;margin-top:8px;cursor:pointer">取消</button>
+      </div>
+    </div>
+
     <div id="mail" class="screen">
       <div class="section-title">📧 郵件</div>
       <p style="text-align:center;font-size:0.82rem;color:#666;margin:0 0 10px">官方與系統訊息會出現在這裡</p>
@@ -1340,6 +1399,24 @@
         <div id="mail-read-reward" style="margin-top:10px"></div>
         <button type="button" class="btn btn-pink" id="mail-claim-btn" style="width:100%;margin-top:10px;display:none">領取附件</button>
         <button type="button" class="btn btn-back" id="mail-read-close" style="width:100%;margin-top:8px">關閉</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="announce-modal" style="z-index:710">
+      <div class="modal" style="max-width:min(460px,94vw);width:100%;text-align:left">
+        <h2 style="text-align:center">📢 公告</h2>
+        <p style="text-align:center;font-size:0.8rem;color:#666;margin:4px 0 10px">官方最新消息</p>
+        <div id="announce-list" style="max-height:55vh;overflow-y:auto"></div>
+        <div id="announce-empty" style="text-align:center;color:#999;padding:20px;display:none">目前沒有公告</div>
+        <button type="button" class="btn btn-back" id="announce-close" style="width:100%;margin-top:12px">關閉</button>
+      </div>
+    </div>
+    <div class="overlay hidden" id="announce-read-modal" style="z-index:720">
+      <div class="modal" style="max-width:min(440px,94vw);width:100%;text-align:left">
+        <h2 id="announce-read-title" style="text-align:center">公告</h2>
+        <p id="announce-read-meta" style="font-size:0.78rem;color:#888;text-align:center;margin:4px 0 10px"></p>
+        <div id="announce-read-body" style="font-size:0.9rem;line-height:1.55;color:#444;white-space:pre-wrap;max-height:50vh;overflow-y:auto"></div>
+        <button type="button" class="btn btn-back" id="announce-read-close" style="width:100%;margin-top:12px">返回列表</button>
       </div>
     </div>
 
@@ -3820,6 +3897,7 @@ function doDismantlePetConfirmed(idx, p, gain) {
 const S = {
   coins:80, level:1, exp:0, wins:0,
   mail:[], mailClaimed:{},
+  announcements:[], annReadIds:{},
   ladderRating:1000, ladderWins:0, ladderLosses:0, ladderHistory:[], ladderRoster:null,
   fragments:{},
   treasures:{},
@@ -5149,7 +5227,10 @@ function showScreen(id) {
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
   if(id==='map') renderIsland();
   if(id==='team') renderTeam();
+  if(id==='more'){ try{if(typeof bindMoreMenu==='function')bindMoreMenu();}catch(e){} if(typeof updateMoreBadges==='function') updateMoreBadges(); }
   if(id==='mail'){ renderMail(); fetchGameMail(); }
+  if(id==='rankings'){ const p=$('rank-pet-panel'); if(p) p.style.display='none'; }
+  if(id==='account'){ openAccountScreen(); }
   if(id==='bag') renderBag();
   if(id==='codex') renderCodex();
   if(id==='history') renderBattleHistoryScreen();
@@ -5178,7 +5259,7 @@ function setLoginButtonsBusy(busy) {
 function getSaveData() {
   return {
     island: {
-      coins: S.coins, level: S.level, exp: S.exp, wins: S.wins, ladderRating: getLadderRating(), ladderWins: S.ladderWins||0, ladderLosses: S.ladderLosses||0, ladderHistory: S.ladderHistory||[], mail: S.mail||[], mailClaimed: S.mailClaimed||{}, ladderRoster: S.ladderRoster||null,
+      coins: S.coins, level: S.level, exp: S.exp, wins: S.wins, ladderRating: getLadderRating(), ladderWins: S.ladderWins||0, ladderLosses: S.ladderLosses||0, ladderHistory: S.ladderHistory||[], mail: S.mail||[], mailClaimed: S.mailClaimed||{}, announcements: S.announcements||[], annReadIds: S.annReadIds||{}, redeemedCodes: S.redeemedCodes||{}, ladderRoster: S.ladderRoster||null,
       trainerName: S.trainerName, trainerEmoji: S.trainerEmoji, nameSet: !!S.nameSet,
       unlocked: S.unlocked, owned: S.owned, team: S.team, items: S.items,
       fragments: S.fragments || {},
@@ -5464,6 +5545,7 @@ function enterAsGuest() {
   }
 
   bindGameHandlers();
+  try { showStartupAnnouncement(); } catch (e) {}
   if (!S.nameSet || !S.trainerName) openNameModal(false);
   else {
     addLog('map-log','歡迎，' + S.trainerEmoji + S.trainerName + '！（訪客）');
@@ -5599,6 +5681,15 @@ function bindGameHandlers() {
   };
   const confAct = $('confirm-actions-btn');
   if (confAct) confAct.onclick = () => resolvePlayerActions();
+  try { if (typeof bindMoreMenu === 'function') bindMoreMenu(); } catch (e) { console.warn('bindMoreMenu', e); }
+  (function(){
+    const ab = $('announce-btn');
+    if (ab) ab.onclick = () => openAnnounceModal();
+    const ac = $('announce-close');
+    if (ac) ac.onclick = () => { const m=$('announce-modal'); if(m) m.classList.add('hidden'); };
+    const arc = $('announce-read-close');
+    if (arc) arc.onclick = () => { const m=$('announce-read-modal'); if(m) m.classList.add('hidden'); };
+  })();
   const autoBtn = $('auto-battle-btn');
   if (autoBtn) autoBtn.onclick = () => toggleAutoBattle();
   const fleeBtn = $('flee-battle-btn');
@@ -5741,7 +5832,7 @@ function openZone(z) {
   if(z.arena){
     if (typeof ensureLadderRoster === 'function') ensureLadderRoster();
     // 精簡頂部說明（對手名單嵌在下方）
-    if (zd) zd.textContent = '點選對手開戰。勝利只獲得金幣，並與對手交換名次。';
+    if (zd) zd.textContent = '點選對手開戰。勝利只獲得金幣；打贏排名更高的對手才會對調名次。';
     const panel = document.querySelector('#zone .zone-panel');
     if (panel) panel.classList.add('forge-wide');
   }
@@ -6991,7 +7082,7 @@ function sortLadderRosterByRating() {
   if (!Array.isArray(S.ladderRoster)) return;
   S.ladderRoster.sort((a, b) => (b.rating || 0) - (a.rating || 0));
 }
-/** 挑戰成功：與對手「對調名次」（真正交換陣列位置） */
+/** 挑戰成功：只有打贏「排名比自己高」的對手才對調名次（打低排名不會掉名） */
 function promoteOnLadderWin(oppId) {
   if (oppId == null) return;
   ensureLadderRoster();
@@ -7000,7 +7091,8 @@ function promoteOnLadderWin(oppId) {
   const oid = String(oppId);
   const oppIdx = list.findIndex(r => r && String(r.id) === oid);
   if (myIdx < 0 || oppIdx < 0 || myIdx === oppIdx) return;
-  // 真正對調名次（陣列位置 = 排名）
+  // 名次數字越小越好：只有對手名次更好（索引更小）才交換
+  if (oppIdx >= myIdx) return;
   const tmp = list[myIdx];
   list[myIdx] = list[oppIdx];
   list[oppIdx] = tmp;
@@ -7066,15 +7158,46 @@ function clonePetForArena(p) {
   o.hp = o.maxHp; o.mp = o.maxMp;
   return o;
 }
+/** 匯出全寵物精簡資料供全服排行（每隻都算） */
+function buildPetsRankPayload() {
+  const list = [];
+  (S.owned || []).forEach((p, i) => {
+    if (!p) return;
+    const pw = calcCombatPower(p);
+    list.push({
+      id: p.id || null,
+      name: p.name || '寵物',
+      nick: p.nickname || '',
+      emoji: p.emoji || '🐾',
+      level: p.level || 1,
+      type: p.type || '',
+      star: p.starLevel != null ? p.starLevel : 0,
+      evo: p.evoStage != null ? p.evoStage : 0,
+      power: pw,
+      idx: i
+    });
+  });
+  list.sort((a, b) => b.power - a.power);
+  return list;
+}
 async function publishArenaPresence() {
   if (!sb || !S.userId) return;
   try {
     const team = snapshotArenaTeam();
     const power = team.reduce((s, p) => s + (p ? calcCombatPower(p) : 0), 0);
+    const petsRank = buildPetsRankPayload();
+    const topPet = petsRank[0] || null;
+    const topPower = topPet ? topPet.power : 0;
     await sb.from('arena_presence').upsert({
       user_id: S.userId,
       username: S.trainerName || S.username || '冒險者',
       power: power,
+      top_pet_power: topPower,
+      top_pet_name: topPet ? topPet.name : null,
+      top_pet_emoji: topPet ? topPet.emoji : null,
+      top_pet_level: topPet ? topPet.level : null,
+      top_pet_type: topPet ? topPet.type : null,
+      pets_rank: petsRank, // 全寵物陣列（全服排行用）
       rating: getLadderRating(),
       ladder_wins: S.ladderWins || 0,
       ladder_losses: S.ladderLosses || 0,
@@ -7239,7 +7362,7 @@ async function openLadderBoard() {
       tier.emoji + ' 第 <b>' + myRank + '</b> 名／' + total +
       '　積分 <b>' + getLadderRating() + '</b>　⚔️ <b>' + myPower.toLocaleString() + '</b></div>';
     html += '<div style="font-size:0.78rem;color:#666;margin-top:4px">' +
-      (S.ladderWins || 0) + ' 勝　' + (S.ladderLosses || 0) + ' 敗　·　點對手開戰（只拿金幣、交換名次）</div>';
+      (S.ladderWins || 0) + ' 勝　' + (S.ladderLosses || 0) + ' 敗　·　點對手開戰（只拿金幣；打更高名次才升）</div>';
     html += '</div>';
 
     html += '<div id="ladder-inline-list">';
@@ -8904,8 +9027,9 @@ function calcAtk(atk,def,sk,isP){
     critMulUsed = cd;
     dmg = dmg * cd;
   }
-  // 手稿：傷害 − 目標防 × 0.8
-  dmg = Math.max(1, Math.floor(dmg - defStat * 0.8));
+  // 手稿：傷害 − 目標防 × 0.8；多段可先加總再扣一次（sk._noDef）
+  if (sk && sk._noDef) dmg = Math.max(0, Math.floor(dmg));
+  else dmg = Math.max(1, Math.floor(dmg - defStat * 0.8));
 
   if (isP && S.atkBoost) { dmg = Math.floor(dmg * 1.5); S.atkBoost = false; }
   if (isP && S.eEffects && S.eEffects.slow) dmg = Math.floor(dmg * 1.2);
@@ -9558,19 +9682,25 @@ function executeSkill(pl, sk, onDone, isEnemy){
         }, beamOpts));
       } catch (e) {}
     }
+    const srcSkAll = (typeof skUse !== 'undefined' && skUse) ? skUse : sk;
+    const sumThenDef = hits > 1 && (
+      (srcSkAll.fixedHits != null && srcSkAll.fixedHits > 1) ||
+      (srcSkAll.atkPercentMin != null && srcSkAll.atkPercentMax != null)
+    );
+    let rawSum = 0, sumCrit = false, sumTypeMul = 1, hitsLanded = 0;
     for (let h = 0; h < hits; h++) {
       if (!defender || defender.hp <= 0) break;
-      const srcSk = (typeof skUse !== 'undefined' && skUse) ? skUse : sk;
+      const srcSk = srcSkAll;
       let hitSk = srcSk;
       if (srcSk.atkPercentMin != null && srcSk.atkPercentMax != null) {
         const pct = srcSk.atkPercentMin + Math.random() * (srcSk.atkPercentMax - srcSk.atkPercentMin);
         hitSk = Object.assign({}, srcSk, { atkPercent: pct });
       } else if (srcSk.hitAtkPercents && Array.isArray(srcSk.hitAtkPercents)) {
-        // 依總連擊數取對應倍率：2/3/4 擊 → 160/180/200
         const idx = Math.min(hits - 2, srcSk.hitAtkPercents.length - 1);
         const pct = srcSk.hitAtkPercents[Math.max(0, idx)];
         hitSk = Object.assign({}, srcSk, { atkPercent: pct });
       }
+      if (sumThenDef) hitSk = Object.assign({}, hitSk, { _noDef: true });
       const r = calcAtk(pl, defender, hitSk, !isEnemy);
       if (r.type === 'miss') {
         if (hits === 1) {
@@ -9591,6 +9721,13 @@ function executeSkill(pl, sk, onDone, isEnemy){
         continue;
       }
       anyHit = true;
+      if (sumThenDef) {
+        rawSum += Math.max(0, Number(r.dmg) || 0);
+        hitsLanded++;
+        if (r.type === 'crit') sumCrit = true;
+        if (r.typeMul != null) sumTypeMul = r.typeMul;
+        continue;
+      }
       let realDmg = r.dmg;
       // 冰刀紫階：第一次受到超過 50% 最大血的攻擊 → 抵消
       try {
@@ -9677,6 +9814,43 @@ function executeSkill(pl, sk, onDone, isEnemy){
     }
 
     // 對其他敵人追加傷害（海·波濤大浪 splash / 三叉戟已在 defenders 列表時逐一打）
+    
+    // 多段加總後一次扣防（當電雷／天雷轟等）
+    if (sumThenDef && anyHit && defender && hitsLanded > 0) {
+      const defStat = Number(defender.defense) || 0;
+      let realDmg = Math.max(1, Math.floor(rawSum - defStat * 0.8));
+      try {
+        if (typeof getTreasureCombatEffects === 'function' && defender && !defender._iceNullifyUsed) {
+          const dfx = getTreasureCombatEffects(defender);
+          if (dfx.onceNullifyOverHpPct != null) {
+            const maxHp = Math.max(1, Number(defender.maxHp) || 1);
+            if (realDmg > maxHp * dfx.onceNullifyOverHpPct) {
+              defender._iceNullifyUsed = true;
+              addBLog((typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : defender.name) + ' 的冰刀發出寒光，抵消了本次重擊！', 'heal');
+              realDmg = 0;
+            }
+          }
+        }
+      } catch (e) {}
+      if (defender._shield && defender._shield > 0) {
+        const absorbed = Math.min(defender._shield, realDmg);
+        defender._shield -= absorbed;
+        realDmg -= absorbed;
+        if (absorbed > 0) addBLog(defender.name + ' 的護盾吸收了 ' + absorbed + ' 傷害！', 'sys');
+      }
+      const hpBefore = Math.max(0, Number(defender.hp) || 0);
+      const applied = Math.min(realDmg, hpBefore);
+      defender.hp = Math.max(0, hpBefore - applied);
+      totalDmg += applied;
+      const atkName = (typeof getPetDisplayName === 'function' ? getPetDisplayName(pl) : (pl.name || '攻擊者'));
+      const defName = (typeof getPetDisplayName === 'function' ? getPetDisplayName(defender) : (defender.name || '目標'));
+      const skLabel = ((skUse && (skUse.emoji || skUse.name)) ? ((skUse.emoji || '') + (skUse.name || '')) : ((sk.emoji || '') + (sk.name || '技能')));
+      const isCrit = sumCrit;
+      addBLog(atkName + ' 用 ' + skLabel + '（' + hitsLanded + ' 道）→ ' + defName +
+        (isCrit ? '　💥暴擊 ' : '　造成 ') + Math.round(applied) + ' 傷害', isCrit ? 'crit' : (isEnemy ? 'en' : 'p'));
+      showPop(isEnemy ? 'p' : 'e', (isCrit ? '暴擊 ' : '') + Math.round(applied), isCrit ? 'c' : 'h');
+    }
+
     if ((skUse.splashOtherEnemies || sk.splashOtherEnemies) && defender) {
       const splashPct = Number(skUse.splashOtherEnemies || sk.splashOtherEnemies) || 100;
       const others = (isEnemy ? (S.battleAllies||[]) : (S.battleEnemies||[])).filter(e => e && e.hp > 0 && e !== defender);
@@ -10364,8 +10538,10 @@ function endBattle(win){
   S.autoBattle = false;
   if (typeof updateAutoBattleBtn === 'function') updateAutoBattleBtn();
   setBattleBtns(false);
+  // 先記住是否天梯（後面會清掉 arenaBattle）
+  const isArena = !!(S.arenaBattle && S.arenaBattle.active);
   // 天梯失敗結算（勝利在 win 分支處理）
-  if (!win && S.arenaBattle && S.arenaBattle.active) {
+  if (!win && isArena) {
     const lr = applyLadderResult(false);
     if (lr) {
       S._ladderLoseNote = '<div class="res-sec"><div class="res-sec-title">🏆 天梯</div>' +
@@ -10386,8 +10562,7 @@ function endBattle(win){
   const actions = $('res-actions');
   actions.innerHTML = '';
 
-  // 天梯：不掉戰利品碎片；一般戰鬥才 roll drops
-  const isArena = !!(S.arenaBattle && S.arenaBattle.active);
+  // 天梯：不掉戰利品碎片、不給經驗；一般戰鬥才 roll drops
   const drops = isArena ? { frags: [], coins: 0, extra: [] } : rollBattleDrops(win);
 
   if(win){
@@ -10404,7 +10579,7 @@ function endBattle(win){
         ladderNote = '<div class="res-sec"><div class="res-sec-title">🏆 天梯</div>' +
           '<div class="res-line">積分 <b>' + (lr.rating - lr.delta) + '</b> → <b style="color:#2e7d32">' + lr.rating + '</b>（' +
           (lr.delta >= 0 ? '+' : '') + lr.delta + '）　' + lr.tier.emoji + lr.tier.name + '</div>' +
-          '<div class="res-line">排名變為 <b>第 ' + rk + ' 名</b>（與對手交換名次）</div></div>';
+          '<div class="res-line">目前排名 <b>第 ' + rk + ' 名</b></div></div>';
       }
       S.arenaBattle = null;
     }
@@ -10737,11 +10912,14 @@ function getBattlePetExpMult(ownedIdx) {
       $('result-modal').classList.remove('hidden');
       return;
     }
-    // 敗北也給少量經驗（依表的 25%）
-    const expReward = calcBattleExpRewards(false);
-    const expG = expReward.petExp;
-    const playerExpG = expReward.playerExp;
-    S.exp += playerExpG;
+    // 敗北也給少量經驗（依表的 25%）；天梯一律不給經驗
+    let expG = 0, playerExpG = 0;
+    if (!isArena) {
+      const expReward = calcBattleExpRewards(false);
+      expG = expReward.petExp;
+      playerExpG = expReward.playerExp;
+      S.exp += playerExpG;
+    }
     const battleIdxs = (function() {
       const set = [];
       const add = (i) => { if (i != null && set.indexOf(i) < 0) set.push(i); };
@@ -12476,6 +12654,462 @@ function maybeSeedWelcomeMail() {
     rewards: { coins: 50 }
   });
 }
+
+/* ===== 公告 ===== */
+function ensureAnnounceState() {
+  if (!Array.isArray(S.announcements)) S.announcements = [];
+  if (!S.annReadIds || typeof S.annReadIds !== 'object') S.annReadIds = {};
+}
+function unreadAnnounceCount() {
+  ensureAnnounceState();
+  return S.announcements.filter(a => a && a.id && !S.annReadIds[a.id]).length;
+}
+function maybeSeedAnnouncements() {
+  ensureAnnounceState();
+  if (S.announcements.some(a => a && a.id === 'ann_welcome_v1')) return;
+  S.announcements.unshift({
+    id: 'ann_welcome_v1',
+    title: '波波島開服公告',
+    body: '歡迎來到波波島！\n\n• 探索島嶼收集寵物與寶物\n• 挑戰天梯競技爭取更高排名\n• 記得每日簽到領取獎勵\n\n祝冒險愉快！',
+    from: '波波島營運',
+    at: Date.now()
+  });
+}
+async function fetchAnnouncements() {
+  ensureAnnounceState();
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from('game_announcements')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(30);
+    if (error || !data) return;
+    const have = {};
+    S.announcements.forEach(a => { if (a && a.id) have[a.id] = true; });
+    data.forEach(row => {
+      const id = row.id || ('ann_' + (row.created_at || Math.random()));
+      if (have[id]) return;
+      S.announcements.push({
+        id: id,
+        title: row.title || '公告',
+        body: row.body || '',
+        from: row.from_name || '波波島營運',
+        at: row.created_at ? new Date(row.created_at).getTime() : Date.now()
+      });
+      have[id] = true;
+    });
+    S.announcements.sort((a, b) => (b.at || 0) - (a.at || 0));
+    if (typeof saveGame === 'function') saveGame();
+    updateAnnounceBadge();
+  } catch (e) {
+    console.warn('fetchAnnouncements', e);
+  }
+}
+function updateAnnounceBadge() {
+  const btn = document.getElementById('announce-btn');
+  if (!btn) return;
+  let dot = btn.querySelector('.red-dot');
+  const n = unreadAnnounceCount();
+  if (n > 0) {
+    if (!dot) {
+      dot = document.createElement('span');
+      dot.className = 'red-dot';
+      btn.appendChild(dot);
+    }
+  } else if (dot) {
+    dot.remove();
+  }
+}
+
+/** 每次開啟遊戲只彈「最新一則」公告（本頁工作階段只自動彈一次） */
+async function showStartupAnnouncement() {
+  try {
+    if (sessionStorage.getItem('bobo_ann_shown') === '1') return;
+    sessionStorage.setItem('bobo_ann_shown', '1');
+  } catch (e) {}
+  try {
+    ensureAnnounceState();
+    maybeSeedAnnouncements();
+    await fetchAnnouncements();
+  } catch (e) {}
+  setTimeout(function() {
+    try {
+      ensureAnnounceState();
+      // 依時間新→舊排序後取第一則
+      S.announcements.sort((a, b) => (b.at || 0) - (a.at || 0));
+      if (!S.announcements.length) return;
+      if (typeof openAnnounceRead === 'function') openAnnounceRead(0);
+    } catch (e) {}
+  }, 600);
+}
+
+function openAnnounceModal() {
+  ensureAnnounceState();
+  maybeSeedAnnouncements();
+  const modal = document.getElementById('announce-modal');
+  if (!modal) return;
+  renderAnnounceList();
+  modal.classList.remove('hidden');
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
+  fetchAnnouncements().then(() => renderAnnounceList());
+}
+function renderAnnounceList() {
+  ensureAnnounceState();
+  const list = document.getElementById('announce-list');
+  const empty = document.getElementById('announce-empty');
+  if (!list) return;
+  if (!S.announcements.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = S.announcements.map((a, i) => {
+    const unread = a && a.id && !S.annReadIds[a.id];
+    const t = a.at ? new Date(a.at).toLocaleString() : '';
+    return '<div class="history-card" data-ann-i="' + i + '" style="cursor:pointer;' + (unread ? 'border-color:#42a5f5' : '') + '">' +
+      '<div class="hc-top"><span class="hc-result">' + (unread ? '<span style="color:#1e88e5;font-weight:900">● </span>' : '') + (a.title || '公告') + '</span>' +
+      '<span class="hc-time">' + t + '</span></div>' +
+      '<div class="hc-zone">' + (a.from || '波波島營運') + '</div>' +
+      '<div class="hc-more">點擊閱讀</div></div>';
+  }).join('');
+  list.querySelectorAll('[data-ann-i]').forEach(el => {
+    el.onclick = () => openAnnounceRead(Number(el.dataset.annI));
+  });
+  updateAnnounceBadge();
+}
+function openAnnounceRead(idx) {
+  ensureAnnounceState();
+  const a = S.announcements[idx];
+  if (!a) return;
+  if (a.id) S.annReadIds[a.id] = true;
+  const modal = document.getElementById('announce-read-modal');
+  if (!modal) return;
+  const t = document.getElementById('announce-read-title');
+  const m = document.getElementById('announce-read-meta');
+  const b = document.getElementById('announce-read-body');
+  if (t) t.textContent = a.title || '公告';
+  if (m) m.textContent = (a.from || '波波島營運') + (a.at ? ('　' + new Date(a.at).toLocaleString()) : '');
+  if (b) b.textContent = a.body || '';
+  modal.classList.remove('hidden');
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
+  if (typeof saveGame === 'function') saveGame();
+  updateAnnounceBadge();
+  renderAnnounceList();
+}
+function closeAnnounceModals() {
+  const m1 = document.getElementById('announce-modal');
+  const m2 = document.getElementById('announce-read-modal');
+  if (m1) m1.classList.add('hidden');
+  if (m2) m2.classList.add('hidden');
+}
+
+
+
+/* ===== 更多／禮包碼／排行榜／帳號 ===== */
+const GIFT_CODES = {
+  'BOBO2026': { coins: 200, label: '開服禮包：金幣 ×200' },
+  'POPOISLAND': { coins: 100, frags: { 'lei_dao': 5 }, label: '島民禮包：金幣 ×100、雷刀碎片 ×5' },
+  'HIROGIFT': { coins: 500, label: '特別禮包：金幣 ×500' }
+};
+function ensureGiftState() {
+  if (!S.redeemedCodes || typeof S.redeemedCodes !== 'object') S.redeemedCodes = {};
+}
+function openGiftCodeModal() {
+  ensureGiftState();
+  const m = $('gift-code-modal');
+  const inp = $('gift-code-input');
+  const msg = $('gift-code-msg');
+  if (msg) { msg.textContent = ''; msg.style.color = '#c62828'; }
+  if (inp) inp.value = '';
+  if (m) {
+    m.classList.remove('hidden');
+    if (m.parentNode) m.parentNode.appendChild(m);
+  }
+  setTimeout(() => { try { inp && inp.focus(); } catch (e) {} }, 80);
+}
+function submitGiftCode() {
+  ensureGiftState();
+  const inp = $('gift-code-input');
+  const msg = $('gift-code-msg');
+  const raw = (inp && inp.value ? inp.value : '').trim().toUpperCase().replace(/\s+/g, '');
+  if (!raw) {
+    if (msg) { msg.textContent = '請輸入禮包碼'; msg.style.color = '#c62828'; }
+    return;
+  }
+  if (S.redeemedCodes[raw]) {
+    if (msg) { msg.textContent = '此禮包碼已兌換過'; msg.style.color = '#c62828'; }
+    return;
+  }
+  const gift = GIFT_CODES[raw];
+  if (!gift) {
+    // 嘗試雲端
+    tryRedeemCloudGift(raw);
+    return;
+  }
+  applyGiftReward(raw, gift);
+}
+async function tryRedeemCloudGift(code) {
+  const msg = $('gift-code-msg');
+  if (!sb) {
+    if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
+    return;
+  }
+  try {
+    const { data, error } = await sb.from('gift_codes').select('*').eq('code', code).limit(1);
+    if (error || !data || !data.length) {
+      if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
+      return;
+    }
+    const row = data[0];
+    if (row.active === false) {
+      if (msg) { msg.textContent = '此禮包碼已停用'; msg.style.color = '#c62828'; }
+      return;
+    }
+    applyGiftReward(code, {
+      coins: row.coins || 0,
+      frags: row.frags || null,
+      label: row.label || ('禮包：' + code)
+    });
+  } catch (e) {
+    if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
+  }
+}
+function applyGiftReward(code, gift) {
+  ensureGiftState();
+  const msg = $('gift-code-msg');
+  if (gift.coins) S.coins = (S.coins || 0) + Number(gift.coins || 0);
+  if (gift.frags && typeof addTreasureFragments === 'function') {
+    Object.keys(gift.frags).forEach(k => addTreasureFragments(k, gift.frags[k]));
+  }
+  S.redeemedCodes[code] = Date.now();
+  if (typeof updateHeader === 'function') updateHeader();
+  if (typeof saveGame === 'function') saveGame();
+  if (msg) {
+    msg.style.color = '#2e7d32';
+    msg.textContent = '兌換成功！' + (gift.label || '');
+  }
+  addLog('map-log', '🎁 禮包碼兌換成功：' + (gift.label || code));
+  setTimeout(() => {
+    const m = $('gift-code-modal');
+    if (m) m.classList.add('hidden');
+  }, 900);
+}
+async function fetchGlobalTopPets() {
+  const rows = [];
+  const myName = S.trainerName || S.username || '我';
+  // 自己：每一隻寵物都上榜
+  (S.owned || []).forEach((p, i) => {
+    if (!p) return;
+    rows.push({
+      username: myName,
+      petName: p.name || '寵物',
+      nick: p.nickname || '',
+      emoji: p.emoji || '🐾',
+      level: p.level || 1,
+      type: p.type || '',
+      star: p.starLevel != null ? p.starLevel : 0,
+      power: calcCombatPower(p),
+      isMe: true
+    });
+  });
+  if (sb) {
+    try {
+      let res = await sb.from('arena_presence')
+        .select('user_id,username,power,top_pet_power,top_pet_name,top_pet_emoji,top_pet_level,top_pet_type,pets_rank,team,updated_at')
+        .limit(200);
+      if (res.error) {
+        res = await sb.from('arena_presence')
+          .select('user_id,username,power,team,updated_at')
+          .limit(200);
+      }
+      const data = res.data;
+      if (!res.error && data) {
+        data.forEach(row => {
+          if (S.userId && row.user_id === S.userId) return; // 自己已用本機資料
+          const uname = row.username || '冒險者';
+          // 優先：pets_rank 全寵物
+          if (Array.isArray(row.pets_rank) && row.pets_rank.length) {
+            row.pets_rank.forEach(p => {
+              if (!p) return;
+              rows.push({
+                username: uname,
+                petName: p.name || '寵物',
+                nick: p.nick || '',
+                emoji: p.emoji || '🐾',
+                level: p.level || 1,
+                type: p.type || '',
+                star: p.star != null ? p.star : 0,
+                power: Number(p.power) || 0,
+                isMe: false
+              });
+            });
+            return;
+          }
+          // 次選：team 陣列裡每隻
+          if (Array.isArray(row.team) && row.team.length) {
+            row.team.forEach(p => {
+              if (!p) return;
+              const pw = (typeof calcCombatPower === 'function') ? calcCombatPower(p) : (Number(p.power) || 0);
+              rows.push({
+                username: uname,
+                petName: p.name || '寵物',
+                nick: p.nickname || '',
+                emoji: p.emoji || '🐾',
+                level: p.level || 1,
+                type: p.type || '',
+                star: p.starLevel != null ? p.starLevel : 0,
+                power: pw,
+                isMe: false
+              });
+            });
+            return;
+          }
+          // 後備：只有最強一隻
+          const pw = Number(row.top_pet_power != null ? row.top_pet_power : row.power) || 0;
+          if (pw > 0) {
+            rows.push({
+              username: uname,
+              petName: row.top_pet_name || '主力寵物',
+              nick: '',
+              emoji: row.top_pet_emoji || '🐾',
+              level: row.top_pet_level || '—',
+              type: row.top_pet_type || '',
+              star: 0,
+              power: pw,
+              isMe: false
+            });
+          }
+        });
+      }
+    } catch (e) { console.warn('fetchGlobalTopPets', e); }
+  }
+  rows.sort((a, b) => b.power - a.power);
+  return rows.slice(0, 100);
+}
+async function renderTopPetRanking() {
+  const list = $('rank-pet-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;color:#888;padding:16px">載入全服排行中…</div>';
+  // 順便上傳自己
+  try { if (typeof publishArenaPresence === 'function') await publishArenaPresence(); } catch (e) {}
+  const ranked = await fetchGlobalTopPets();
+  if (!ranked.length) {
+    list.innerHTML = '<div style="text-align:center;color:#999;padding:20px">尚無資料（需連線雲端同步）</div>';
+    return;
+  }
+  list.innerHTML = ranked.map((x, idx) => {
+    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ('#' + (idx + 1));
+    const meTag = x.isMe ? ' <span style="color:#e65100;font-weight:800">（你）</span>' : '';
+    const nick = x.nick ? ('「' + x.nick + '」') : '';
+    return '<div class="history-card" style="display:flex;align-items:center;gap:10px;' + (x.isMe ? 'border-color:#ff9800;background:linear-gradient(90deg,#fff8e1,#fff)"' : '') + '">' +
+      '<div style="width:42px;font-weight:900;font-size:1.05rem">' + medal + '</div>' +
+      '<div style="font-size:1.6rem">' + (x.emoji || '🐾') + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-weight:800">' + (x.petName || '寵物') + nick + meTag + '</div>' +
+        '<div style="font-size:0.8rem;color:#666">訓練師：' + (x.username || '—') +
+          (x.level != null && x.level !== '—' ? ('　Lv.' + x.level) : '') +
+          (x.type ? ('　' + x.type + '系') : '') +
+          (x.star ? ('　⭐' + x.star) : '') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;font-weight:900;color:#e65100">⚔️ ' + Number(x.power).toLocaleString() + '</div>' +
+    '</div>';
+  }).join('');
+}
+function openRankings() {
+  showScreen('rankings');
+  const panel = $('rank-pet-panel');
+  if (panel) panel.style.display = 'none';
+}
+function openTopPetRanking() {
+  const panel = $('rank-pet-panel');
+  if (panel) panel.style.display = 'block';
+  renderTopPetRanking();
+}
+function openAccountScreen() {
+  const line = $('account-user-line');
+  if (line) {
+    const name = S.trainerName || S.username || '冒險者';
+    const uid = S.userId ? String(S.userId).slice(0, 8) + '…' : (S.isGuest ? '訪客模式' : '—');
+    line.innerHTML = '名稱：<b>' + name + '</b><br>帳號：' + (S.username || uid);
+  }
+}
+function updateMoreBadges() {
+  try {
+    const annBtn = $('more-announce');
+    if (annBtn && typeof unreadAnnounceCount === 'function') {
+      let dot = annBtn.querySelector('.red-dot');
+      if (unreadAnnounceCount() > 0) {
+        if (!dot) { dot = document.createElement('span'); dot.className = 'red-dot'; annBtn.appendChild(dot); }
+      } else if (dot) dot.remove();
+    }
+    const mailBtn = $('more-mail');
+    if (mailBtn && typeof unreadMailCount === 'function') {
+      let dot = mailBtn.querySelector('.red-dot');
+      if (unreadMailCount() > 0) {
+        if (!dot) { dot = document.createElement('span'); dot.className = 'red-dot'; mailBtn.appendChild(dot); }
+      } else if (dot) dot.remove();
+    }
+    const moreNav = $('nav-more');
+    if (moreNav) {
+      const n = (typeof unreadAnnounceCount === 'function' ? unreadAnnounceCount() : 0) +
+        (typeof unreadMailCount === 'function' ? unreadMailCount() : 0);
+      let dot = moreNav.querySelector('.red-dot');
+      if (n > 0) {
+        if (!dot) { dot = document.createElement('span'); dot.className = 'red-dot'; moreNav.appendChild(dot); }
+      } else if (dot) dot.remove();
+    }
+  } catch (e) {}
+}
+function bindMoreMenu() {
+  const on = (id, fn) => {
+    const el = $(id);
+    if (el) el.onclick = function(e) { try { e && e.preventDefault && e.preventDefault(); fn(); } catch (err) { console.warn(id, err); } };
+  };
+  on('more-gift', () => openGiftCodeModal());
+  on('more-help', () => {
+    if (typeof openHelp === 'function') openHelp('guide');
+    else {
+      const b = $('help-btn');
+      if (b && b.onclick) b.onclick();
+    }
+  });
+  on('more-streak', () => { if (typeof openStreakModal === 'function') openStreakModal(true); });
+  on('more-announce', () => { if (typeof openAnnounceModal === 'function') openAnnounceModal(); });
+  on('more-rank', () => openRankings());
+  on('more-mail', () => showScreen('mail'));
+  on('more-account', () => { showScreen('account'); openAccountScreen(); });
+  on('rank-top-pets', () => openTopPetRanking());
+  on('rank-back-more', () => showScreen('more'));
+  on('rank-pet-back', () => { const p=$('rank-pet-panel'); if(p) p.style.display='none'; });
+  on('account-profile', () => { if (typeof showPlayerProfile === 'function') showPlayerProfile(); });
+  on('account-logout', () => { if (typeof doLogout === 'function') doLogout(); });
+  on('account-back-more', () => showScreen('more'));
+  on('gift-code-submit', () => submitGiftCode());
+  on('gift-code-close', () => { const m=$('gift-code-modal'); if(m) m.classList.add('hidden'); });
+  const gi = $('gift-code-input');
+  if (gi && !gi._giftBound) {
+    gi._giftBound = true;
+    gi.addEventListener('keydown', e => { if (e.key === 'Enter') submitGiftCode(); });
+  }
+  const gm = $('gift-code-modal');
+  if (gm && !gm._giftBound) {
+    gm._giftBound = true;
+    gm.addEventListener('click', (e) => { if (e.target === gm) gm.classList.add('hidden'); });
+  }
+  // 再次綁定：進「更多」頁時也重綁一次，避免漏綁
+  const moreScreen = $('more');
+  if (moreScreen && !moreScreen._moreBound) {
+    moreScreen._moreBound = true;
+    moreScreen.addEventListener('click', function(ev) {
+      const t = ev.target && ev.target.closest ? ev.target.closest('button[id]') : null;
+      if (!t || !t.id) return;
+      // 已由 onclick 處理；此為後備
+    });
+  }
+}
+
+
 function renderMail() {
   ensureMailState();
   maybeSeedWelcomeMail();
@@ -12555,6 +13189,8 @@ function openMailRead(idx) {
 
 
 function updateRedDots() {
+  try { if (typeof updateAnnounceBadge === 'function') updateAnnounceBadge(); } catch (e) {}
+  try { if (typeof updateMoreBadges === 'function') updateMoreBadges(); } catch (e) {}
   try {
     const mailBtn = document.getElementById('nav-mail');
     if (mailBtn) {
@@ -12955,8 +13591,18 @@ enterGame = async function(username, userId, savedData) {
 const _origGuest = enterAsGuest;
 enterAsGuest = function() {
   try { localStorage.setItem('bobodao_last_mode', 'guest'); } catch (e) {}
-  return _origGuest();
+  const r = _origGuest();
+  try { showStartupAnnouncement(); } catch (e) {}
+  return r;
 };
+const _origEnterGameAnn = typeof enterGame === 'function' ? enterGame : null;
+if (_origEnterGameAnn) {
+  enterGame = async function() {
+    const r = await _origEnterGameAnn.apply(this, arguments);
+    try { showStartupAnnouncement(); } catch (e) {}
+    return r;
+  };
+}
 const _origLogout = doLogout;
 doLogout = async function() {
   try {
@@ -12967,6 +13613,43 @@ doLogout = async function() {
 
 // 啟動時嘗試還原
 tryRestoreSession();
+
+
+// 暴露給 HTML onclick 使用
+window.openGiftCodeModal = typeof openGiftCodeModal === 'function' ? openGiftCodeModal : window.openGiftCodeModal;
+window.openRankings = typeof openRankings === 'function' ? openRankings : window.openRankings;
+window.openTopPetRanking = typeof openTopPetRanking === 'function' ? openTopPetRanking : window.openTopPetRanking;
+window.openAccountScreen = typeof openAccountScreen === 'function' ? openAccountScreen : window.openAccountScreen;
+window.submitGiftCode = typeof submitGiftCode === 'function' ? submitGiftCode : window.submitGiftCode;
+window.openAnnounceModal = typeof openAnnounceModal === 'function' ? openAnnounceModal : window.openAnnounceModal;
+window.openStreakModal = typeof openStreakModal === 'function' ? openStreakModal : window.openStreakModal;
+window.openHelp = typeof openHelp === 'function' ? openHelp : window.openHelp;
+window.showScreen = typeof showScreen === 'function' ? showScreen : window.showScreen;
+window.showPlayerProfile = typeof showPlayerProfile === 'function' ? showPlayerProfile : window.showPlayerProfile;
+window.doLogout = typeof doLogout === 'function' ? doLogout : window.doLogout;
+
+document.addEventListener('click', function(ev) {
+  try {
+    var el = ev.target && ev.target.closest ? ev.target.closest('[data-more-act]') : null;
+    if (!el) return;
+    var act = el.getAttribute('data-more-act');
+    if (!act) return;
+    if (act === 'gift') openGiftCodeModal();
+    else if (act === 'help') openHelp('guide');
+    else if (act === 'streak') openStreakModal(true);
+    else if (act === 'announce') openAnnounceModal();
+    else if (act === 'rank') openRankings();
+    else if (act === 'mail') showScreen('mail');
+    else if (act === 'account') { showScreen('account'); openAccountScreen(); }
+    else if (act === 'topPets') openTopPetRanking();
+    else if (act === 'backMore') showScreen('more');
+    else if (act === 'petBack') { var p=document.getElementById('rank-pet-panel'); if(p) p.style.display='none'; }
+    else if (act === 'profile') showPlayerProfile();
+    else if (act === 'logout') doLogout();
+    else if (act === 'giftSubmit') submitGiftCode();
+    else if (act === 'giftClose') { var m=document.getElementById('gift-code-modal'); if(m) m.classList.add('hidden'); }
+  } catch (e) { console.warn('more click', e); alert('操作失敗：' + (e && e.message ? e.message : e)); }
+}, true);
 
 </script>
 <script>
