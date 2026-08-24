@@ -5383,6 +5383,7 @@ async function persistCurrentUser() {
 function saveGame() {
   if (currentUserId) {
     persistCurrentUser();
+    try { if (typeof publishArenaPresence === 'function') publishArenaPresence(); } catch (e) {}
   } else if (currentUser === '訪客') {
     try {
       localStorage.setItem('bobodao_guest_v1', JSON.stringify(getSaveData()));
@@ -12897,12 +12898,14 @@ function applyGiftReward(code, gift) {
 }
 async function fetchGlobalTopPets() {
   const rows = [];
-  const myName = S.trainerName || S.username || '我';
-  // 自己：每一隻寵物都上榜
-  (S.owned || []).forEach((p, i) => {
+  const myName = S.trainerName || S.username || currentUser || '我';
+  const myUid = S.userId || currentUserId || null;
+  // 自己：每一隻
+  (S.owned || []).forEach((p) => {
     if (!p) return;
     rows.push({
       username: myName,
+      petId: p.id || null,
       petName: p.name || '寵物',
       nick: p.nickname || '',
       emoji: p.emoji || '🐾',
@@ -12913,27 +12916,62 @@ async function fetchGlobalTopPets() {
       isMe: true
     });
   });
+  let remoteCount = 0;
+  let fetchNote = '';
   if (sb) {
+    // 來源 A：saves 全存檔（每位玩家全部寵物）
     try {
-      let res = await sb.from('arena_presence')
-        .select('user_id,username,power,top_pet_power,top_pet_name,top_pet_emoji,top_pet_level,top_pet_type,pets_rank,team,updated_at')
-        .limit(200);
+      const res = await sb.from('saves').select('user_id,username,data,updated_at').limit(150);
       if (res.error) {
-        res = await sb.from('arena_presence')
-          .select('user_id,username,power,team,updated_at')
-          .limit(200);
-      }
-      const data = res.data;
-      if (!res.error && data) {
-        data.forEach(row => {
-          if (S.userId && row.user_id === S.userId) return; // 自己已用本機資料
+        fetchNote += 'saves:' + (res.error.message || 'error') + '；';
+      } else if (res.data) {
+        res.data.forEach(row => {
+          if (myUid && row.user_id === myUid) return;
           const uname = row.username || '冒險者';
-          // 優先：pets_rank 全寵物
+          const island = row.data && row.data.island ? row.data.island : null;
+          const owned = island && Array.isArray(island.owned) ? island.owned : null;
+          if (!owned) return;
+          owned.forEach(p => {
+            if (!p) return;
+            let pw = 0;
+            try { pw = calcCombatPower(p); } catch (e) { pw = Number(p.power) || 0; }
+            rows.push({
+              username: uname,
+              petId: p.id || null,
+              petName: p.name || '寵物',
+              nick: p.nickname || '',
+              emoji: p.emoji || '🐾',
+              level: p.level || 1,
+              type: p.type || '',
+              star: p.starLevel != null ? p.starLevel : 0,
+              power: pw,
+              isMe: false
+            });
+            remoteCount++;
+          });
+        });
+      }
+    } catch (e) {
+      fetchNote += 'saves例外；';
+      console.warn('rank saves', e);
+    }
+    // 來源 B：arena_presence.pets_rank（備援）
+    try {
+      const res2 = await sb.from('arena_presence')
+        .select('user_id,username,pets_rank,team,top_pet_power,top_pet_name,top_pet_emoji,top_pet_level,top_pet_type,power')
+        .limit(200);
+      if (res2.error) {
+        fetchNote += 'presence:' + (res2.error.message || 'error') + '；';
+      } else if (res2.data) {
+        res2.data.forEach(row => {
+          if (myUid && row.user_id === myUid) return;
+          const uname = row.username || '冒險者';
           if (Array.isArray(row.pets_rank) && row.pets_rank.length) {
             row.pets_rank.forEach(p => {
               if (!p) return;
               rows.push({
                 username: uname,
+                petId: p.id || null,
                 petName: p.name || '寵物',
                 nick: p.nick || '',
                 emoji: p.emoji || '🐾',
@@ -12943,16 +12981,16 @@ async function fetchGlobalTopPets() {
                 power: Number(p.power) || 0,
                 isMe: false
               });
+              remoteCount++;
             });
-            return;
-          }
-          // 次選：team 陣列裡每隻
-          if (Array.isArray(row.team) && row.team.length) {
+          } else if (Array.isArray(row.team) && row.team.length) {
             row.team.forEach(p => {
               if (!p) return;
-              const pw = (typeof calcCombatPower === 'function') ? calcCombatPower(p) : (Number(p.power) || 0);
+              let pw = 0;
+              try { pw = calcCombatPower(p); } catch (e) { pw = 0; }
               rows.push({
                 username: uname,
+                petId: p.id || null,
                 petName: p.name || '寵物',
                 nick: p.nickname || '',
                 emoji: p.emoji || '🐾',
@@ -12962,30 +13000,31 @@ async function fetchGlobalTopPets() {
                 power: pw,
                 isMe: false
               });
-            });
-            return;
-          }
-          // 後備：只有最強一隻
-          const pw = Number(row.top_pet_power != null ? row.top_pet_power : row.power) || 0;
-          if (pw > 0) {
-            rows.push({
-              username: uname,
-              petName: row.top_pet_name || '主力寵物',
-              nick: '',
-              emoji: row.top_pet_emoji || '🐾',
-              level: row.top_pet_level || '—',
-              type: row.top_pet_type || '',
-              star: 0,
-              power: pw,
-              isMe: false
+              remoteCount++;
             });
           }
         });
       }
-    } catch (e) { console.warn('fetchGlobalTopPets', e); }
+    } catch (e) {
+      fetchNote += 'presence例外；';
+      console.warn('rank presence', e);
+    }
+  } else {
+    fetchNote = '未連線雲端';
   }
-  rows.sort((a, b) => b.power - a.power);
-  return rows.slice(0, 100);
+  // 去重：同擁有者+同名+同戰力只留一筆（粗略）
+  const seen = {};
+  const uniq = [];
+  rows.forEach(r => {
+    const k = (r.username || '') + '|' + (r.petName || '') + '|' + (r.level || '') + '|' + (r.power || '');
+    if (seen[k]) return;
+    seen[k] = true;
+    uniq.push(r);
+  });
+  uniq.sort((a, b) => b.power - a.power);
+  uniq._remoteCount = remoteCount;
+  uniq._fetchNote = fetchNote;
+  return uniq.slice(0, 150);
 }
 async function renderTopPetRanking() {
   const list = $('rank-pet-list');
@@ -12998,21 +13037,47 @@ async function renderTopPetRanking() {
     list.innerHTML = '<div style="text-align:center;color:#999;padding:20px">尚無資料（需連線雲端同步）</div>';
     return;
   }
-  list.innerHTML = ranked.map((x, idx) => {
+  const others = ranked.filter(r => !r.isMe).length;
+  let head = '';
+  if (others === 0) {
+    head = '<div style="text-align:center;font-size:0.8rem;color:#c62828;padding:8px 6px;margin-bottom:8px;background:#ffebee;border-radius:10px">' +
+      '目前只讀到你自己的寵物。<br>請確認其他帳號有登入並存檔；若仍只有自己，需在 Supabase 開放 <b>saves</b> 的 SELECT 權限給所有人（或 authenticated）。' +
+      (ranked._fetchNote ? ('<br><span style="color:#888">偵測：' + ranked._fetchNote + '</span>') : '') +
+      '</div>';
+  } else {
+    head = '<div style="text-align:center;font-size:0.78rem;color:#666;margin-bottom:8px">全服共 ' + ranked.length + ' 筆　（其他玩家 ' + others + ' 筆）</div>';
+  }
+  list.innerHTML = head + ranked.map((x, idx) => {
     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ('#' + (idx + 1));
     const meTag = x.isMe ? ' <span style="color:#e65100;font-weight:800">（你）</span>' : '';
     const nick = x.nick ? ('「' + x.nick + '」') : '';
+    // 用遊戲寵物圖，不用 emoji
+    let face = '';
+    try {
+      face = (typeof petFaceHtml === 'function')
+        ? petFaceHtml({ id: x.petId || null, name: x.petName || '', emoji: x.emoji || '🐾' }, 44)
+        : '';
+    } catch (e) { face = ''; }
+    if (!face) {
+      const nm = String(x.petName || '').replace(/\s+[A-Z]$/, '');
+      face = nm
+        ? ('<img src="' + nm + '.png" alt="" style="width:44px;height:44px;object-fit:contain" onerror="this.style.display=\'none\'">')
+        : '';
+    }
+    const starHtml = (typeof renderStarsHtml === 'function')
+      ? renderStarsHtml(Number(x.star) || 0, { size: 14, showLabel: false })
+      : '';
     return '<div class="history-card" style="display:flex;align-items:center;gap:10px;' + (x.isMe ? 'border-color:#ff9800;background:linear-gradient(90deg,#fff8e1,#fff)"' : '') + '">' +
-      '<div style="width:42px;font-weight:900;font-size:1.05rem">' + medal + '</div>' +
-      '<div style="font-size:1.6rem">' + (x.emoji || '🐾') + '</div>' +
-      '<div style="flex:1">' +
+      '<div style="width:36px;font-weight:900;font-size:0.95rem;flex-shrink:0">' + medal + '</div>' +
+      '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + face + '</div>' +
+      '<div style="flex:1;min-width:0">' +
         '<div style="font-weight:800">' + (x.petName || '寵物') + nick + meTag + '</div>' +
-        '<div style="font-size:0.8rem;color:#666">訓練師：' + (x.username || '—') +
+        '<div style="font-size:0.78rem;color:#666;margin-top:2px">擁有者：' + (x.username || '—') +
           (x.level != null && x.level !== '—' ? ('　Lv.' + x.level) : '') +
-          (x.type ? ('　' + x.type + '系') : '') +
-          (x.star ? ('　⭐' + x.star) : '') + '</div>' +
+          (x.type ? ('　' + x.type + '系') : '') + '</div>' +
+        (starHtml ? ('<div style="margin-top:2px">' + starHtml + '</div>') : '') +
       '</div>' +
-      '<div style="text-align:right;font-weight:900;color:#e65100">⚔️ ' + Number(x.power).toLocaleString() + '</div>' +
+      '<div style="text-align:right;font-weight:900;color:#e65100;flex-shrink:0">⚔️ ' + Number(x.power).toLocaleString() + '</div>' +
     '</div>';
   }).join('');
 }
