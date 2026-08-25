@@ -2196,7 +2196,7 @@ const ZONES = [
   /* 依截圖紅圈：標記落在各區域正中央；家在池塘右下方 */
   {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以整理隊伍與查看資訊。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
   {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。出沒隨早／午／晚改變。', unlock:6, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76, timeSpawns:true},
-  {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:12, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
+  {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。出沒隨早／午／晚改變。', unlock:14, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24, timeSpawns:true},
   {id:'volcano',  name:'熾熱火山',  emoji:'🌋', desc:'島中央偏右的熾熱火山，隨時可能噴發。出沒隨早／午／晚改變。', unlock:18, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40, timeSpawns:true},
   {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！出沒隨早／午／晚改變，且較易遇到高等級野生。', unlock:27, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52, timeSpawns:true},
@@ -4014,7 +4014,7 @@ const S = {
   treasures:{},
   treasureFrags:{},
   trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
-  unlocked:['plaza','coral_forge'],
+  unlocked:['plaza','meadow','coral_forge'],
   owned:[], team:[],
   discovered:[], // 圖鑑：遇過或擁有過的寵物 id
   items:{hua_mi:0},
@@ -4152,21 +4152,47 @@ const EVO_REQ_LABELS = {
   star: '星級', starLevel: '星級'
 };
 
+/** 與判定邏輯一致的「放寬後」條件（顯示與檢查共用） */
+function softenEvoReq(req, toStage) {
+  if (!req) return null;
+  const to = Math.max(0, Number(toStage != null ? toStage : req.to) || 0);
+  const out = {};
+  Object.keys(req).forEach(k => {
+    if (k === 'to') { out.to = req.to; return; }
+    let need = Number(req[k]);
+    if (!Number.isFinite(need)) return;
+    if (k === 'level') {
+      const soft = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || need;
+      need = Math.min(need, soft);
+    } else {
+      need = Math.max(1, Math.floor(need * 0.72));
+    }
+    out[k] = need;
+  });
+  // 若原 req 沒有 level，補上放寬後的等級門檻
+  if (out.level == null && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
+    out.level = EVO_STAGE_NEED_LV[to];
+  }
+  return out;
+}
+
 /** 格式化單一階段條件（不含 to） */
-function formatEvoReqBits(req) {
+function formatEvoReqBits(req, toStage) {
   if (!req) return '';
+  const soft = (typeof softenEvoReq === 'function') ? softenEvoReq(req, toStage != null ? toStage : req.to) : req;
+  const r = soft || req;
   const bits = [];
   const order = ['level','force','intel','charm','atk','attack','def','defense','speed','hp','maxHp','mp','maxMp','star','starLevel'];
   const seen = {};
   order.forEach(k => {
-    if (req[k] == null || !Number.isFinite(Number(req[k]))) return;
+    if (r[k] == null || !Number.isFinite(Number(r[k]))) return;
     seen[k] = true;
-    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + req[k]);
+    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + r[k]);
   });
-  Object.keys(req).forEach(k => {
+  Object.keys(r).forEach(k => {
     if (k === 'to' || seen[k]) return;
-    if (req[k] == null || !Number.isFinite(Number(req[k]))) return;
-    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + req[k]);
+    if (r[k] == null || !Number.isFinite(Number(r[k]))) return;
+    bits.push((EVO_REQ_LABELS[k] || k) + '≥' + r[k]);
   });
   return bits.join('、');
 }
@@ -4196,11 +4222,10 @@ function formatPetEvoReqsHtml(baseOrPet, opts) {
     const to = Number(r.to) || 0;
     if (to <= startStage && opts.hidePastBase) return;
     const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[to]) || ('階段'+to);
-    const bits = formatEvoReqBits(r);
-    // 確保等級有顯示（若 evoReqs 沒寫 level，補上共通門檻）
+    const bits = formatEvoReqBits(r, to);
     let line = bits;
-    if (!r.level && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
-      line = '等級≥' + EVO_STAGE_NEED_LV[to] + (bits ? '、' + bits : '');
+    if (!line && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
+      line = '等級≥' + EVO_STAGE_NEED_LV[to];
     }
     rows.push('<div style="margin:3px 0;padding:4px 8px;background:rgba(232,245,233,0.65);border-radius:8px;border:1px solid #c8e6c9">' +
       '<b style="color:#2e7d32">✨ ' + name + '</b><br><span style="color:#555">' + (line || '（僅等級）') + '</span></div>');
@@ -4214,15 +4239,20 @@ function formatPetEvoBrief(base) {
   if (!base) return '';
   const list = Array.isArray(base.evoReqs) ? base.evoReqs.slice() : [];
   list.sort((a,b) => (Number(a.to)||0) - (Number(b.to)||0));
+  const lvOf = (r) => {
+    const soft = softenEvoReq(r, r.to);
+    return (soft && soft.level != null) ? soft.level : ((EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[r.to]) || '?');
+  };
   if (!list.length) {
-    return '進化 Lv.13→…→160';
+    const a = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[1]) || 8;
+    const b = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[11]) || 115;
+    return '進化 Lv.' + a + '→…→' + b;
   }
   const first = list[0];
   const last = list[list.length - 1];
-  const fn = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[Number(first.to)]) || '';
   const ln = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[Number(last.to)]) || '';
-  const fl = first.level || (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[first.to]) || '?';
-  const ll = last.level || (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[last.to]) || '?';
+  const fl = lvOf(first);
+  const ll = lvOf(last);
   return '進化 ' + fl + '→' + ll + (ln ? '（至'+ln.replace('進化','')+'）' : '');
 }
 
@@ -4243,7 +4273,7 @@ function evaluateNextEvoReq(p) {
   const to = cur + 1;
   const maxByLv = maxEvoStageForPet(p);
   if (to > maxByLv) {
-    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 13;
+    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 8;
     return {
       ok: false, to: to, req: { to: to, level: needLv },
       fails: [{ key: 'level', need: needLv, have: Math.max(1, Number(p.level) || 1), label: '等級' }]
@@ -4251,27 +4281,22 @@ function evaluateNextEvoReq(p) {
   }
   let req = getEvoReqForStage(p, to);
   if (!req) {
-    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 13;
+    const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 8;
     req = { to: to, level: needLv };
   }
+  // 顯示與判定同一套放寬數值
+  const softReq = softenEvoReq(req, to) || req;
   const fails = [];
-  // 進化條件放寬：非等級數值需求 ×0.72；等級改吃較低的 EVO_STAGE_NEED_LV
-  Object.keys(req).forEach(k => {
+  Object.keys(softReq).forEach(k => {
     if (k === 'to') return;
-    let need = Number(req[k]);
+    const need = Number(softReq[k]);
     if (!Number.isFinite(need)) return;
-    if (k === 'level') {
-      const soft = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || need;
-      need = Math.min(need, soft);
-    } else {
-      need = Math.max(1, Math.floor(need * 0.72));
-    }
     const have = getPetEvoStatValue(p, k);
     if (have + 1e-9 < need) {
       fails.push({ key: k, need: need, have: have, label: EVO_REQ_LABELS[k] || k });
     }
   });
-  return { ok: fails.length === 0, to: to, req: req, fails: fails };
+  return { ok: fails.length === 0, to: to, req: softReq, fails: fails };
 }
 
 /** 是否可手動進化到下一階段（等級＋圖鑑 evoReqs 三圍／防禦等） */
@@ -5416,7 +5441,7 @@ function loadGameData(saved) {
     S.trainerName = d.trainerName || '';
     S.trainerEmoji = d.trainerEmoji || '🧑‍🌾';
     S.nameSet = !!(d.nameSet && d.trainerName);
-    S.unlocked = d.unlocked || ['plaza','coral_forge'];
+    S.unlocked = d.unlocked || ['plaza','meadow','coral_forge'];
   // 舊存檔可能缺新解鎖的初始地點
   ['plaza','meadow','beach'].forEach(id => {
     if (!S.unlocked.includes(id)) S.unlocked.push(id);
