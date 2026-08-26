@@ -36,8 +36,39 @@
     }
     .side-ad-left { left: max(8px, calc(50% - 490px - 176px)); }
     .side-ad-right { right: max(8px, calc(50% - 490px - 176px)); }
+    /* 寬螢幕：左右側廣告；窄螢幕：底部橫幅 */
+    .mobile-ad {
+      display: none;
+      width: 100%;
+      min-height: 50px;
+      max-height: 90px;
+      overflow: hidden;
+      background: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      flex-shrink: 0;
+      z-index: 80;
+    }
+    .mobile-ad ins.adsbygoogle {
+      display: block;
+      width: 100% !important;
+      min-height: 50px;
+    }
     @media (max-width: 1200px) {
-      .side-ad { display: none; }
+      .side-ad { display: none !important; }
+      .mobile-ad {
+        display: block;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      /* 避免內容被底部廣告擋住 */
+      body { padding-bottom: 60px; }
+      .game { padding-bottom: 8px; }
+    }
+    @media (min-width: 1201px) {
+      .mobile-ad { display: none !important; }
     }
 
     .game {
@@ -1743,6 +1774,7 @@
       <div class="pet-info-actions" id="pet-info-actions">
         <button type="button" class="btn btn-purple" id="pet-info-evo" style="position:relative;display:none">✨ 進化</button>
         <button type="button" class="btn btn-pink" id="pet-info-ascend" style="position:relative;display:none">🔄 轉化高階</button>
+        <button type="button" class="btn btn-primary" id="pet-info-exp-pack" style="position:relative;display:none">📦 使用經驗包</button>
         <button type="button" class="btn btn-shop" id="pet-info-star" style="position:relative">⭐ 升星</button>
         <button type="button" class="btn btn-explore" id="pet-info-star-bonus" style="position:relative;display:none">🎁 領取星階加成</button>
         <button type="button" class="btn btn-pink" id="pet-info-dismantle">♻️ 換成碎片</button>
@@ -4278,42 +4310,64 @@ function formatEvoReqBits(req, toStage, baseOrPet) {
   return bits.join('、');
 }
 
-/** 圖鑑／說明用：列出寵物全部進化條件 */
+/** 圖鑑／說明用：列出寵物全部進化條件（可展開／收合） */
 function formatPetEvoReqsHtml(baseOrPet, opts) {
   opts = opts || {};
   const base = (baseOrPet && baseOrPet.id && typeof getBase === 'function')
     ? (getBase(baseOrPet.id) || baseOrPet) : baseOrPet;
   if (!base) return '<div style="color:#888">無進化資料</div>';
   const list = Array.isArray(base.evoReqs) ? base.evoReqs.slice() : [];
-  // 依 to 排序
   list.sort((a,b) => (Number(a.to)||0) - (Number(b.to)||0));
+  let rowsHtml = '';
   if (!list.length) {
-    // 至少顯示共通等級門檻
     const rows = [];
     for (let s = 1; s <= (EVO_STAGE_MAX || 11); s++) {
       const lv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[s]) || null;
       const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[s]) || ('階段'+s);
       rows.push('<div style="margin:2px 0">✨ <b>' + name + '</b>：等級≥' + (lv != null ? lv : '?') + '</div>');
     }
-    return '<div style="font-size:0.82rem;line-height:1.55">' + rows.join('') + '</div>';
+    rowsHtml = rows.join('');
+  } else {
+    const startStage = Number(base.evoStage) || 0;
+    const rows = [];
+    list.forEach(r => {
+      const to = Number(r.to) || 0;
+      if (to <= startStage && opts.hidePastBase) return;
+      const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[to]) || ('階段'+to);
+      const bits = formatEvoReqBits(r, to, base);
+      let line = bits;
+      if (!line && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
+        line = '等級≥' + EVO_STAGE_NEED_LV[to];
+      }
+      rows.push('<div style="margin:3px 0;padding:4px 8px;background:rgba(232,245,233,0.65);border-radius:8px;border:1px solid #c8e6c9">' +
+        '<b style="color:#2e7d32">✨ ' + name + '</b><br><span style="color:#555">' + (line || '（僅等級）') + '</span></div>');
+    });
+    if (!rows.length) return '<div style="color:#888">已達最高進化階段</div>';
+    rowsHtml = rows.join('');
   }
-  const startStage = Number(base.evoStage) || 0;
-  const rows = [];
-  list.forEach(r => {
-    const to = Number(r.to) || 0;
-    if (to <= startStage && opts.hidePastBase) return;
-    const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[to]) || ('階段'+to);
-    const bits = formatEvoReqBits(r, to, base);
-    let line = bits;
-    if (!line && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
-      line = '等級≥' + EVO_STAGE_NEED_LV[to];
-    }
-    rows.push('<div style="margin:3px 0;padding:4px 8px;background:rgba(232,245,233,0.65);border-radius:8px;border:1px solid #c8e6c9">' +
-      '<b style="color:#2e7d32">✨ ' + name + '</b><br><span style="color:#555">' + (line || '（僅等級）') + '</span></div>');
-  });
-  if (!rows.length) return '<div style="color:#888">已達最高進化階段</div>';
-  return '<div style="font-size:0.82rem;line-height:1.5">' + rows.join('') + '</div>';
+  const uid = 'evo-req-' + Math.random().toString(36).slice(2, 9);
+  return '<div class="evo-req-wrap" style="font-size:0.82rem;line-height:1.5">' +
+    '<button type="button" class="evo-req-toggle" data-evo-panel="' + uid + '" onclick="toggleEvoReqPanel(this)" ' +
+    'style="width:100%;text-align:left;padding:8px 10px;border-radius:10px;border:2px solid #a5d6a7;background:#e8f5e9;cursor:pointer;font-family:inherit;font-weight:800;color:#2e7d32;display:flex;justify-content:space-between;align-items:center">' +
+    '<span>📋 查看各階進化條件</span><span class="evo-req-arrow">▼</span></button>' +
+    '<div id="' + uid + '" class="evo-req-panel" style="display:none;margin-top:6px">' + rowsHtml + '</div></div>';
 }
+function toggleEvoReqPanel(btn) {
+  try {
+    const id = btn && btn.getAttribute('data-evo-panel');
+    const panel = id ? document.getElementById(id) : null;
+    if (!panel) return;
+    const open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : 'block';
+    const arrow = btn.querySelector('.evo-req-arrow');
+    if (arrow) arrow.textContent = open ? '▼' : '▲';
+    const lab = btn.querySelector('span');
+    if (lab && lab !== arrow) {
+      // keep first span as title
+    }
+  } catch (e) {}
+}
+
 
 /** 簡短一行：下一個進化條件（圖鑑卡片用） */
 function formatPetEvoBrief(base) {
@@ -12416,6 +12470,7 @@ function openPetInfo(idx) {
   // 本體不再轉化高階；僅碎片可兌換（背包）
   const ascendBtn = $('pet-info-ascend');
   if (ascendBtn) ascendBtn.style.display = 'none';
+  try { updatePetInfoExpPackBtn(); } catch (e) {}
   // 在詳情區補一行進化條件
   try {
     const detailEl = $('pet-info-detail');
@@ -12604,7 +12659,85 @@ function toggleTeam(idx){
 }
 
 
+
+/** 寵物頁：對目前這隻使用經驗包（先選包種類） */
+function countOwnedExpPacks() {
+  let n = 0;
+  (typeof PET_EXP_PACKS !== 'undefined' ? PET_EXP_PACKS : []).forEach(function(def) {
+    n += (S.items && S.items[def.id]) || 0;
+  });
+  return n;
+}
+function openPetExpPackForCurrentPet() {
+  const oi = window._petInfoIdx;
+  if (oi == null || !S.owned[oi]) {
+    alert('請先開啟寵物資訊');
+    return;
+  }
+  if (countOwnedExpPacks() <= 0) {
+    alert('背包沒有寵物經驗包\\n（戰鬥勝利有機率掉落）');
+    return;
+  }
+  let modal = document.getElementById('pet-exp-pack-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'overlay';
+    modal.id = 'pet-exp-pack-modal';
+    modal.innerHTML = '<div class="modal" style="max-width:min(420px,94vw);width:100%;text-align:left">' +
+      '<h2 style="text-align:center" id="pet-exp-pack-title">📦 使用經驗包</h2>' +
+      '<p style="text-align:center;font-size:0.8rem;color:#666;margin:4px 0 10px" id="pet-exp-pack-desc"></p>' +
+      '<div id="pet-exp-pack-list" class="history-list" style="max-height:50vh;overflow:auto"></div>' +
+      '<button type="button" class="btn btn-back" style="width:100%;margin-top:10px" id="pet-exp-pack-close">取消</button></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.classList.add('hidden'); });
+  }
+  const pet = S.owned[oi];
+  const title = document.getElementById('pet-exp-pack-title');
+  const desc = document.getElementById('pet-exp-pack-desc');
+  const list = document.getElementById('pet-exp-pack-list');
+  const cap = getPetLevelCap();
+  if (title) title.textContent = '📦 給「' + (pet.name || '寵物') + '」使用經驗包';
+  if (desc) {
+    desc.innerHTML = '目前 Lv.' + (pet.level || 1) + '　EXP ' + (pet.exp || 0) + '/' + petExpNeeded(pet.level || 1) +
+      '<br>寵物等級上限 Lv.' + cap + '（玩家等級+6）';
+  }
+  list.innerHTML = (PET_EXP_PACKS || []).map(function(def) {
+    const cnt = (S.items && S.items[def.id]) || 0;
+    if (cnt <= 0) return '';
+    return '<div class="history-card" data-pack-id="' + def.id + '" style="cursor:pointer;display:flex;align-items:center;gap:10px">' +
+      '<div style="font-size:1.6rem">' + def.emoji + '</div>' +
+      '<div style="flex:1"><div style="font-weight:800">' + def.name + ' ×' + cnt + '</div>' +
+      '<div style="font-size:0.78rem;color:#666">經驗 +' + def.exp + '</div></div></div>';
+  }).join('') || '<div style="text-align:center;color:#888;padding:12px">沒有經驗包</div>';
+  list.querySelectorAll('[data-pack-id]').forEach(function(el) {
+    el.onclick = function() {
+      usePetExpPackOn(oi, el.getAttribute('data-pack-id'));
+      // 使用後若還有包且寵物頁開著，刷新寵物頁
+      try {
+        if (typeof openPetInfo === 'function') openPetInfo(oi);
+      } catch (e) {}
+    };
+  });
+  const cl = document.getElementById('pet-exp-pack-close');
+  if (cl) cl.onclick = function() { modal.classList.add('hidden'); };
+  modal.classList.remove('hidden');
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
+}
+function updatePetInfoExpPackBtn() {
+  const btn = document.getElementById('pet-info-exp-pack');
+  if (!btn) return;
+  const n = countOwnedExpPacks();
+  const oi = window._petInfoIdx;
+  const show = oi != null && S.owned[oi] && n > 0;
+  btn.style.display = show ? 'inline-block' : 'none';
+  if (show) {
+    btn.innerHTML = '📦 使用經驗包' + (n > 0 ? ' <span style="font-size:0.75rem">(' + n + ')</span>' : '');
+    btn.onclick = function() { openPetExpPackForCurrentPet(); };
+  }
+}
+
 function openPetExpPackPicker(packId) {
+
   const def = getPetExpPackDef(packId);
   if (!def) { alert('未知的經驗包'); return; }
   const n = (S.items && S.items[packId]) || 0;
@@ -12705,9 +12838,8 @@ function renderBag(){
       has = true;
       const d = document.createElement('div'); d.className = 'item-card';
       d.style.borderColor = '#42a5f5';
-      d.style.cursor = 'pointer';
-      d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">經驗 +' + def.exp + '<br>點擊選擇寵物使用</div>';
-      d.onclick = function() { openPetExpPackPicker(def.id); };
+      d.style.cursor = 'default';
+      d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">經驗 +' + def.exp + '<br>請至寵物頁面使用</div>';
       box.appendChild(d);
     });
     // 寶箱
@@ -15325,5 +15457,13 @@ document.addEventListener('click', function(ev) {
 })();
 
 </script>
+  <div class="mobile-ad" aria-label="手機廣告">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-4837269887561375"
+         data-ad-format="horizontal"
+         data-full-width-responsive="true"></ins>
+    <script>try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}</script>
+  </div>
 </body>
 </html>
