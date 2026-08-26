@@ -1525,6 +1525,7 @@
         <div class="battle-row-enemies" id="battle-enemies"></div>
         <div class="battle-bottom-bar">
           <div id="item-btns" class="act-grid" style="flex:1"></div>
+          <button type="button" class="btn" id="flee-battle-btn" style="display:none">🏃 逃走</button>
           <button type="button" class="btn btn-shop" id="battle-switch-btn" style="display:none">🔄 換人</button>
           <button class="btn btn-primary" id="confirm-actions-btn" style="display:none">✅ 確認出招</button>
           <button type="button" class="btn btn-purple" id="auto-battle-btn" style="display:none">▶ 自動</button>
@@ -2190,13 +2191,69 @@ const ALL_PETS = [
         stunChance:1.0, stunTurns:4 }
     ]
   },
+
+  {
+    id: 'baozhen_guai',
+    name: '抱枕怪',
+    emoji: '🛏️',
+    img: '抱枕怪.png',
+    type: '泡泡',
+    rarity: '稀有',
+    force: 78,
+    intel: 116,
+    charm: 118,
+    baseAtk: 60,
+    baseDef: 70,
+    baseHp: 70,
+    baseMp: 28,
+    baseSpeed: 20,
+    baseCrit: 0.15,
+    baseDodge: 0.09,
+    baseHit: 0.88,
+    evoStage: 0,
+    maxHp: 70,
+    crit: 0.15,
+    dodge: 0.09,
+    fragmentSummon: 12,
+    spawnZones: { meadow: 0.35 },
+    captureRate: 0.33,
+    minWildLevel: 10,
+    evoReqs: [
+      { to:1, level:13, intel:117 },
+      { to:2, level:19, charm:119 },
+      { to:3, level:29, intel:120, charm:122 },
+      { to:4, level:37, intel:124, charm:126 },
+      { to:5, level:49, intel:128, charm:130 },
+      { to:6, level:60, intel:132, charm:135, force:85 },
+      { to:7, level:75, intel:138, charm:140, force:90 },
+      { to:8, level:100, intel:145, charm:148, force:95 },
+      { to:9, level:115, intel:152, charm:155, force:100 },
+      { to:10, level:130, intel:160, charm:162, force:108 },
+      { to:11, level:160, intel:170, charm:172, force:118 }
+    ],
+    dropFrags: [3, 5],
+    dropPetExp: [20, 30],
+    dropPlayerExp: [30, 45],
+    dropCoins: [60, 120],
+    skills: [
+      { id:'hao_keai', name:'好可愛!!', emoji:'🥰', evoReq:0, unlockLv:0, mp:15,
+        fixedHits:3, atkPercentMin:90, atkPercentMax:140, healSelfPercent:0.10 },
+      { id:'ruanruan', name:'軟軟之術', emoji:'🫧', evoReq:0, unlockLv:0, mp:30,
+        atkPercentMin:120, atkPercentMax:180, burnChance:1.0, burnTurns:3,
+        selfBuff:{ defBonus:0.40, turns:99 } },
+      { id:'keai_zhentou', name:'可愛的枕頭', emoji:'🛏️', evoReq:1, unlockLv:8, mp:60,
+        atkPercentMin:240, atkPercentMax:380, randomAttackTypes:['火','水','電'] },
+      { id:'chaoji_shufu', name:'超級舒服的抱枕怪', emoji:'💖', evoReq:2, unlockLv:12, mp:80,
+        atkPercent:1000, selfAtkMulAfter:0.60 }
+    ]
+  },
 ];
 
 const ZONES = [
   /* 依截圖紅圈：標記落在各區域正中央；家在池塘右下方 */
   {id:'plaza',    name:'家',        emoji:'🏠', desc:'你的家，位於荷花池塘右下方，可以整理隊伍與查看資訊。', unlock:0, danger:0, pets:[], shop:true, rest:true, x:73, y:70},
   {id:'beach',    name:'沙灘',      emoji:'🏖️', desc:'左下角的沙灘，有海星點綴，水系寵物常出沒。出沒隨早／午／晚改變。', unlock:6, danger:1, pets:['shuibo_bao','hai_shuibo_bao'], x:18, y:76, timeSpawns:true},
-  {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['huobao_xiong'], x:36, y:60, timeSpawns:true},
+  {id:'meadow',   name:'陽光草原',  emoji:'🌸', desc:'沙灘右側的櫻花樹林，陽光灑落，出沒隨早／午／晚改變。', unlock:0, danger:1, pets:['baozhen_guai','huobao_xiong'], x:36, y:60, timeSpawns:true},
   {id:'ashfield', name:'沙漠',      emoji:'🏜️', desc:'島上北側的炎熱沙漠，炙熱而空曠。出沒隨早／午／晚改變。', unlock:14, danger:2, pets:['huobao_xiong','shen_huobao_xiong','shen_diandian_zhu'], x:64, y:24, timeSpawns:true},
   {id:'volcano',  name:'熾熱火山',  emoji:'🌋', desc:'島中央偏右的熾熱火山，隨時可能噴發。出沒隨早／午／晚改變。', unlock:18, danger:3, pets:['huobao_xiong','shen_huobao_xiong'], x:55, y:40, timeSpawns:true},
   {id:'rainbow',  name:'彩虹山脈',  emoji:'🌈', desc:'火山右側的綠色山脊，傳說稀有寵物會出現！出沒隨早／午／晚改變，且較易遇到高等級野生。', unlock:27, danger:4, pets:['shen_diandian_zhu','xiangsu_diandian_zhu','shen_huobao_xiong'], x:76, y:52, timeSpawns:true},
@@ -2269,7 +2326,7 @@ const ZONE_TIME_SPAWNS = {
   /* ---- 陽光草原（手稿；未實裝寵物暫用火爆熊外觀，note＝正式名稱）---- */
   meadow: {
     morning: [
-      { id:'huobao_xiong', weight:27, note:'抱枕怪' },
+      { id:'baozhen_guai', weight:27, note:'抱枕怪' },
       { id:'huobao_xiong', weight:23, note:'喵噗噗' },
       { id:'huobao_xiong', weight:17, note:'土・喵噗噗' },
       { id:'huobao_xiong', weight:17, note:'火烘培兔' },
@@ -2280,7 +2337,7 @@ const ZONE_TIME_SPAWNS = {
       { id:'huobao_xiong', weight:1, note:'亮・金蜜蜂' }
     ],
     afternoon: [
-      { id:'huobao_xiong', weight:60, note:'抱枕怪' },
+      { id:'baozhen_guai', weight:60, note:'抱枕怪' },
       { id:'huobao_xiong', weight:22, note:'黃昏鼠' },
       { id:'huobao_xiong', weight:18, note:'神・白雪犬' }
     ],
@@ -4086,20 +4143,30 @@ const EVO_STAGE_NEED_LV = {
 };
 const EVO_STAGE_MAX = EVO_STAGE_NAMES.length - 1; // 11 宇宙進化
 
-/** 依等級對應「最高可進化到」的階段 */
+/** 依等級對應「最高可進化到」的階段（與 EVO_STAGE_NEED_LV / 顯示條件一致） */
 function evoStageFromLevel(level) {
   const lv = Math.max(0, Math.floor(Number(level) || 0));
-  if (lv >= 160) return 11; // 宇宙
-  if (lv >= 130) return 10; // 黑洞
-  if (lv >= 115) return 9;  // 星系
-  if (lv >= 100) return 8;  // 恆星
-  if (lv >= 75) return 7;   // 無限
-  if (lv >= 60) return 6;   // 極限
-  if (lv >= 49) return 5;   // 完美
-  if (lv >= 37) return 4;
-  if (lv >= 29) return 3;
-  if (lv >= 19) return 2;
-  if (lv >= 13) return 1;
+  let max = 0;
+  if (typeof EVO_STAGE_NEED_LV === 'object' && EVO_STAGE_NEED_LV) {
+    const keys = Object.keys(EVO_STAGE_NEED_LV).map(Number).sort((a, b) => a - b);
+    keys.forEach(stage => {
+      const need = Number(EVO_STAGE_NEED_LV[stage]);
+      if (Number.isFinite(need) && lv >= need) max = stage;
+    });
+    return max;
+  }
+  // 後備（應與 EVO_STAGE_NEED_LV 相同）
+  if (lv >= 115) return 11;
+  if (lv >= 95) return 10;
+  if (lv >= 80) return 9;
+  if (lv >= 65) return 8;
+  if (lv >= 50) return 7;
+  if (lv >= 40) return 6;
+  if (lv >= 32) return 5;
+  if (lv >= 24) return 4;
+  if (lv >= 18) return 3;
+  if (lv >= 12) return 2;
+  if (lv >= 8) return 1;
   return 0;
 }
 /** 目前等級「最高可進化到」的階段（僅依等級表；實際進化還要過 evoReqs） */
@@ -4152,10 +4219,16 @@ const EVO_REQ_LABELS = {
   star: '星級', starLevel: '星級'
 };
 
-/** 與判定邏輯一致的「放寬後」條件（顯示與檢查共用） */
-function softenEvoReq(req, toStage) {
+/** 與判定邏輯一致的「放寬後」條件（顯示與檢查共用）
+ * baseOrPet：可傳圖鑑/寵物，用來保證武力／智力／魅力必須「高於基礎三圍」
+ */
+function softenEvoReq(req, toStage, baseOrPet) {
   if (!req) return null;
   const to = Math.max(0, Number(toStage != null ? toStage : req.to) || 0);
+  let base = baseOrPet || null;
+  if (base && base.id && typeof getBase === 'function') {
+    base = getBase(base.id) || base;
+  }
   const out = {};
   Object.keys(req).forEach(k => {
     if (k === 'to') { out.to = req.to; return; }
@@ -4164,12 +4237,20 @@ function softenEvoReq(req, toStage) {
     if (k === 'level') {
       const soft = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || need;
       need = Math.min(need, soft);
+    } else if (k === 'force' || k === 'intel' || k === 'charm') {
+      // 先略為放寬，但不得低於「基礎三圍 +1」（一定要高於原來三圍）
+      need = Math.max(1, Math.floor(need * 0.72));
+      if (base) {
+        const baseStat = Number(base[k]);
+        if (Number.isFinite(baseStat) && baseStat > 0) {
+          need = Math.max(need, Math.floor(baseStat) + 1);
+        }
+      }
     } else {
       need = Math.max(1, Math.floor(need * 0.72));
     }
     out[k] = need;
   });
-  // 若原 req 沒有 level，補上放寬後的等級門檻
   if (out.level == null && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
     out.level = EVO_STAGE_NEED_LV[to];
   }
@@ -4177,9 +4258,9 @@ function softenEvoReq(req, toStage) {
 }
 
 /** 格式化單一階段條件（不含 to） */
-function formatEvoReqBits(req, toStage) {
+function formatEvoReqBits(req, toStage, baseOrPet) {
   if (!req) return '';
-  const soft = (typeof softenEvoReq === 'function') ? softenEvoReq(req, toStage != null ? toStage : req.to) : req;
+  const soft = (typeof softenEvoReq === 'function') ? softenEvoReq(req, toStage != null ? toStage : req.to, baseOrPet) : req;
   const r = soft || req;
   const bits = [];
   const order = ['level','force','intel','charm','atk','attack','def','defense','speed','hp','maxHp','mp','maxMp','star','starLevel'];
@@ -4222,7 +4303,7 @@ function formatPetEvoReqsHtml(baseOrPet, opts) {
     const to = Number(r.to) || 0;
     if (to <= startStage && opts.hidePastBase) return;
     const name = (EVO_STAGE_NAMES && EVO_STAGE_NAMES[to]) || ('階段'+to);
-    const bits = formatEvoReqBits(r, to);
+    const bits = formatEvoReqBits(r, to, base);
     let line = bits;
     if (!line && EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to] != null) {
       line = '等級≥' + EVO_STAGE_NEED_LV[to];
@@ -4240,7 +4321,7 @@ function formatPetEvoBrief(base) {
   const list = Array.isArray(base.evoReqs) ? base.evoReqs.slice() : [];
   list.sort((a,b) => (Number(a.to)||0) - (Number(b.to)||0));
   const lvOf = (r) => {
-    const soft = softenEvoReq(r, r.to);
+    const soft = softenEvoReq(r, r.to, base);
     return (soft && soft.level != null) ? soft.level : ((EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[r.to]) || '?');
   };
   if (!list.length) {
@@ -4284,8 +4365,8 @@ function evaluateNextEvoReq(p) {
     const needLv = (EVO_STAGE_NEED_LV && EVO_STAGE_NEED_LV[to]) || 8;
     req = { to: to, level: needLv };
   }
-  // 顯示與判定同一套放寬數值
-  const softReq = softenEvoReq(req, to) || req;
+  // 顯示與判定同一套放寬數值（三圍必須高於基礎）
+  const softReq = softenEvoReq(req, to, p) || req;
   const fails = [];
   Object.keys(softReq).forEach(k => {
     if (k === 'to') return;
@@ -9104,11 +9185,21 @@ function updateSameTypeBonusUI() {
 }
 function calcAtk(atk,def,sk,isP){
   // 規則：技能一定命中、一定不會被閃避（不判定 miss / dodge）
-  // 手稿受擊：{ 技能% × 攻擊 × 暴擊倍率 } − 目標防 × 0.8
+  // 受擊：{ 技能% × 攻擊 × 暴擊倍率 } − 目標防 × 0.5
   const atkStat = Math.max(1, Number(atk.attack) || Number(atk.baseAtk) || 30);
   let defStat = Math.max(0, Number(def.defense) || Number(def.baseDef) || 0);
   // 防禦指令：該回合防禦 +50
   if (def && def._defending) defStat += 50;
+  // 被動／技能防禦增益（selfBuff.defBonus）
+  try {
+    const side = isP ? (S.eSelfEffects) : (S.pEffects);
+    // 防守方的增益在對方 effects：我打敵→敵用 eSelfEffects；敵打我→我用 pEffects
+    const defFx = isP ? S.eSelfEffects : S.pEffects;
+    if (defFx && defFx.defBonus) defStat = Math.floor(defStat * (1 + Number(defFx.defBonus)));
+  } catch (e) {}
+  if (def && def._selfBuff && def._selfBuff.defBonus) {
+    defStat = Math.floor(defStat * (1 + Number(def._selfBuff.defBonus)));
+  }
 
   let skillPct = 100;
   if (sk.baseAtkPercent != null) {
@@ -9128,9 +9219,15 @@ function calcAtk(atk,def,sk,isP){
   }
   let dmg = atkStat * (skillPct / 100);
   dmg = Math.max(0, dmg + rand(-3, 5));
-
-  // 屬性克制（水克火 1.5 倍；火打水 0.75 倍等）
-  const aType = atk.type || (typeof getBase === 'function' && getBase(atk.id) && getBase(atk.id).type) || '';
+  // 使用大招後的永久攻擊倍率減益
+  if (atk && atk._selfAtkMul != null && atk._selfAtkMul > 0) {
+    dmg = Math.max(1, Math.floor(dmg * Number(atk._selfAtkMul)));
+  }
+  // 隨機屬性攻擊（可愛的枕頭）
+  let aType = atk.type || (typeof getBase === 'function' && getBase(atk.id) && getBase(atk.id).type) || '';
+  if (sk && Array.isArray(sk.randomAttackTypes) && sk.randomAttackTypes.length) {
+    aType = sk.randomAttackTypes[Math.floor(Math.random() * sk.randomAttackTypes.length)];
+  }
   const dType = def.type || (typeof getBase === 'function' && getBase(def.id) && getBase(def.id).type) || '';
   const typeMul = getTypeMul(aType, dType);
   if (typeMul !== 1) dmg = Math.max(1, Math.floor(dmg * typeMul));
@@ -9175,9 +9272,9 @@ function calcAtk(atk,def,sk,isP){
     critMulUsed = cd;
     dmg = dmg * cd;
   }
-  // 手稿：傷害 − 目標防 × 0.8；多段可先加總再扣一次（sk._noDef）
+  // 傷害 − 目標防 × 0.5；多段可先加總再扣一次（sk._noDef）
   if (sk && sk._noDef) dmg = Math.max(0, Math.floor(dmg));
-  else dmg = Math.max(1, Math.floor(dmg - defStat * 0.8));
+  else dmg = Math.max(1, Math.floor(dmg - defStat * 0.5));
 
   if (isP && S.atkBoost) { dmg = Math.floor(dmg * 1.5); S.atkBoost = false; }
   if (isP && S.eEffects && S.eEffects.slow) dmg = Math.floor(dmg * 1.2);
@@ -9620,38 +9717,46 @@ function executeSkill(pl, sk, onDone, isEnemy){
   }
 
   // 自我增益（如火紅戰士、神奇衝浪板）— 敵我同等
+  // 純增益技能才在此結束；同時有傷害的（如軟軟之術）繼續往下打出攻擊
   if (sk.selfBuff) {
-    const turns = sk.selfBuff.turns || 3;
-    // 寫入寵物自身標記，持續期間不可再點增益技能
-    pl._selfBuff = { skillId: sk.id, turns: turns, name: sk.name };
-    const bag = isEnemy ? (S.eSelfEffects = S.eSelfEffects || {}) : (S.pEffects = S.pEffects || {});
-    bag.buffTurns = Math.max(bag.buffTurns || 0, turns);
-    const parts = [];
-    if (sk.selfBuff.critBonus) {
-      bag.critBonus = (bag.critBonus || 0) + sk.selfBuff.critBonus;
-      bag.critTurns = Math.max(bag.critTurns || 0, turns);
-      parts.push('暴擊+' + Math.round(sk.selfBuff.critBonus * 100) + '%');
+    const hasAtk = sk.atkPercent != null || sk.atkPercentMin != null || sk.forcePercent != null ||
+      sk.fixedHits != null || sk.multiHit || sk.multiHitChances || sk.power != null;
+    if (!hasAtk) {
+      const turns = sk.selfBuff.turns || 3;
+      pl._selfBuff = Object.assign({ skillId: sk.id, turns: turns, name: sk.name }, sk.selfBuff);
+      const bag = isEnemy ? (S.eSelfEffects = S.eSelfEffects || {}) : (S.pEffects = S.pEffects || {});
+      bag.buffTurns = Math.max(bag.buffTurns || 0, turns);
+      const parts = [];
+      if (sk.selfBuff.critBonus) {
+        bag.critBonus = (bag.critBonus || 0) + sk.selfBuff.critBonus;
+        bag.critTurns = Math.max(bag.critTurns || 0, turns);
+        parts.push('暴擊+' + Math.round(sk.selfBuff.critBonus * 100) + '%');
+      }
+      if (sk.selfBuff.dodgeBonus) {
+        bag.dodgeBonus = (bag.dodgeBonus || 0) + sk.selfBuff.dodgeBonus;
+        parts.push('閃避+' + Math.round(sk.selfBuff.dodgeBonus * 100) + '%');
+      }
+      if (sk.selfBuff.hitBonus) {
+        bag.hitBonus = (bag.hitBonus || 0) + sk.selfBuff.hitBonus;
+        parts.push('命中+' + Math.round(sk.selfBuff.hitBonus * 100) + '%');
+      }
+      if (sk.selfBuff.speedBonus) {
+        bag.speedBonus = (bag.speedBonus || 0) + sk.selfBuff.speedBonus;
+        parts.push('速度+' + sk.selfBuff.speedBonus);
+      }
+      if (sk.selfBuff.critDmgMul) {
+        bag.critDmgMul = sk.selfBuff.critDmgMul;
+        parts.push('暴擊傷害×' + sk.selfBuff.critDmgMul);
+      }
+      if (sk.selfBuff.defBonus) {
+        bag.defBonus = (bag.defBonus || 0) + sk.selfBuff.defBonus;
+        parts.push('防禦+' + Math.round(sk.selfBuff.defBonus * 100) + '%');
+      }
+      addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！' + (parts.length ? parts.join('、') : '獲得增益') + '，持續 ' + turns + ' 回合！', 'sys');
+      updateBattleHp();
+      __onDone();
+      return;
     }
-    if (sk.selfBuff.dodgeBonus) {
-      bag.dodgeBonus = (bag.dodgeBonus || 0) + sk.selfBuff.dodgeBonus;
-      parts.push('閃避+' + Math.round(sk.selfBuff.dodgeBonus * 100) + '%');
-    }
-    if (sk.selfBuff.hitBonus) {
-      bag.hitBonus = (bag.hitBonus || 0) + sk.selfBuff.hitBonus;
-      parts.push('命中+' + Math.round(sk.selfBuff.hitBonus * 100) + '%');
-    }
-    if (sk.selfBuff.speedBonus) {
-      bag.speedBonus = (bag.speedBonus || 0) + sk.selfBuff.speedBonus;
-      parts.push('速度+' + sk.selfBuff.speedBonus);
-    }
-    if (sk.selfBuff.critDmgMul) {
-      bag.critDmgMul = sk.selfBuff.critDmgMul;
-      parts.push('暴擊傷害×' + sk.selfBuff.critDmgMul);
-    }
-    addBLog(pl.name + ' 使用 ' + sk.emoji + sk.name + '！' + (parts.length ? parts.join('、') : '獲得增益') + '，持續 ' + turns + ' 回合！', 'sys');
-    updateBattleHp();
-    __onDone();
-    return;
   }
   // 自我護盾
   if (sk.selfShield) {
@@ -9966,7 +10071,7 @@ function executeSkill(pl, sk, onDone, isEnemy){
     // 多段加總後一次扣防（當電雷／天雷轟等）
     if (sumThenDef && anyHit && defender && hitsLanded > 0) {
       const defStat = Number(defender.defense) || 0;
-      let realDmg = Math.max(1, Math.floor(rawSum - defStat * 0.8));
+      let realDmg = Math.max(1, Math.floor(rawSum - defStat * 0.5));
       try {
         if (typeof getTreasureCombatEffects === 'function' && defender && !defender._iceNullifyUsed) {
           const dfx = getTreasureCombatEffects(defender);
@@ -10047,6 +10152,38 @@ function executeSkill(pl, sk, onDone, isEnemy){
         if (actual > 0) addBLog('💧 ' + target.name + ' 吸收水波回復 ' + actual + '！', 'heal');
         if (!isEnemy && typeof syncAlliesHpToOwned === 'function') syncAlliesHpToOwned();
       }
+    }
+    // 攻擊後自我治療（好可愛!!）
+    const healSelfP = (skUse.healSelfPercent != null ? skUse.healSelfPercent : sk.healSelfPercent);
+    if (healSelfP != null && pl && pl.hp > 0) {
+      const healAmt = Math.max(1, Math.floor((pl.maxHp || 1) * Number(healSelfP)));
+      const before = pl.hp;
+      pl.hp = Math.min(pl.maxHp, pl.hp + healAmt);
+      const actual = Math.round(pl.hp - before);
+      if (actual > 0) addBLog(pl.name + ' 感覺好可愛，回復了 ' + actual + ' 血量！', 'heal');
+      if (!isEnemy && typeof syncAlliesHpToOwned === 'function') syncAlliesHpToOwned();
+    }
+    // 攻擊技能附帶的自我增益（軟軟之術）
+    if (sk.selfBuff && anyHit) {
+      const turns = sk.selfBuff.turns || 3;
+      const bag = isEnemy ? (S.eSelfEffects = S.eSelfEffects || {}) : (S.pEffects = S.pEffects || {});
+      bag.buffTurns = Math.max(bag.buffTurns || 0, turns);
+      pl._selfBuff = Object.assign({ skillId: sk.id, turns: turns, name: sk.name }, sk.selfBuff);
+      const parts = [];
+      if (sk.selfBuff.defBonus) {
+        bag.defBonus = (bag.defBonus || 0) + sk.selfBuff.defBonus;
+        parts.push('防禦+' + Math.round(sk.selfBuff.defBonus * 100) + '%');
+      }
+      if (sk.selfBuff.critBonus) {
+        bag.critBonus = (bag.critBonus || 0) + sk.selfBuff.critBonus;
+        parts.push('暴擊+' + Math.round(sk.selfBuff.critBonus * 100) + '%');
+      }
+      if (parts.length) addBLog(pl.name + ' 獲得增益：' + parts.join('、') + '（' + turns + ' 回合）', 'sys');
+    }
+    // 大招後攻擊倍率下降（超級舒服）
+    if (sk.selfAtkMulAfter != null && anyHit) {
+      pl._selfAtkMul = Number(sk.selfAtkMulAfter);
+      addBLog(pl.name + ' 之後造成的傷害變為 ' + Math.round(pl._selfAtkMul * 100) + '%！', 'sys');
     }
   }
 
@@ -10297,35 +10434,23 @@ function tryFleeBattle() {
     setTutBattleHint('👆 點寵物卡片上的技能 → 再按「✅ 確認出招」');
     return;
   }
-  const foes = livingEnemies();
   const allies = livingAllies();
   if (!allies.length) return;
-  // 成功率：基礎 45% + 我方平均速度優勢
-  const aSpd = allies.reduce((s,p)=>s+(p.speed||0),0) / allies.length;
-  const eSpd = foes.length ? foes.reduce((s,p)=>s+(p.speed||0),0) / foes.length : 0;
-  let rate = 0.45 + Math.max(-0.15, Math.min(0.35, (aSpd - eSpd) / 100));
-  rate = Math.max(0.25, Math.min(0.85, rate));
+  // 逃走必定成功
   setBattleBtns(false);
-  addBLog('嘗試逃走…（成功率約 ' + Math.round(rate*100) + '%）', 'sys');
+  addBLog('成功逃走了！', 'sys');
   setTimeout(() => {
-    if (roll(rate)) {
-      addBLog('成功逃走了！', 'sys');
-      if (typeof archiveBattleLog === 'function') archiveBattleLog('flee');
-      S.battling = false;
-      if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
-      S.wild = null;
-      S.selectedActions = {};
-      S.selectedTargets = {};
-      syncAlliesHpToOwned();
-      showScreen('map');
-      addLog('map-log', '你從戰鬥中逃走了…');
-      saveGame();
-    } else {
-      addBLog('逃走失敗！敵方趁機攻擊！', 'sys');
-      (S.battleAllies||[]).forEach(p => { if (p) p._defending = false; });
-      setTimeout(enemyTurn, battleWait(500));
-    }
-  }, 400);
+    if (typeof archiveBattleLog === 'function') archiveBattleLog('flee');
+    S.battling = false;
+    if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
+    S.wild = null;
+    S.selectedActions = {};
+    S.selectedTargets = {};
+    syncAlliesHpToOwned();
+    showScreen('map');
+    addLog('map-log', '你從戰鬥中逃走了…');
+    saveGame();
+  }, 300);
 }
 
 function snapshotPetCombatStats(p) {
@@ -10474,7 +10599,9 @@ function petExpNeeded(lv) {
 
 /** 寵物等級不得超過玩家等級 */
 function getPetLevelCap() {
-  return Math.max(1, Number(S.level) || 1);
+  // 玩家 Lv.n → 寵物上限 n+6（例：玩家2→寵8、玩家3→寵9）
+  const pl = Math.max(1, Number(S.level) || 1);
+  return pl + 6;
 }
 
 /** 給指定寵物增加經驗（經驗包／系統用）；回傳升級資訊 */
@@ -10483,7 +10610,7 @@ function grantPetExpToOwned(oi, amount) {
   if (!pet || !(amount > 0)) return null;
   const cap = getPetLevelCap();
   if ((pet.level || 1) >= cap && (Number(pet.exp) || 0) >= petExpNeeded(pet.level || 1) - 1) {
-    // 已達玩家等級上限：經驗可微存但不升級
+    // 已達寵物等級上限：經驗可微存但不升級
   }
   const fromLv = pet.level || 1;
   pet.exp = (Number(pet.exp) || 0) + Math.floor(amount);
@@ -10549,17 +10676,10 @@ function rollPetExpPackDrop(win, danger) {
 }
 
 
-/** 戰鬥後：先播全員 EXP 進度條，再依序跳升級畫面 */
+/** 戰鬥後流程：寵物經驗改由經驗包，不再顯示「獲得經驗 +0」畫面 */
 function runPostBattleFlow() {
-  const entries = S._pendingBattleExp;
-  S._pendingBattleExp = null;
-  if (entries && entries.length) {
-    showBattleExpScreen(entries, () => {
-      showNextPendingLevelUp();
-    });
-  } else {
-    showNextPendingLevelUp();
-  }
+  S._pendingBattleExp = null; // 略過全員 EXP 畫面
+  showNextPendingLevelUp();
 }
 
 function showNextPendingLevelUp() {
@@ -12507,7 +12627,7 @@ function openPetExpPackPicker(packId) {
   const title = document.getElementById('pet-exp-pack-title');
   const desc = document.getElementById('pet-exp-pack-desc');
   if (title) title.textContent = (def.emoji || '📦') + ' ' + def.name;
-  if (desc) desc.innerHTML = '選擇一隻寵物，獲得 <b>' + def.exp + '</b> 經驗<br>寵物等級不會超過玩家等級';
+  if (desc) desc.innerHTML = '選擇一隻寵物，獲得 <b>' + def.exp + '</b> 經驗<br>寵物等級上限＝玩家等級+6';
   const list = document.getElementById('pet-exp-pack-list');
   const cap = getPetLevelCap();
   list.innerHTML = (S.owned || []).map(function(p, i) {
@@ -12516,7 +12636,7 @@ function openPetExpPackPicker(packId) {
     return '<div class="history-card" data-pack-oi="' + i + '" style="cursor:pointer;display:flex;align-items:center;gap:10px' + (atCap ? ';opacity:0.75' : '') + '">' +
       '<div style="width:44px">' + (typeof petFaceHtml === 'function' ? petFaceHtml(p, 40) : '') + '</div>' +
       '<div style="flex:1"><div style="font-weight:800">' + (p.name || '寵物') + (p.nickname ? ('「' + p.nickname + '」') : '') + '</div>' +
-      '<div style="font-size:0.78rem;color:#666">Lv.' + (p.level || 1) + (atCap ? '（已達玩家等級上限）' : '') +
+      '<div style="font-size:0.78rem;color:#666">Lv.' + (p.level || 1) + (atCap ? '（已達寵物等級上限）' : '') +
       '　EXP ' + (p.exp || 0) + '/' + petExpNeeded(p.level || 1) + '</div></div></div>';
   }).join('');
   list.querySelectorAll('[data-pack-oi]').forEach(function(el) {
@@ -12547,7 +12667,7 @@ function usePetExpPackOn(oi, packId) {
   if (modal) modal.classList.add('hidden');
   let msg = (pet.name || '寵物') + ' 使用' + def.name + '，經驗 +' + amount;
   if (r && r.leveled) msg += '\n升級！ Lv.' + r.fromLv + ' → Lv.' + r.toLv;
-  if ((pet.level || 1) >= getPetLevelCap()) msg += '\n（已達玩家等級上限 Lv.' + getPetLevelCap() + '）';
+  if ((pet.level || 1) >= getPetLevelCap()) msg += '\n（已達寵物等級上限 Lv.' + getPetLevelCap() + '）';
   alert(msg);
 }
 
@@ -12588,6 +12708,19 @@ function renderBag(){
       d.style.cursor = 'pointer';
       d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">經驗 +' + def.exp + '<br>點擊選擇寵物使用</div>';
       d.onclick = function() { openPetExpPackPicker(def.id); };
+      box.appendChild(d);
+    });
+    // 寶箱
+    Object.keys(typeof GIFT_BOX_DEFS !== 'undefined' ? GIFT_BOX_DEFS : {}).forEach(function(bid) {
+      const def = GIFT_BOX_DEFS[bid];
+      const cnt = (S.items && S.items[bid]) || 0;
+      if (cnt <= 0) return;
+      has = true;
+      const d = document.createElement('div'); d.className = 'item-card';
+      d.style.borderColor = '#ff9800';
+      d.style.cursor = 'pointer';
+      d.innerHTML = '<div class="emoji">' + (def.emoji || '🎁') + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (def.desc || '點擊開啟') + '</div>';
+      d.onclick = function() { openGiftBoxFromBag(bid); };
       box.appendChild(d);
     });
   }
@@ -13222,10 +13355,57 @@ function closeAnnounceModals() {
 
 
 /* ===== 更多／禮包碼／排行榜／帳號 ===== */
+
+/** 背包寶箱定義 */
+const GIFT_BOX_DEFS = {
+  frag_box_i: {
+    id: 'frag_box_i',
+    name: '自選碎片寶箱I',
+    emoji: '🎁',
+    desc: '開啟後自選：水波豹或火爆熊碎片 ×5',
+    choosePetFrags: {
+      amount: 5,
+      times: 1,
+      options: ['shuibo_bao', 'huobao_xiong'],
+      boxName: '自選碎片寶箱I'
+    }
+  }
+};
+function getGiftBoxDef(id) {
+  return (typeof GIFT_BOX_DEFS !== 'undefined' && GIFT_BOX_DEFS[id]) ? GIFT_BOX_DEFS[id] : null;
+}
+function openGiftBoxFromBag(boxId) {
+  const def = getGiftBoxDef(boxId);
+  if (!def) { alert('未知寶箱'); return; }
+  const n = (S.items && S.items[boxId]) || 0;
+  if (n <= 0) { alert('沒有' + def.name); return; }
+  S.items[boxId] = n - 1;
+  if (typeof saveGame === 'function') saveGame();
+  if (typeof renderBag === 'function') renderBag();
+  if (def.choosePetFrags && typeof openGiftPetFragChooser === 'function') {
+    openGiftPetFragChooser(def.choosePetFrags);
+  } else {
+    alert('已開啟 ' + def.name);
+  }
+}
+
+
 const GIFT_CODES = {
-  'BOBO2026': { coins: 200, label: '開服禮包：金幣 ×200' },
-  'POPOISLAND': { coins: 100, frags: { 'lei_dao': 5 }, label: '島民禮包：金幣 ×100、雷刀碎片 ×5' },
-  'HIROGIFT': { coins: 500, label: '特別禮包：金幣 ×500' }
+  'BOBO2026': {
+    coins: 200,
+    expPacks: { exp_pack_normal: 2 },
+    label: '普通經驗包 ×2、金幣 ×200'
+  },
+  'BOBOVIP': {
+    coins: 100,
+    expPacks: { exp_pack_rare: 1 },
+    label: '稀有經驗包 ×1、金幣 ×100'
+  },
+  'BOBOISLAND888': {
+    // 進背包：自選碎片寶箱I ×2（使用時選水波豹／火爆熊碎片 ×5）
+    boxes: { frag_box_i: 2 },
+    label: '自選碎片寶箱I ×2（至背包開啟）'
+  }
 };
 function ensureGiftState() {
   if (!S.redeemedCodes || typeof S.redeemedCodes !== 'object') S.redeemedCodes = {};
@@ -13258,7 +13438,6 @@ function submitGiftCode() {
   }
   const gift = GIFT_CODES[raw];
   if (!gift) {
-    // 嘗試雲端
     tryRedeemCloudGift(raw);
     return;
   }
@@ -13284,6 +13463,9 @@ async function tryRedeemCloudGift(code) {
     applyGiftReward(code, {
       coins: row.coins || 0,
       frags: row.frags || null,
+      petFrags: row.pet_frags || row.petFrags || null,
+      expPacks: row.exp_packs || row.expPacks || null,
+      choosePetFrags: row.choose_pet_frags || row.choosePetFrags || null,
       label: row.label || ('禮包：' + code)
     });
   } catch (e) {
@@ -13293,23 +13475,131 @@ async function tryRedeemCloudGift(code) {
 function applyGiftReward(code, gift) {
   ensureGiftState();
   const msg = $('gift-code-msg');
-  if (gift.coins) S.coins = (S.coins || 0) + Number(gift.coins || 0);
+  const lines = [];
+  if (gift.coins) {
+    S.coins = (S.coins || 0) + Number(gift.coins || 0);
+    lines.push('金幣 ×' + gift.coins);
+  }
+  // 寶物碎片
   if (gift.frags && typeof addTreasureFragments === 'function') {
-    Object.keys(gift.frags).forEach(k => addTreasureFragments(k, gift.frags[k]));
+    Object.keys(gift.frags).forEach(k => {
+      addTreasureFragments(k, gift.frags[k]);
+      lines.push((k) + '碎片 ×' + gift.frags[k]);
+    });
+  }
+  // 寵物碎片（直接給）
+  if (gift.petFrags && typeof addFragments === 'function') {
+    Object.keys(gift.petFrags).forEach(k => {
+      addFragments(k, gift.petFrags[k]);
+      const b = typeof getBase === 'function' ? getBase(k) : null;
+      lines.push(((b && b.name) || k) + '碎片 ×' + gift.petFrags[k]);
+    });
+  }
+  // 經驗包
+  if (gift.expPacks) {
+    Object.keys(gift.expPacks).forEach(k => {
+      const n = Number(gift.expPacks[k]) || 0;
+      if (n > 0 && typeof addPetExpPack === 'function') {
+        addPetExpPack(k, n);
+        const def = getPetExpPackDef(k);
+        lines.push(((def && def.name) || k) + ' ×' + n);
+      }
+    });
+  }
+  // 寶箱進背包
+  if (gift.boxes) {
+    S.items = S.items || {};
+    Object.keys(gift.boxes).forEach(k => {
+      const n = Number(gift.boxes[k]) || 0;
+      if (n <= 0) return;
+      S.items[k] = (S.items[k] || 0) + n;
+      const bn = (typeof getGiftBoxDef === 'function' && getGiftBoxDef(k)) ? getGiftBoxDef(k).name : k;
+      lines.push(bn + ' ×' + n);
+    });
   }
   S.redeemedCodes[code] = Date.now();
   if (typeof updateHeader === 'function') updateHeader();
   if (typeof saveGame === 'function') saveGame();
+  if (typeof renderBag === 'function') renderBag();
+  const label = gift.label || lines.join('、') || code;
   if (msg) {
     msg.style.color = '#2e7d32';
-    msg.textContent = '兌換成功！' + (gift.label || '');
+    msg.textContent = '兌換成功！' + label;
   }
-  addLog('map-log', '🎁 禮包碼兌換成功：' + (gift.label || code));
+  addLog('map-log', '🎁 禮包碼兌換成功：' + label);
+  // 自選碎片寶箱
+  const choose = gift.choosePetFrags;
   setTimeout(() => {
     const m = $('gift-code-modal');
     if (m) m.classList.add('hidden');
-  }, 900);
+    if (choose && choose.options && choose.options.length) {
+      openGiftPetFragChooser(choose);
+    }
+  }, 500);
 }
+
+/** 自選寵物碎片寶箱：可選多次 */
+function openGiftPetFragChooser(cfg) {
+  const times = Math.max(1, Number(cfg.times) || 1);
+  const amount = Math.max(1, Number(cfg.amount) || 1);
+  const options = (cfg.options || []).slice();
+  const boxName = cfg.boxName || '自選碎片寶箱';
+  let remain = times;
+
+  function showOne() {
+    if (remain <= 0) {
+      if (typeof saveGame === 'function') saveGame();
+      if (typeof renderBag === 'function') renderBag();
+      return;
+    }
+    let modal = document.getElementById('gift-frag-choose-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.className = 'overlay';
+      modal.id = 'gift-frag-choose-modal';
+      modal.innerHTML = '<div class="modal" style="max-width:min(400px,94vw);width:100%;text-align:left">' +
+        '<h2 style="text-align:center" id="gift-frag-choose-title">自選碎片</h2>' +
+        '<p style="text-align:center;font-size:0.82rem;color:#666;margin:4px 0 12px" id="gift-frag-choose-desc"></p>' +
+        '<div id="gift-frag-choose-list" style="display:flex;flex-direction:column;gap:8px"></div>' +
+        '</div>';
+      document.body.appendChild(modal);
+    }
+    const title = document.getElementById('gift-frag-choose-title');
+    const desc = document.getElementById('gift-frag-choose-desc');
+    const list = document.getElementById('gift-frag-choose-list');
+    if (title) title.textContent = '🎁 ' + boxName;
+    if (desc) desc.textContent = '請選擇一種碎片 ×' + amount + '（還剩 ' + remain + ' 次）';
+    list.innerHTML = options.map(function(pid) {
+      const b = typeof getBase === 'function' ? getBase(pid) : null;
+      const name = (b && b.name) || pid;
+      const face = (typeof petFaceHtml === 'function' && b) ? petFaceHtml(b, 40) : '🐾';
+      return '<button type="button" class="btn btn-primary" data-frag-pick="' + pid + '" style="width:100%;height:auto;padding:12px;display:flex;align-items:center;gap:12px;justify-content:flex-start">' +
+        '<span style="width:44px;display:inline-flex;justify-content:center">' + face + '</span>' +
+        '<span style="font-weight:800;text-align:left">' + name + '碎片 ×' + amount + '</span></button>';
+    }).join('');
+    list.querySelectorAll('[data-frag-pick]').forEach(function(btn) {
+      btn.onclick = function() {
+        const pid = btn.getAttribute('data-frag-pick');
+        if (typeof addFragments === 'function') addFragments(pid, amount);
+        const b = typeof getBase === 'function' ? getBase(pid) : null;
+        addLog('map-log', '🎁 獲得 ' + ((b && b.name) || pid) + '碎片 ×' + amount);
+        remain--;
+        if (typeof saveGame === 'function') saveGame();
+        if (remain <= 0) {
+          modal.classList.add('hidden');
+          if (typeof renderBag === 'function') renderBag();
+          alert('自選碎片已全部領取完成！');
+        } else {
+          showOne();
+        }
+      };
+    });
+    modal.classList.remove('hidden');
+    if (modal.parentNode) modal.parentNode.appendChild(modal);
+  }
+  showOne();
+}
+
 /** 全服寵物榜快取（減少重複打 API） */
 var _petRankCache = { at: 0, rows: null, note: '' };
 var PET_RANK_CACHE_MS = 3 * 60 * 1000; // 3 分鐘
