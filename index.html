@@ -21,34 +21,36 @@
       overflow-x: hidden;
     }
 
-    /* 左右側廣告（寬螢幕） */
+    /* 左右側廣告（寬螢幕）— 縮小尺寸 */
     .side-ad {
       position: fixed;
-      top: 80px;
-      width: 160px;
-      min-height: 200px;
-      max-height: calc(100vh - 100px);
+      top: 72px;
+      width: 120px;
+      min-height: 120px;
+      max-height: 280px;
       overflow: hidden;
       z-index: 50;
       display: none;
       align-items: flex-start;
       justify-content: center;
-      background: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.25);
       border-radius: 8px;
     }
-    .side-ad-left { left: 8px; }
-    .side-ad-right { right: 8px; }
+    .side-ad-left { left: 4px; }
+    .side-ad-right { right: 4px; }
     .side-ad ins.adsbygoogle {
       display: block;
-      width: 160px !important;
-      min-height: 600px;
+      width: 120px !important;
+      max-width: 120px !important;
+      min-height: 200px !important;
+      max-height: 250px !important;
     }
-    /* 底部橫幅：僅手機／窄螢幕 */
+    /* 底部橫幅：僅手機／窄螢幕（縮小） */
     .mobile-ad {
       display: none;
       width: 100%;
-      min-height: 50px;
-      max-height: 100px;
+      min-height: 40px;
+      max-height: 56px;
       overflow: hidden;
       background: #f5f5f5;
       border-top: 1px solid #e0e0e0;
@@ -58,7 +60,8 @@
     .mobile-ad ins.adsbygoogle {
       display: block;
       width: 100% !important;
-      min-height: 50px;
+      min-height: 40px !important;
+      max-height: 56px !important;
     }
     @media (min-width: 1201px) {
       .side-ad { display: flex; }
@@ -74,8 +77,16 @@
         right: 0;
         bottom: 0;
       }
-      body { padding-bottom: 64px; }
+      body { padding-bottom: 52px; }
     }
+    /* 戰鬥中完全關閉廣告 */
+    body.in-battle .side-ad,
+    body.in-battle .mobile-ad {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    body.in-battle { padding-bottom: 8px !important; }
 
     .game {
       background: #fffef9;
@@ -1440,7 +1451,7 @@
 <body>
   <aside class="side-ad side-ad-left" aria-label="左側廣告">
     <ins class="adsbygoogle"
-         style="display:inline-block;width:160px;height:600px"
+         style="display:inline-block;width:120px;height:250px"
          data-ad-client="ca-pub-4837269887561375"
          data-ad-format="vertical"
          data-full-width-responsive="false"></ins>
@@ -1448,7 +1459,7 @@
   </aside>
   <aside class="side-ad side-ad-right" aria-label="右側廣告">
     <ins class="adsbygoogle"
-         style="display:inline-block;width:160px;height:600px"
+         style="display:inline-block;width:120px;height:250px"
          data-ad-client="ca-pub-4837269887561375"
          data-ad-format="vertical"
          data-full-width-responsive="false"></ins>
@@ -1607,6 +1618,7 @@
       <p style="text-align:center;font-size:0.82rem;color:#666;margin:0 0 8px">官方與系統訊息會出現在這裡</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
         <button type="button" class="btn" id="mail-claim-all-btn" style="padding:10px 22px;font-weight:900;font-size:0.95rem;color:#fff;background:linear-gradient(180deg,#ef6c00,#bf360c);border:2px solid #8d2b0b;box-shadow:0 3px 0 #6d1f08,0 4px 10px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)">🎁 一鍵領取全部附件</button>
+        <button type="button" class="btn" id="mail-delete-all-btn" style="padding:10px 22px;font-weight:900;font-size:0.95rem;color:#fff;background:linear-gradient(180deg,#78909c,#455a64);border:2px solid #37474f;box-shadow:0 3px 0 #263238,0 4px 10px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)">🗑️ 一鍵刪除</button>
       </div>
       <div id="mail-list" class="history-list"></div>
       <div id="mail-empty" style="text-align:center;color:#999;padding:24px;display:none">目前沒有郵件</div>
@@ -5826,10 +5838,24 @@ function showPlayerProfile() {
     '<br><span style="color:#888;font-size:0.8rem">升級會獲得金錢獎勵，並讓野生寵物等級範圍提升。</span>';
   $('player-modal').classList.remove('hidden');
 }
+function setBattleAdsHidden(on) {
+  try {
+    if (on) document.body.classList.add('in-battle');
+    else document.body.classList.remove('in-battle');
+  } catch (e) {}
+}
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
+  // 戰鬥畫面關閉廣告；離開戰鬥才顯示
+  try {
+    if (id === 'battle' || (typeof S !== 'undefined' && S.battling)) {
+      document.body.classList.add('in-battle');
+    } else {
+      document.body.classList.remove('in-battle');
+    }
+  } catch (e) {}
   if(id==='map'){ try{ if(typeof grantLadderDailyRewardMail==='function') grantLadderDailyRewardMail(); }catch(e){} renderIsland(); }
   if(id==='team') renderTeam();
   if(id==='more'){ try{if(typeof bindMoreMenu==='function')bindMoreMenu();}catch(e){} if(typeof updateMoreBadges==='function') updateMoreBadges(); }
@@ -6007,11 +6033,20 @@ function saveGame() {
 async function enterGame(username, userId, savedData) {
   currentUser = username;
   currentUserId = userId;
+  if (userId) {
+    window._accountSessionActive = true;
+    try { localStorage.setItem('bobodao_last_mode', 'account'); localStorage.setItem('bobodao_account_used', '1'); } catch (e) {}
+    hideGuestModeEntry();
+    // 登入帳號後隱藏訪客入口
+    const gb = $('guest-btn');
+    if (gb) gb.style.display = 'none';
+  }
   showLoginError('');
   $('login-overlay').classList.add('hidden');
   $('user-display').textContent = '👤 '+username;
   $('user-display').style.display = 'inline-block';
   $('logout-btn').style.display = 'inline-block';
+  $('logout-btn').textContent = '🚪 登出';
 
   if (savedData && savedData.island && Array.isArray(savedData.island.owned) && savedData.island.owned.length) {
     loadGameData(savedData);
@@ -6117,7 +6152,7 @@ async function doRegister() {
   enterGame(username, userId, null);
 }
 async function doLogout() {
-  // 訪客：先存本機，再開登入畫面（可直接用原帳號登入）
+  // 訪客：先存本機，再開登入畫面
   if (!currentUserId && currentUser === '訪客') {
     try {
       localStorage.setItem('bobodao_guest_v1', JSON.stringify(getSaveData()));
@@ -6128,7 +6163,10 @@ async function doLogout() {
   }
   if (currentUserId) await persistCurrentUser();
   if (sb) await sb.auth.signOut();
-  try { localStorage.setItem('bobodao_last_mode', ''); } catch (e) {}
+  try {
+    localStorage.setItem('bobodao_last_mode', 'account');
+    localStorage.setItem('bobodao_account_used', '1');
+  } catch (e) {}
   location.reload();
 }
 /** 訪客中開啟登入畫面，登入成功後載入雲端原帳號資料 */
@@ -6141,23 +6179,36 @@ function openLoginFromGuest() {
   const tip = document.getElementById('login-guest-tip');
   if (tip) {
     tip.style.display = 'block';
-    tip.textContent = '訪客進度已保存在本機。登入帳號後會載入該帳號的雲端資料（與訪客進度分開）。';
+    tip.textContent = '訪客進度已保存在本機。登入成功後會載入帳號雲端資料，且無法再回到訪客模式。';
   }
   const guestBtn = $('guest-btn');
   if (guestBtn) {
-    guestBtn.textContent = '← 繼續訪客';
+    // 尚未登入成功前可取消；登入成功後 enterGame 會隱藏此按鈕
+    guestBtn.style.display = '';
+    guestBtn.textContent = '← 取消';
     guestBtn.onclick = function() {
       ov.classList.add('hidden');
-      // 恢復訪客介面
       currentUser = '訪客';
       currentUserId = null;
       $('user-display').textContent = '👤 訪客';
-      $('logout-btn').textContent = '🚪 登入帳號';
+      $('logout-btn').textContent = '🔑 登入帳號';
     };
   }
 }
 
+function hideGuestModeEntry() {
+  const gb = $('guest-btn');
+  if (gb) gb.style.display = 'none';
+}
 function enterAsGuest() {
+  if (currentUserId) {
+    alert('已登入帳號，無法切換訪客模式。請先登出。');
+    return;
+  }
+  if (window._accountSessionActive) {
+    alert('本裝置已使用帳號登入，無法再進入訪客模式。');
+    return;
+  }
   currentUser = '訪客';
   currentUserId = null; // 不寫入 Supabase
   showLoginError('');
@@ -11394,6 +11445,7 @@ function tryFleeBattle() {
   addBLog('成功逃走了！', 'sys');
   setTimeout(() => {
     if (typeof archiveBattleLog === 'function') archiveBattleLog('flee');
+  try{setBattleAdsHidden(false);}catch(e){}
     S.battling = false;
     if (typeof clearBattleStatuses === 'function') clearBattleStatuses();
     if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
@@ -11834,6 +11886,8 @@ function showLevelUpScreen(info) {
 
 function endBattle(win){
   S.battling=false;
+  // 等離開戰鬥畫面（結果確定）後由 showScreen 再開廣告；此處先保持關閉
+
   if (typeof clearBattleStatuses === 'function') clearBattleStatuses();
   S.autoBattle = false;
   if (typeof updateAutoBattleBtn === 'function') updateAutoBattleBtn();
@@ -15281,6 +15335,25 @@ function claimAllMailRewards() {
   if (typeof updateRedDots === 'function') updateRedDots();
   alert(n > 0 ? ('已領取 ' + n + ' 封郵件的附件！') : '沒有可領取的附件');
 }
+function deleteAllMail() {
+  ensureMailState();
+  const list = S.mail || [];
+  if (!list.length) {
+    alert('目前沒有郵件');
+    return;
+  }
+  const unclaimed = list.filter(function(m) { return m && m.rewards && !m.claimed; }).length;
+  let msg = '確定刪除全部 ' + list.length + ' 封郵件？';
+  if (unclaimed > 0) {
+    msg += '\n\n⚠️ 其中有 ' + unclaimed + ' 封尚未領取附件，刪除後無法復原！\n建議先按「一鍵領取全部附件」。';
+  }
+  if (!confirm(msg)) return;
+  S.mail = [];
+  if (typeof saveGame === 'function') saveGame();
+  renderMail();
+  if (typeof updateRedDots === 'function') updateRedDots();
+  alert('已刪除全部郵件');
+}
 function renderMail() {
   ensureMailState();
   maybeSeedWelcomeMail();
@@ -15288,6 +15361,8 @@ function renderMail() {
   const empty = $('mail-empty');
   const claimAllBtn = $('mail-claim-all-btn');
   if (claimAllBtn) claimAllBtn.onclick = claimAllMailRewards;
+  const delAllBtn = $('mail-delete-all-btn');
+  if (delAllBtn) delAllBtn.onclick = deleteAllMail;
   if (!list) return;
   if (!S.mail.length) {
     list.innerHTML = '';
@@ -15748,6 +15823,9 @@ async function tryRestoreSession() {
   } catch (e) {}
 
   // 3) 都沒有 → 顯示登入畫面
+  try {
+    if (localStorage.getItem('bobodao_account_used') === '1') hideGuestModeEntry();
+  } catch (e) {}
   $('login-overlay').classList.remove('hidden');
 }
 
