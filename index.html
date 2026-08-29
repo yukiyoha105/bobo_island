@@ -21,7 +21,14 @@
       overflow-x: hidden;
     }
 
-    /* 左右側廣告（寬螢幕）— 縮小尺寸 */
+    /* 廣告：預設全關；僅主畫面（島嶼 map）加上 body.ads-on 才顯示 */
+    .side-ad,
+    .mobile-ad {
+      display: none !important;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    /* 電腦：左右側廣告（不擋中間遊戲區） */
     .side-ad {
       position: fixed;
       top: 72px;
@@ -29,8 +36,7 @@
       min-height: 120px;
       max-height: 280px;
       overflow: hidden;
-      z-index: 50;
-      display: none;
+      z-index: 40;
       align-items: flex-start;
       justify-content: center;
       background: rgba(255,255,255,0.25);
@@ -45,48 +51,60 @@
       min-height: 200px !important;
       max-height: 250px !important;
     }
-    /* 底部橫幅：僅手機／窄螢幕（縮小） */
+    /* 手機：頂部橫幅（不擋內容：用 padding-top 推開遊戲） */
     .mobile-ad {
-      display: none;
       width: 100%;
       min-height: 40px;
-      max-height: 56px;
+      max-height: 50px;
       overflow: hidden;
       background: #f5f5f5;
-      border-top: 1px solid #e0e0e0;
+      border-bottom: 1px solid #e0e0e0;
       text-align: center;
-      z-index: 80;
+      z-index: 40;
     }
     .mobile-ad ins.adsbygoogle {
       display: block;
       width: 100% !important;
       min-height: 40px !important;
-      max-height: 56px !important;
+      max-height: 50px !important;
     }
     @media (min-width: 1201px) {
-      .side-ad { display: flex; }
-      .mobile-ad { display: none !important; }
-      body { padding-bottom: 8px; }
+      body.ads-on .side-ad {
+        display: flex !important;
+        visibility: visible;
+        pointer-events: auto;
+      }
+      body.ads-on .mobile-ad { display: none !important; }
+      body { padding-bottom: 8px; padding-top: 8px; }
+      /* 中間遊戲區保留左右空間，避免被側欄蓋住 */
+      body.ads-on .game {
+        margin-left: 128px;
+        margin-right: 128px;
+        max-width: calc(100vw - 272px);
+      }
     }
     @media (max-width: 1200px) {
-      .side-ad { display: none !important; }
-      .mobile-ad {
-        display: block;
+      body.ads-on .side-ad { display: none !important; }
+      body.ads-on .mobile-ad {
+        display: block !important;
+        visibility: visible;
+        pointer-events: auto;
         position: fixed;
         left: 0;
         right: 0;
-        bottom: 0;
+        top: 0;
+        bottom: auto;
       }
-      body { padding-bottom: 52px; }
+      /* 遊戲內容往下推，不被頂部廣告擋住 */
+      body.ads-on {
+        padding-top: 54px;
+        padding-bottom: 8px;
+      }
+      body:not(.ads-on) {
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
     }
-    /* 戰鬥中完全關閉廣告 */
-    body.in-battle .side-ad,
-    body.in-battle .mobile-ad {
-      display: none !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-    body.in-battle { padding-bottom: 8px !important; }
 
     .game {
       background: #fffef9;
@@ -5838,24 +5856,28 @@ function showPlayerProfile() {
     '<br><span style="color:#888;font-size:0.8rem">升級會獲得金錢獎勵，並讓野生寵物等級範圍提升。</span>';
   $('player-modal').classList.remove('hidden');
 }
+function updateAdVisibility(screenId) {
+  try {
+    // 只有主畫面（島嶼 map）顯示廣告；不擋其他內容
+    const onMap = (screenId === 'map') && !(typeof S !== 'undefined' && S.battling);
+    if (onMap) document.body.classList.add('ads-on');
+    else document.body.classList.remove('ads-on');
+  } catch (e) {}
+}
 function setBattleAdsHidden(on) {
   try {
-    if (on) document.body.classList.add('in-battle');
-    else document.body.classList.remove('in-battle');
+    if (on) document.body.classList.remove('ads-on');
+    else {
+      const active = document.querySelector('.screen.active');
+      updateAdVisibility(active ? active.id : '');
+    }
   } catch (e) {}
 }
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
-  // 戰鬥畫面關閉廣告；離開戰鬥才顯示
-  try {
-    if (id === 'battle' || (typeof S !== 'undefined' && S.battling)) {
-      document.body.classList.add('in-battle');
-    } else {
-      document.body.classList.remove('in-battle');
-    }
-  } catch (e) {}
+  updateAdVisibility(id);
   if(id==='map'){ try{ if(typeof grantLadderDailyRewardMail==='function') grantLadderDailyRewardMail(); }catch(e){} renderIsland(); }
   if(id==='team') renderTeam();
   if(id==='more'){ try{if(typeof bindMoreMenu==='function')bindMoreMenu();}catch(e){} if(typeof updateMoreBadges==='function') updateMoreBadges(); }
@@ -6305,6 +6327,7 @@ function bindGameHandlers() {
   if (typeof bindBattleLogUI === 'function') bindBattleLogUI();
   if (_handlersBound) return;
   _handlersBound = true;
+  try{ if(typeof updateAdVisibility==='function') updateAdVisibility('map'); }catch(e){}
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
   });
