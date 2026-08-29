@@ -1475,8 +1475,7 @@
       <button class="nav-btn active" data-screen="map">🗺️ 島嶼</button>
       <button class="nav-btn" data-screen="team">🐾 隊伍</button>
       <button class="nav-btn" data-screen="codex">📖 圖鑑</button>
-      <button class="nav-btn" data-screen="history">📜 戰鬥紀錄</button>
-      <button class="nav-btn" data-screen="bag">🎒 背包</button>
+            <button class="nav-btn" data-screen="bag">🎒 背包</button>
       <button class="nav-btn" data-screen="more" id="nav-more">⋯ 更多</button>
     </div>
 
@@ -1519,15 +1518,16 @@
       <div class="pet-list" id="codex-summon-list"></div>
     </div>
 
-    <div id="history" class="screen">
-      <div class="section-title">📜 戰鬥紀錄 <span id="history-progress" style="font-weight:600;color:#666;font-size:0.85rem"></span></div>
-      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">保存最近 50 場戰鬥，點擊可看完整日誌</p>
-      <div id="history-list" class="history-list"></div>
-    </div>
-
     <div id="bag" class="screen">
       <div class="section-title">🎒 背包</div>
-      <p style="text-align:center;font-size:0.8rem;color:#888;margin:-4px 0 10px">金幣、道具與寶物碎片</p>
+      <div id="bag-tabs" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 12px;padding:0 4px">
+        <button type="button" class="btn bag-tab" data-bag-tab="all" style="padding:7px 12px;font-size:0.8rem;font-weight:800">全部</button>
+        <button type="button" class="btn bag-tab" data-bag-tab="currency" style="padding:7px 12px;font-size:0.8rem;font-weight:800">💰 貨幣</button>
+        <button type="button" class="btn bag-tab" data-bag-tab="items" style="padding:7px 12px;font-size:0.8rem;font-weight:800">🎒 道具</button>
+        <button type="button" class="btn bag-tab" data-bag-tab="petfrags" style="padding:7px 12px;font-size:0.8rem;font-weight:800">🧩 寵物碎片</button>
+        <button type="button" class="btn bag-tab" data-bag-tab="treasures" style="padding:7px 12px;font-size:0.8rem;font-weight:800">💎 寶物</button>
+        <button type="button" class="btn bag-tab" data-bag-tab="trefrags" style="padding:7px 12px;font-size:0.8rem;font-weight:800">🔩 寶物碎片</button>
+      </div>
       <div class="item-list" id="item-list"></div>
     </div>
 
@@ -1605,8 +1605,7 @@
       <div class="section-title">📧 郵件</div>
       <p style="text-align:center;font-size:0.82rem;color:#666;margin:0 0 8px">官方與系統訊息會出現在這裡</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
-        <button type="button" class="btn" id="mail-read-all-btn" style="padding:8px 14px;font-weight:800;background:#e3f2fd;border:2px solid #64b5f6">一鍵已讀</button>
-        <button type="button" class="btn" id="mail-claim-all-btn" style="padding:8px 14px;font-weight:800;background:#fff8e1;border:2px solid #ffb74d">一鍵領取全部附件</button>
+        <button type="button" class="btn" id="mail-claim-all-btn" style="padding:10px 22px;font-weight:900;font-size:0.95rem;color:#fff;background:linear-gradient(180deg,#ef6c00,#bf360c);border:2px solid #8d2b0b;box-shadow:0 3px 0 #6d1f08,0 4px 10px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)">🎁 一鍵領取全部附件</button>
       </div>
       <div id="mail-list" class="history-list"></div>
       <div id="mail-empty" style="text-align:center;color:#999;padding:24px;display:none">目前沒有郵件</div>
@@ -2362,7 +2361,9 @@ const ALL_PETS = [
     dropCoins: [60, 120],
     skills: [
       { id:'hao_keai', name:'好可愛!!', emoji:'🥰', evoReq:0, unlockLv:0, mp:15,
-        fixedHits:3, atkPercentMin:90, atkPercentMax:140, healSelfPercent:0.10 },
+        fixedHits:3, atkPercentMin:90, atkPercentMax:140, healSelfPercent:0.10,
+        /* 魅力高於對手：傷害+10%；魅力低於對手：對自身造成同等傷害 */
+        charmVsBoost: 0.10, charmVsRecoil: true },
       { id:'ruanruan', name:'軟軟之術', emoji:'🫧', evoReq:0, unlockLv:0, mp:30,
         atkPercentMin:120, atkPercentMax:180, burnChance:1.0, burnTurns:3,
         selfBuff:{ defBonus:0.40, turns:99 } },
@@ -2851,10 +2852,6 @@ function ensureCurrencyState() {
 const SHOP_CATALOG = [
   { id: 'hua_mi', kind: 'item', name: '花蜜', emoji: '🍯', price: 100, chance: 100, dailyLimit: 0,
     desc: '戰鬥中回復 HP 120' },
-  { id: 'exp_pack_normal', kind: 'exp_pack', name: '普通經驗包', emoji: '📦', price: 150, chance: 45, dailyLimit: 5,
-    desc: '寵物經驗 +150（寵物頁使用）' },
-  { id: 'exp_pack_rare', kind: 'exp_pack', name: '稀有經驗包', emoji: '📦', price: 250, chance: 35, dailyLimit: 5,
-    desc: '寵物經驗 +200（寵物頁使用）' },
   { id: 'frag_huobao_xiong', kind: 'frag', petId: 'huobao_xiong', name: '火爆熊碎片', emoji: '🧩', price: 250, chance: 40, dailyLimit: 5, amount: 1,
     desc: '火爆熊碎片 ×1' },
   { id: 'frag_shuibo_bao', kind: 'frag', petId: 'shuibo_bao', name: '水波豹碎片', emoji: '🧩', price: 250, chance: 40, dailyLimit: 5, amount: 1,
@@ -5814,7 +5811,7 @@ function showScreen(id) {
   if(id==='account'){ openAccountScreen(); }
   if(id==='bag') renderBag();
   if(id==='codex') renderCodex();
-  if(id==='history') renderBattleHistoryScreen();
+  if(id==='history'){ showScreen('map'); return; } if(false&&id==='history') renderBattleHistoryScreen();
 }
 
 /* ---------------- Supabase 登入 / 雲端存檔 ---------------- */
@@ -8841,7 +8838,7 @@ function isCombatLogEntry(e) {
   return false;
 }
 
-function archiveBattleLog(result) {
+function archiveBattleLog(result) { return;
   try {
     const logs = (S._battleLog || [])
       .filter(isCombatLogEntry)
@@ -10791,6 +10788,18 @@ function executeSkill(pl, sk, onDone, isEnemy){
         continue;
       }
       let realDmg = r.dmg;
+      // 好可愛!! 魅力高於對手：傷害 +10%
+      try {
+        const boost = (skUse.charmVsBoost != null ? skUse.charmVsBoost : sk.charmVsBoost);
+        if (boost && pl && defender) {
+          const myCharm = Number(pl.charm) || 0;
+          const foCharm = Number(defender.charm) || 0;
+          if (myCharm > foCharm) {
+            realDmg = Math.max(1, Math.floor(realDmg * (1 + Number(boost))));
+            if (h === 0) addBLog(pl.name + ' 魅力更高，好可愛傷害 +' + Math.round(Number(boost) * 100) + '%！', 'lucky');
+          }
+        }
+      } catch (e) {}
       // 冰刀紫階：第一次受到超過 50% 最大血的攻擊 → 抵消
       try {
         if (typeof getTreasureCombatEffects === 'function' && defender && !defender._iceNullifyUsed) {
@@ -10891,6 +10900,13 @@ function executeSkill(pl, sk, onDone, isEnemy){
       const defStat = Number(defender.defense) || 0;
       let realDmg = Math.max(1, Math.floor(rawSum - defStat * 0.3));
       try {
+        const boost = (skUse.charmVsBoost != null ? skUse.charmVsBoost : sk.charmVsBoost);
+        if (boost && pl && defender && (Number(pl.charm)||0) > (Number(defender.charm)||0)) {
+          realDmg = Math.max(1, Math.floor(realDmg * (1 + Number(boost))));
+          addBLog(pl.name + ' 魅力更高，好可愛傷害 +' + Math.round(Number(boost) * 100) + '%！', 'lucky');
+        }
+      } catch (e) {}
+      try {
         if (typeof getTreasureCombatEffects === 'function' && defender && !defender._iceNullifyUsed) {
           const dfx = getTreasureCombatEffects(defender);
           if (dfx.onceNullifyOverHpPct != null) {
@@ -10975,6 +10991,19 @@ function executeSkill(pl, sk, onDone, isEnemy){
         target.hp = Math.min(target.maxHp, target.hp + healAmt);
         const actual = Math.round(target.hp - before);
         if (actual > 0) addBLog('💧 ' + target.name + ' 吸收水波回復 ' + actual + '！', 'heal');
+        if (!isEnemy && typeof syncAlliesHpToOwned === 'function') syncAlliesHpToOwned();
+      }
+    }
+    // 好可愛!!：魅力比較（高於對手傷害已在命中時加成；低於則反噬同等總傷）
+    const charmRecoil = (skUse.charmVsRecoil != null ? skUse.charmVsRecoil : sk.charmVsRecoil);
+    if (charmRecoil && anyHit && totalDmg > 0 && pl && pl.hp > 0 && defender) {
+      const myCharm = Number(pl.charm) || 0;
+      const foCharm = Number(defender.charm) || 0;
+      if (myCharm < foCharm) {
+        const recoil = Math.min(pl.hp, Math.round(totalDmg));
+        pl.hp = Math.max(0, pl.hp - recoil);
+        addBLog(pl.name + ' 魅力低於對手，被可愛反噬了 ' + recoil + ' 傷害！', 'sys');
+        try { showDamageNumber(pl, '-' + recoil, 'd', !isEnemy); } catch (e) {}
         if (!isEnemy && typeof syncAlliesHpToOwned === 'function') syncAlliesHpToOwned();
       }
     }
@@ -11766,12 +11795,9 @@ function endBattle(win){
       playerExpG = 0;
     } else {
       const expReward = calcBattleExpRewards(true);
-      expG = 0; // 改掉落經驗包
-      playerExpG = expReward.playerExp;
-      try {
-        const dang = (S.currentZone && ZONES.find(z => z.id === S.currentZone.id)) ? (S.currentZone.danger || 1) : 1;
-        S._battlePackDrop = rollPetExpPackDrop(true, dang);
-      } catch (e) { S._battlePackDrop = null; }
+      expG = expReward.petExp || 0;
+      playerExpG = expReward.playerExp || 0;
+      S._battlePackDrop = null;
     }
     S.coins+=coins; S.exp+=playerExpG;
     let leveled=false; let levelsGained=0;
@@ -11813,7 +11839,7 @@ function getBattlePetExpMult(ownedIdx) {
       const pet = S.owned[oi];
       if (!pet) return;
       const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
-      const gain = 0; // 寵物經驗改由「寵物經驗包」獲得，戰鬥不再直接加經驗
+      const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult)); // 戰鬥獲得寵物經驗
       const need = Math.max(1, (pet.level || 1) * 40);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
@@ -12100,8 +12126,8 @@ function getBattlePetExpMult(ownedIdx) {
     let expG = 0, playerExpG = 0;
     if (!isArena) {
       const expReward = calcBattleExpRewards(false);
-      expG = 0;
-      playerExpG = expReward.playerExp;
+      expG = expReward.petExp || 0;
+      playerExpG = expReward.playerExp || 0;
       S.exp += playerExpG;
       S._battlePackDrop = null;
     }
@@ -12120,7 +12146,7 @@ function getBattlePetExpMult(ownedIdx) {
       const pet = S.owned[oi];
       if (!pet) return;
       const mult = (typeof getBattlePetExpMult === 'function') ? getBattlePetExpMult(oi) : 1;
-      const gain = 0; // 寵物經驗改由「寵物經驗包」獲得，戰鬥不再直接加經驗
+      const gain = Math.max(0, Math.floor((Number(expG) || 0) * mult)); // 戰鬥獲得寵物經驗
       const need = Math.max(1, (pet.level || 1) * 40);
       const expBefore = Math.max(0, Number(pet.exp) || 0);
       const fromLv = pet.level || 1;
@@ -13354,7 +13380,7 @@ function openPetInfo(idx) {
       e.stopPropagation();
       const si = Number(el.dataset.skillIdx);
       const sk = skills[si];
-      if (sk && canUseSkill(p, sk)) openSkillDetail(sk, p);
+      if (sk) openSkillDetail(sk, p);
     };
   });
   // 寶物格：依部位顯示，點擊開彈窗選擇／卸下；湊滿系列則特殊外框
@@ -13685,10 +13711,10 @@ function openPetExpPackForCurrentPet() {
 function updatePetInfoExpPackBtn() {
   const btn = document.getElementById('pet-info-exp-pack');
   if (!btn) return;
-  const n = countOwnedExpPacks();
+  btn.style.display = 'none';
+  const n = 0;
   const oi = window._petInfoIdx;
-  const show = oi != null && S.owned[oi] && n > 0;
-  btn.style.display = show ? 'inline-block' : 'none';
+  const show = false;
   if (show) {
     btn.innerHTML = '📦 使用經驗包' + (n > 0 ? ' <span style="font-size:0.75rem">(' + n + ')</span>' : '');
     btn.onclick = function() { openPetExpPackForCurrentPet(); };
@@ -13764,122 +13790,138 @@ function usePetExpPackOn(oi, packId) {
 }
 
 function renderBag(){
-  const box=$('item-list'); box.innerHTML=''; let has=false;
+  if (!window._bagTab) window._bagTab = 'all';
+  const tab = window._bagTab;
+  const showAll = (tab === 'all');
+  const box = $('item-list');
+  if (!box) return;
+  box.innerHTML = '';
+  // tab styles
+  document.querySelectorAll('.bag-tab').forEach(function(btn) {
+    const on = btn.getAttribute('data-bag-tab') === tab;
+    btn.style.background = on ? 'linear-gradient(180deg,#42a5f5,#1e88e5)' : '#fff';
+    btn.style.color = on ? '#fff' : '#555';
+    btn.style.border = on ? '2px solid #1565c0' : '2px solid #ddd';
+    btn.onclick = function() {
+      window._bagTab = btn.getAttribute('data-bag-tab');
+      renderBag();
+    };
+  });
 
-  // ① 金幣
-  {
-    has = true;
-    const d = document.createElement('div'); d.className = 'item-card';
-    d.style.borderColor = '#ffb300';
-    d.innerHTML = '<div class="emoji">💰</div><div class="name">金幣</div><div class="count">×' + (S.coins || 0) + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">通用貨幣</div>';
+  function card(html, border) {
+    const d = document.createElement('div');
+    d.className = 'item-card';
+    if (border) d.style.borderColor = border;
+    d.innerHTML = html;
     box.appendChild(d);
+    return d;
+  }
+  let has = false;
+
+  if (showAll || tab === 'currency') {
+    if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:8px 0 4px;font-size:0.95rem'; h.textContent='💰 貨幣'; box.appendChild(h); }
+    if (typeof ensureCurrencyState === 'function') ensureCurrencyState();
+    has = true;
+    card('<div class="emoji">💰</div><div class="name">金幣</div><div class="count">×' + (S.coins || 0).toLocaleString() + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">通用貨幣</div>', '#ffb300');
+    card('<div class="emoji">🏅</div><div class="name">競技幣</div><div class="count">×' + (S.arenaCoins || 0).toLocaleString() + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">競技商店用</div>', '#ff7043');
+    (typeof BIRTHSTONE_DEFS !== 'undefined' ? BIRTHSTONE_DEFS : []).forEach(function(b) {
+      const n = (S.birthstones && S.birthstones[b.id]) || 0;
+      card('<div class="emoji">' + (b.emoji || '💎') + '</div><div class="name">' + b.name + '</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">誕生石</div>', '#ab47bc');
+    });
   }
 
-  {
-    const cnt = (S.items && S.items.hua_mi) || 0;
-    if (cnt > 0) {
-      has = true;
-      const d = document.createElement('div'); d.className = 'item-card';
-      d.innerHTML = '<div class="emoji">' + (typeof itemFaceHtml === 'function' ? itemFaceHtml('花蜜', '🍯', 40) : '🍯') + '</div><div class="name">花蜜</div><div class="count">×'+cnt+'</div><div style="font-size:0.7rem;color:#666;margin-top:3px">戰鬥中回復 120 HP</div>';
-      box.appendChild(d);
-    }
-  }
-
-  {
-    // 相容舊存檔：pet_exp_pack → 普通
+  if (showAll || tab === 'items') {
+    if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:12px 0 4px;font-size:0.95rem'; h.textContent='🎒 道具'; box.appendChild(h); }
     if (S.items && S.items.pet_exp_pack > 0) {
       S.items.exp_pack_normal = (S.items.exp_pack_normal || 0) + S.items.pet_exp_pack;
       delete S.items.pet_exp_pack;
     }
-    (typeof PET_EXP_PACKS !== 'undefined' ? PET_EXP_PACKS : []).forEach(function(def) {
-      const cnt = (S.items && S.items[def.id]) || 0;
-      if (cnt <= 0) return;
+    const hua = (S.items && S.items.hua_mi) || 0;
+    if (hua > 0) {
       has = true;
-      const d = document.createElement('div'); d.className = 'item-card';
-      d.style.borderColor = '#42a5f5';
-      d.style.cursor = 'default';
-      d.innerHTML = '<div class="emoji">' + def.emoji + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">經驗 +' + def.exp + '<br>請至寵物頁面使用</div>';
-      box.appendChild(d);
-    });
-    // 寶箱
+      card('<div class="emoji">' + (typeof itemFaceHtml === 'function' ? itemFaceHtml('花蜜', '🍯', 40) : '🍯') + '</div><div class="name">花蜜</div><div class="count">×' + hua + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">戰鬥中回復 120 HP</div>', '#ffb74d');
+    }
     if (typeof ensureShopBoxDefs === 'function') ensureShopBoxDefs();
     Object.keys(typeof GIFT_BOX_DEFS !== 'undefined' ? GIFT_BOX_DEFS : {}).forEach(function(bid) {
       const def = GIFT_BOX_DEFS[bid];
       const cnt = (S.items && S.items[bid]) || 0;
       if (cnt <= 0) return;
       has = true;
-      const d = document.createElement('div'); d.className = 'item-card';
-      d.style.borderColor = '#ff9800';
+      const d = card('<div class="emoji">' + (def.emoji || '🎁') + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (def.desc || '點擊開啟') + '</div>', '#ff9800');
       d.style.cursor = 'pointer';
-      d.innerHTML = '<div class="emoji">' + (def.emoji || '🎁') + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (def.desc || '點擊開啟') + '</div>';
       d.onclick = function() { openGiftBoxFromBag(bid); };
-      box.appendChild(d);
+    });
+    // 其他 items 鍵（非經驗包、非寶箱、非花蜜）
+    Object.keys(S.items || {}).forEach(function(k) {
+      if (k === 'hua_mi' || k.indexOf('exp_pack') === 0 || (typeof GIFT_BOX_DEFS !== 'undefined' && GIFT_BOX_DEFS[k])) return;
+      const cnt = S.items[k] || 0;
+      if (cnt <= 0) return;
+      has = true;
+      card('<div class="emoji">📦</div><div class="name">' + k + '</div><div class="count">×' + cnt + '</div>', '#90a4ae');
     });
   }
 
-  // ③ 寵物碎片（僅顯示正式存在的寵物；清理無效 id）
-  const fragMap = S.fragments || {};
-  Object.keys(fragMap).forEach(pid => {
-    const n = fragMap[pid] || 0;
-    if (n <= 0) return;
-    const base = getBase(pid);
-    // 無效寵物碎片（例如手稿佔位 id）直接刪除、不顯示
-    if (!base) {
-      delete S.fragments[pid];
-      return;
-    }
-    has = true;
-    const d = document.createElement('div'); d.className = 'item-card';
-    d.style.borderColor = '#81c784';
-    let extra = '用於升星／召喚';
-    let exchangeBtn = '';
-    // 基礎碎片 → 高階碎片
-    const ascendTo = (typeof getAscendTargetId === 'function') ? getAscendTargetId(pid) : null;
-    if (ascendTo) {
-      const toB = getBase(ascendTo);
-      const rate = (typeof PET_ASCEND_FRAG_RATE === 'number') ? PET_ASCEND_FRAG_RATE : 10;
-      const canEx = Math.floor(n / rate);
-      extra = '每 ' + rate + ' 片可換 1 片' + ((toB && toB.name) || '高階') + '碎片';
-      if (canEx > 0) {
-        exchangeBtn = '<button class="btn btn-pink" style="padding:4px 10px;font-size:0.72rem;margin-top:6px" data-ex-ascend="' + pid + '">🔄 兌換（可換 ' + canEx + ' 片）</button>';
+  if (showAll || tab === 'petfrags') {
+    if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:12px 0 4px;font-size:0.95rem'; h.textContent='🧩 寵物碎片'; box.appendChild(h); }
+    const bases = (typeof PETS !== 'undefined' ? PETS : []);
+    bases.forEach(function(base) {
+      if (!base || !base.id) return;
+      const fr = typeof getFragmentCount === 'function' ? getFragmentCount(base.id) : ((S.fragments && S.fragments[base.id]) || 0);
+      if (fr <= 0) return;
+      has = true;
+      const need = base.fragmentSummon || 0;
+      const can = need > 0 && fr >= need;
+      const d = card(
+        '<div class="emoji">' + (typeof petFaceHtml === 'function' ? petFaceHtml(base, 40) : (base.emoji || '🐾')) + '</div>' +
+        '<div class="name">' + base.name + '碎片</div><div class="count">×' + fr + '</div>' +
+        '<div style="font-size:0.7rem;color:#666;margin-top:3px">' + (need ? ('合成需 ' + need + (can ? '　可合成' : '')) : '碎片') + '</div>',
+        can ? '#ab47bc' : '#ce93d8'
+      );
+      if (can) {
+        d.style.cursor = 'pointer';
+        d.onclick = function() { summonPetFromFragments(base.id); renderBag(); };
       }
-    }
-    d.innerHTML = '<div class="emoji">' + petFaceHtml(base, 40) + '</div><div class="name">' + base.name + '碎片</div><div class="count">×' + n + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + extra + '</div>' + exchangeBtn;
-    const exBtn = d.querySelector('[data-ex-ascend]');
-    if (exBtn) {
-      exBtn.onclick = () => exchangeAscendFragments(exBtn.getAttribute('data-ex-ascend'));
-    }
-    box.appendChild(d);
-  });
+    });
+  }
 
-  // ④ 寶物碎片（全部）
-  ALL_TREASURES.forEach(def => {
-    const fr = getTreasureFragment(def.id);
-    if (fr <= 0) return;
-    has = true;
-    const g = getTreasureGrade(def.id);
-    const gName = g >= 0 ? ((def.grades[g] || {}).name || '') + '階' : '未製作';
-    const d = document.createElement('div'); d.className = 'item-card';
-    d.style.borderColor = '#ce93d8';
-    d.innerHTML = '<div class="emoji">' + treasureFaceHtml(def, 40) + '</div><div class="name">' + def.name + '碎片</div><div class="count">×' + fr + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + gName + '　用於升階</div>';
-    box.appendChild(d);
-  });
+  if (showAll || tab === 'treasures') {
+    if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:12px 0 4px;font-size:0.95rem'; h.textContent='💎 寶物'; box.appendChild(h); }
+    (typeof ALL_TREASURES !== 'undefined' ? ALL_TREASURES : []).forEach(function(def) {
+      const g = typeof getTreasureGrade === 'function' ? getTreasureGrade(def.id) : -1;
+      if (g < 0) return;
+      has = true;
+      const gName = (def.grades && def.grades[g] && def.grades[g].name) || '?';
+      const color = (typeof TREASURE_GRADE_COLORS !== 'undefined' && TREASURE_GRADE_COLORS[gName]) || '#666';
+      const bon = typeof formatTreasureBonuses === 'function' ? formatTreasureBonuses(getTreasureBonuses(def.id)) : '';
+      card(
+        '<div class="emoji">' + (typeof treasureFaceHtml === 'function' ? treasureFaceHtml(def, 40) : (def.emoji || '💎')) + '</div>' +
+        '<div class="name">' + def.name + '</div><div class="count" style="color:' + color + '">' + gName + '階</div>' +
+        '<div style="font-size:0.7rem;color:#666;margin-top:3px">' + (bon || '已擁有') + '</div>',
+        color
+      );
+    });
+  }
 
-  // ⑤ 已擁有寶物（非碎片，方便對照）
-  ALL_TREASURES.forEach(def => {
-    const g = getTreasureGrade(def.id);
-    if (g < 0) return;
-    has = true;
-    const gName = (def.grades[g] || {}).name || '?';
-    const color = (TREASURE_GRADE_COLORS && TREASURE_GRADE_COLORS[gName]) || '#666';
-    const bon = formatTreasureBonuses(getTreasureBonuses(def.id));
-    const d = document.createElement('div'); d.className = 'item-card';
-    d.style.borderColor = color;
-    d.innerHTML = '<div class="emoji">' + treasureFaceHtml(def, 40) + '</div><div class="name">' + def.name + '</div><div class="count" style="color:' + color + '">' + gName + '階</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (bon || '已擁有') + '</div>';
-    box.appendChild(d);
-  });
+  if (showAll || tab === 'trefrags') {
+    if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:12px 0 4px;font-size:0.95rem'; h.textContent='🔩 寶物碎片'; box.appendChild(h); }
+    (typeof ALL_TREASURES !== 'undefined' ? ALL_TREASURES : []).forEach(function(def) {
+      const fr = typeof getTreasureFragment === 'function' ? getTreasureFragment(def.id) : ((S.treasureFrags && S.treasureFrags[def.id]) || 0);
+      if (fr <= 0) return;
+      has = true;
+      const g = typeof getTreasureGrade === 'function' ? getTreasureGrade(def.id) : -1;
+      const gName = g >= 0 && def.grades && def.grades[g] ? ((def.grades[g].name || '') + '階') : '未製作';
+      card(
+        '<div class="emoji">' + (typeof treasureFaceHtml === 'function' ? treasureFaceHtml(def, 40) : (def.emoji || '🔩')) + '</div>' +
+        '<div class="name">' + def.name + '碎片</div><div class="count">×' + fr + '</div>' +
+        '<div style="font-size:0.7rem;color:#666;margin-top:3px">' + gName + '　用於鍛造升階</div>',
+        '#ce93d8'
+      );
+    });
+  }
 
-  if (!has) box.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1">背包是空的</p>';
+  if (!has) {
+    box.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1;padding:24px 8px">此分類目前是空的</p>';
+  }
 }
 function openCodexDetail(petId) {
   const base = getBase(petId);
@@ -13924,8 +13966,15 @@ function openCodexDetail(petId) {
   $('pet-info-skills').innerHTML = Array.from({ length: 4 }, (_, i) => {
     const skill = skills[i];
     if (!skill) return '<div class="info-slot">技能 ' + (i + 1) + '<br>空</div>';
-    return '<div class="info-slot">' + (skill.emoji || '💥') + '<br><b>' + skill.name + '</b></div>';
+    return '<div class="info-slot skill-slot-btn" data-skill-idx="' + i + '" style="cursor:pointer" title="點擊查看說明">' + (skill.emoji || '💥') + '<br><b>' + skill.name + '</b></div>';
   }).join('');
+  $('pet-info-skills').querySelectorAll('[data-skill-idx]').forEach(function(el) {
+    el.onclick = function(e) {
+      e.stopPropagation();
+      const sk = skills[Number(el.dataset.skillIdx)];
+      if (sk && typeof openSkillDetail === 'function') openSkillDetail(sk, base);
+    };
+  });
   $('pet-info-treasures').innerHTML = Array.from({ length: 6 }, (_, i) =>
     '<div class="info-slot">寶物格 ' + (i + 1) + '<br>—</div>'
   ).join('');
@@ -15118,9 +15167,7 @@ function renderMail() {
   maybeSeedWelcomeMail();
   const list = $('mail-list');
   const empty = $('mail-empty');
-  const readAllBtn = $('mail-read-all-btn');
   const claimAllBtn = $('mail-claim-all-btn');
-  if (readAllBtn) readAllBtn.onclick = markAllMailRead;
   if (claimAllBtn) claimAllBtn.onclick = claimAllMailRewards;
   if (!list) return;
   if (!S.mail.length) {
