@@ -7696,20 +7696,54 @@ function promoteOnLadderWin(oppId) {
 }
 
 /** 天梯每日排名獎勵（寄到郵件，每天一次） */
+/** 天梯結算日：每天 08:00 起算「今日」；8 點前仍屬前一日 */
+function getLadderSettleDayKey() {
+  const now = new Date();
+  const d = new Date(now.getTime());
+  if (d.getHours() < 8) d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+/** 是否已到今日 8:00 結算點（本機時間） */
+function isPastLadderSettleHour() {
+  return new Date().getHours() >= 8;
+}
+/** 隨機誕生石 ×30（可重複，盡量分散到不同種類） */
+function rollBirthstoneBundle(total) {
+  total = Math.max(1, Number(total) || 30);
+  const defs = (typeof BIRTHSTONE_DEFS !== 'undefined' && BIRTHSTONE_DEFS.length) ? BIRTHSTONE_DEFS : [{ id: 'garnet', name: '石榴石' }];
+  const out = {};
+  // 先每種至少盡量分一點，其餘隨機
+  for (let i = 0; i < total; i++) {
+    const b = defs[Math.floor(Math.random() * defs.length)];
+    out[b.id] = (out[b.id] || 0) + 1;
+  }
+  return out;
+}
 function getLadderRankReward(rank) {
   rank = Number(rank) || 9999;
-  if (rank <= 1) return { coins: 2000, expPacks: { exp_pack_myth: 1 }, label: '第 1 名獎勵：金幣 2000 + 神話經驗包 ×1' };
-  if (rank <= 3) return { coins: 1200, expPacks: { exp_pack_high: 1 }, label: '第 ' + rank + ' 名獎勵：金幣 1200 + 高級經驗包 ×1' };
-  if (rank <= 10) return { coins: 800, expPacks: { exp_pack_mid: 1 }, label: '第 ' + rank + ' 名獎勵：金幣 800 + 中階經驗包 ×1' };
-  if (rank <= 30) return { coins: 500, expPacks: { exp_pack_rare: 1 }, label: '第 ' + rank + ' 名獎勵：金幣 500 + 稀有經驗包 ×1' };
-  if (rank <= 100) return { coins: 300, label: '第 ' + rank + ' 名獎勵：金幣 300' };
-  if (rank <= 500) return { coins: 150, label: '第 ' + rank + ' 名獎勵：金幣 150' };
-  return { coins: 50, label: '第 ' + rank + ' 名獎勵：金幣 50' };
+  // 每日皆有：競技幣 + 隨機誕生石寶箱III（30 顆）
+  const baseBox = { arenaCoins: 20, birthstones: null, birthstoneBox: 30 };
+  let pack;
+  if (rank <= 1) pack = { coins: 2000, arenaCoins: 120, label: '第 1 名：金幣 2000、競技幣 120、誕生石寶箱III' };
+  else if (rank <= 3) pack = { coins: 1200, arenaCoins: 80, label: '第 ' + rank + ' 名：金幣 1200、競技幣 80、誕生石寶箱III' };
+  else if (rank <= 10) pack = { coins: 800, arenaCoins: 50, label: '第 ' + rank + ' 名：金幣 800、競技幣 50、誕生石寶箱III' };
+  else if (rank <= 30) pack = { coins: 500, arenaCoins: 35, label: '第 ' + rank + ' 名：金幣 500、競技幣 35、誕生石寶箱III' };
+  else if (rank <= 100) pack = { coins: 300, arenaCoins: 25, label: '第 ' + rank + ' 名：金幣 300、競技幣 25、誕生石寶箱III' };
+  else if (rank <= 500) pack = { coins: 150, arenaCoins: 20, label: '第 ' + rank + ' 名：金幣 150、競技幣 20、誕生石寶箱III' };
+  else pack = { coins: 50, arenaCoins: 15, label: '第 ' + rank + ' 名：金幣 50、競技幣 15、誕生石寶箱III' };
+  return {
+    coins: pack.coins,
+    arenaCoins: pack.arenaCoins,
+    birthstoneBox: 30,
+    label: pack.label + '（隨機誕生石 ×30）'
+  };
 }
 function grantLadderDailyRewardMail() {
   try {
+    // 每天 8:00 後才發當日結算郵件
+    if (!isPastLadderSettleHour()) return;
     if (typeof ensureLadderRoster === 'function') ensureLadderRoster();
-    const day = (typeof getShopDayKey === 'function') ? getShopDayKey() : String(new Date().toDateString());
+    const day = getLadderSettleDayKey();
     if (S.ladderRewardDay === day) return;
     const rank = (typeof getMyLadderRank === 'function') ? getMyLadderRank() : 1800;
     const rew = getLadderRankReward(rank);
@@ -7719,17 +7753,19 @@ function grantLadderDailyRewardMail() {
       S.ladderRewardDay = day;
       return;
     }
+    const stones = rollBirthstoneBundle(rew.birthstoneBox || 30);
     S.mail.unshift({
       id: id,
       title: '🏆 天梯競技每日排名獎勵',
-      body: '結算時你的排名為第 ' + rank + ' 名。\n' + (rew.label || '') + '\n請至附件領取獎勵！',
+      body: '【每日 8:00 結算】你的排名為第 ' + rank + ' 名。\n' + (rew.label || '') + '\n請領取附件（含競技幣與隨機誕生石寶箱III）！',
       from: '天梯競技委員會',
       at: Date.now(),
       read: false,
       claimed: false,
       rewards: {
         coins: rew.coins || 0,
-        expPacks: rew.expPacks || null
+        arenaCoins: rew.arenaCoins || 0,
+        birthstones: stones
       }
     });
     S.ladderRewardDay = day;
@@ -7762,22 +7798,23 @@ function applyLadderResult(win) {
       const coins = Math.max(10, Math.round(delta * 0.5));
       const arena = Math.max(5, Math.round(delta * 0.1));
       S.ladderBestRank = rk;
-      S.coins = (S.coins || 0) + coins;
-      S.arenaCoins = (S.arenaCoins || 0) + arena;
-      if (!S.birthstones) S.birthstones = {};
-      S.birthstones.garnet = (S.birthstones.garnet || 0) + garnet;
+      // 獎勵改為郵件附件，不自動入帳
       if (!Array.isArray(S.mail)) S.mail = [];
       S.mail.unshift({
         id: 'ladder_best_' + Date.now(),
         title: '🏅 天梯歷史新高！',
-        body: '恭喜！排名從第 ' + prevBest + ' 名提升至第 ' + rk + ' 名（提升 ' + delta + ' 名）。\n已發放：石榴石 ×' + garnet + '、金幣 ×' + coins + '、競技幣 ×' + arena + '。',
+        body: '恭喜！排名從第 ' + prevBest + ' 名提升至第 ' + rk + ' 名（提升 ' + delta + ' 名）。\n請至附件領取：石榴石 ×' + garnet + '、金幣 ×' + coins + '、競技幣 ×' + arena + '。',
         from: '天梯競技委員會',
         at: Date.now(),
         read: false,
-        claimed: true,
-        rewards: null
+        claimed: false,
+        rewards: {
+          coins: coins,
+          arenaCoins: arena,
+          garnet: garnet
+        }
       });
-      S._ladderBestNote = '🏅 歷史新高第 ' + rk + ' 名！石榴石+' + garnet + ' 金幣+' + coins + ' 競技幣+' + arena;
+      S._ladderBestNote = '🏅 歷史新高第 ' + rk + ' 名！請至郵件領取附件獎勵';
     }
   } catch (e) {}
 
@@ -13863,7 +13900,15 @@ function renderBag(){
 
   if (showAll || tab === 'petfrags') {
     if (showAll) { const h=document.createElement('div'); h.style.cssText='grid-column:1/-1;font-weight:900;color:#e65100;margin:12px 0 4px;font-size:0.95rem'; h.textContent='🧩 寵物碎片'; box.appendChild(h); }
-    const bases = (typeof PETS !== 'undefined' ? PETS : []);
+    // 以 ALL_PETS 為主，並補上 S.fragments 裡有數量但圖鑑可能缺的 id
+    const bases = (typeof ALL_PETS !== 'undefined' ? ALL_PETS : []).slice();
+    const seen = {};
+    bases.forEach(function(b) { if (b && b.id) seen[b.id] = true; });
+    Object.keys(S.fragments || {}).forEach(function(pid) {
+      if (seen[pid]) return;
+      const b = (typeof getBase === 'function') ? getBase(pid) : null;
+      bases.push(b || { id: pid, name: pid, emoji: '🧩' });
+    });
     bases.forEach(function(base) {
       if (!base || !base.id) return;
       const fr = typeof getFragmentCount === 'function' ? getFragmentCount(base.id) : ((S.fragments && S.fragments[base.id]) || 0);
