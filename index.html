@@ -10,149 +10,124 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
     body {
       font-family: 'Nunito', sans-serif;
-      background: #87CEEB;
+      background:
+        radial-gradient(ellipse 900px 500px at 50% -10%, rgba(255,255,255,0.35), transparent 60%),
+        linear-gradient(180deg, #bfe6f7 0%, #8fd3e8 32%, #6ec6d9 62%, #57b8c9 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 8px;
+      padding: 20px 8px;
       overflow-x: hidden;
     }
+    /* 舒服一點的捲軸 */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(93,154,110,0.45); border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(93,154,110,0.7); }
 
-    /* 廣告：預設全關；僅主畫面（島嶼 map）加上 body.ads-on 才顯示 */
-    .side-ad,
-    .mobile-ad {
-      display: none !important;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    /* 電腦：左右側廣告（不擋中間遊戲區） */
+    /* 左右側廣告（寬螢幕） */
     .side-ad {
       position: fixed;
-      top: 72px;
-      width: 120px;
-      min-height: 120px;
-      max-height: 280px;
+      top: 80px;
+      width: 160px;
+      min-height: 200px;
+      max-height: calc(100vh - 100px);
       overflow: hidden;
-      z-index: 40;
+      z-index: 50;
+      display: none;
       align-items: flex-start;
       justify-content: center;
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.35);
       border-radius: 8px;
     }
-    .side-ad-left { left: 4px; }
-    .side-ad-right { right: 4px; }
+    .side-ad-left { left: 8px; }
+    .side-ad-right { right: 8px; }
     .side-ad ins.adsbygoogle {
       display: block;
-      width: 120px !important;
-      max-width: 120px !important;
-      min-height: 200px !important;
-      max-height: 250px !important;
+      width: 160px !important;
+      min-height: 600px;
     }
-    /* 手機：頂部細條廣告（固定高度，把遊戲往下擠，不要半版） */
+    /* 底部橫幅：僅手機／窄螢幕 */
     .mobile-ad {
+      display: none;
       width: 100%;
-      height: 50px;
       min-height: 50px;
-      max-height: 50px;
-      overflow: hidden !important;
-      background: #eef2f5;
-      border-bottom: 1px solid #cfd8dc;
+      max-height: 100px;
+      overflow: hidden;
+      background: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
       text-align: center;
-      z-index: 45;
-      line-height: 0;
-    }
-    .mobile-ad iframe,
-    .mobile-ad ins.adsbygoogle,
-    .mobile-ad > * {
-      max-height: 50px !important;
-      overflow: hidden !important;
+      z-index: 80;
     }
     .mobile-ad ins.adsbygoogle {
       display: block;
       width: 100% !important;
-      height: 50px !important;
-      min-height: 50px !important;
-      max-height: 50px !important;
+      min-height: 50px;
     }
     @media (min-width: 1201px) {
-      body.ads-on .side-ad {
-        display: flex !important;
-        visibility: visible;
-        pointer-events: auto;
-      }
-      body.ads-on .mobile-ad { display: none !important; }
-      body { padding-bottom: 8px; padding-top: 8px; }
-      body.ads-on .game {
-        margin-left: 128px;
-        margin-right: 128px;
-        max-width: calc(100vw - 272px);
-      }
+      .side-ad { display: flex; }
+      .mobile-ad { display: none !important; }
+      body { padding-bottom: 8px; }
     }
     @media (max-width: 1200px) {
-      body.ads-on .side-ad { display: none !important; }
-      body.ads-on .mobile-ad {
-        display: block !important;
-        visibility: visible;
-        pointer-events: auto;
+      .side-ad { display: none !important; }
+      .mobile-ad {
+        display: block;
         position: fixed;
         left: 0;
         right: 0;
-        top: 0;
-        bottom: auto;
-        height: 50px !important;
-        max-height: 50px !important;
+        bottom: 0;
       }
-      /* 整塊遊戲往下擠 50px，廣告只佔頂部細條 */
-      body.ads-on {
-        padding-top: 50px !important;
-        padding-bottom: 8px;
-      }
-      body.ads-on .game {
-        margin-top: 0;
-      }
-      body:not(.ads-on) {
-        padding-top: 8px;
-        padding-bottom: 8px;
-      }
+      body { padding-bottom: 64px; }
     }
 
     .game {
       background: #fffef9;
-      border-radius: 20px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      border-radius: 22px;
+      box-shadow:
+        0 20px 50px rgba(20,60,40,0.22),
+        0 4px 14px rgba(20,60,40,0.12),
+        0 0 0 1px rgba(255,255,255,0.4) inset;
       max-width: 980px;
       width: 100%;
       overflow: hidden;
-      border: 4px solid #5d9a6e;
+      border: 3px solid #cfe8d2;
     }
     .header {
-      background: linear-gradient(90deg, #4caf50, #26a69a, #42a5f5);
-      padding: 10px 14px;
+      background: linear-gradient(100deg, #4caf50, #2fae95, #3f9fe8);
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: white;
       flex-wrap: wrap;
       gap: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      position: relative;
+      z-index: 2;
     }
     .header #clock-chip {
       order: -1;
       margin-right: 6px;
     }
-    .header h1 { font-size: 1.25rem; }
+    .header h1 { font-size: 1.3rem; letter-spacing: 0.01em; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
     .header-stats { display: flex; gap: 8px; font-size: 0.8rem; font-weight: 600; }
-    .stat-chip { background: rgba(255,255,255,0.28); padding: 3px 9px; border-radius: 16px; }
-    .player-chip { background: rgba(255,255,255,0.4); cursor: pointer; border: 1.5px solid rgba(255,255,255,0.5); }
-    .player-chip:hover { background: rgba(255,255,255,0.55); }
-    .nav { display: flex; background: #e8f5e9; border-bottom: 2px solid #c8e6c9; }
+    .stat-chip { background: rgba(255,255,255,0.3); padding: 4px 11px; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08) inset; }
+    .player-chip { background: rgba(255,255,255,0.42); cursor: pointer; border: 1.5px solid rgba(255,255,255,0.55); transition: background 0.15s, transform 0.15s; }
+    .player-chip:hover { background: rgba(255,255,255,0.6); transform: translateY(-1px); }
+    .nav { display: flex; background: #eef8ef; border-bottom: 1px solid #d4ecd6; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
     .nav-btn {
-      flex: 1; padding: 9px 4px; border: none; background: transparent;
-      font-family: inherit; font-size: 0.8rem; font-weight: 700; color: #2e7d32; cursor: pointer;
+      flex: 1; padding: 11px 4px; border: none; background: transparent;
+      font-family: inherit; font-size: 0.8rem; font-weight: 700; color: #3e7a49; cursor: pointer;
+      border-bottom: 3px solid transparent; transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
-    .nav-btn:hover, .nav-btn.active { background: #a5d6a7; color: #1b5e20; }
+    .nav-btn:hover { background: rgba(165,214,167,0.35); color: #1b5e20; }
+    .nav-btn.active { background: rgba(76,175,80,0.14); color: #1b5e20; border-bottom-color: #4caf50; }
     
     .more-menu {
       display: grid;
@@ -191,7 +166,7 @@
       position: relative;
       z-index: 6;
     }
-    .screen { display: none; padding: 10px; min-height: 520px; }
+    .screen { display: none; padding: 14px; min-height: 520px; background: linear-gradient(180deg, #fffef9, #fbfaf3); }
     .screen.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -202,9 +177,10 @@
       margin: 0 auto;
       aspect-ratio: 1269 / 952;
       background: #4aa3c7 url('我的地圖.png') center / cover no-repeat;
-      border-radius: 16px;
+      border-radius: 18px;
       overflow: hidden;
       border: 3px solid #4a90a4;
+      box-shadow: 0 8px 24px rgba(20,60,80,0.2), 0 0 0 4px rgba(255,255,255,0.5);
     }
     .island-wrap::before { display: none; }
     .land {
@@ -336,15 +312,17 @@
 
     .zone-panel { max-width: 500px; margin: 0 auto; text-align: center; transition: max-width 0.2s; }
     .zone-panel.forge-wide { max-width: 720px; width: 100%; }
-    .zone-panel .big { font-size: 3.5rem; margin-bottom: 4px; }
-    .zone-panel h2 { font-size: 1.3rem; color: #2e7d32; }
-    .zone-panel .desc { font-size: 0.85rem; color: #666; margin: 6px 0 14px; }
+    .zone-panel .big { font-size: 3.5rem; margin-bottom: 4px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12)); }
+    .zone-panel h2 { font-size: 1.35rem; color: #2e7d32; letter-spacing: 0.01em; }
+    .zone-panel .desc { font-size: 0.85rem; color: #708078; margin: 6px 0 14px; line-height: 1.5; }
     .action-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
     .btn {
-      padding: 10px 18px; border: none; border-radius: 28px; font-family: inherit;
+      padding: 10px 20px; border: none; border-radius: 28px; font-family: inherit;
       font-size: 0.9rem; font-weight: 700; cursor: pointer; color: white; transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(255,255,255,0.25) inset;
     }
-    .btn:hover { transform: scale(1.05); }
+    .btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 14px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.25) inset; }
+    .btn:active { transform: translateY(0) scale(0.98); }
     .btn.ladder-chal-btn:hover,
     .btn.ladder-chal-btn:active,
     .btn.ladder-chal-btn:focus {
@@ -362,8 +340,9 @@
     .btn-pink { background: linear-gradient(90deg, #ec407a, #d81b60); }
     .btn-purple { background: linear-gradient(90deg, #ab47bc, #8e24aa); }
     .log-box {
-      background: #f5f5f5; border-radius: 10px; padding: 8px 12px; max-height: 140px;
-      overflow-y: auto; font-size: 0.82rem; line-height: 1.45; border: 2px solid #e0e0e0; text-align: left;
+      background: #f7f7f2; border-radius: 12px; padding: 10px 13px; max-height: 140px;
+      overflow-y: auto; font-size: 0.82rem; line-height: 1.5; border: 2px solid #e6e4da; text-align: left;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.04);
     }
     .log-box.forge-mode {
       max-height: min(70vh, 560px);
@@ -385,13 +364,14 @@
     .shop-grid.forge-grid .shop-item .name { font-size: 1.05rem; }
     .shop-grid.forge-grid .shop-item .desc { font-size: 0.8rem; line-height: 1.4; }
 
-    .section-title { font-size: 1.05rem; font-weight: 800; color: #2e7d32; margin-bottom: 10px; text-align: center; }
+    .section-title { font-size: 1.08rem; font-weight: 800; color: #2e7d32; margin-bottom: 12px; text-align: center; letter-spacing: 0.01em; }
     .pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
     .pet-card {
-      background: linear-gradient(145deg, #fff8e1, #e8f5e9); border-radius: 12px; padding: 10px;
+      background: linear-gradient(145deg, #fff8e1, #e8f5e9); border-radius: 14px; padding: 10px;
       text-align: center; border: 3px solid transparent; cursor: pointer; transition: all 0.2s; position: relative;
+      box-shadow: 0 3px 10px rgba(80,120,60,0.1);
     }
-    .pet-card:hover { border-color: #81c784; transform: translateY(-2px); }
+    .pet-card:hover { border-color: #81c784; transform: translateY(-3px); box-shadow: 0 8px 18px rgba(80,120,60,0.18); }
     .pet-card.active-team { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
     .pet-card .emoji { font-size: 2.3rem; }
     .pet-card .name { font-weight: 700; font-size: 0.9rem; color: #33691e; }
@@ -416,14 +396,16 @@
     .history-card .hc-vs { font-size: 0.8rem; color: #777; margin-top: 4px; line-height: 1.35; }
     .history-card .hc-more { font-size: 0.75rem; color: #2e7d32; font-weight: 700; margin-top: 6px; }
 
-    .item-card { background: #e3f2fd; border-radius: 10px; padding: 10px; text-align: center; border: 2px solid #90caf9; }
+    .item-card { background: linear-gradient(145deg, #eaf5fe, #e3f2fd); border-radius: 12px; padding: 10px; text-align: center; border: 2px solid #90caf9; box-shadow: 0 3px 8px rgba(60,120,190,0.1); transition: transform 0.15s; }
+    .item-card:hover { transform: translateY(-2px); }
     .item-card .emoji { font-size: 1.6rem; min-height: 40px; display: flex; align-items: center; justify-content: center; }
     .item-card .emoji img { width: 40px; height: 40px; object-fit: contain; }
     .shop-item .emoji img { width: 48px; height: 48px; object-fit: contain; }
     .item-card .name { font-weight: 700; font-size: 0.85rem; }
     .item-card .count { font-size: 0.75rem; color: #1565c0; }
     .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; }
-    .shop-item { background: linear-gradient(145deg, #fff3e0, #fce4ec); border-radius: 12px; padding: 12px; text-align: center; border: 2px solid #ffcc80; }
+    .shop-item { background: linear-gradient(145deg, #fff3e0, #fce4ec); border-radius: 14px; padding: 12px; text-align: center; border: 2px solid #ffcc80; box-shadow: 0 3px 10px rgba(230,150,50,0.12); transition: transform 0.15s, box-shadow 0.15s; }
+    .shop-item:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(230,150,50,0.2); }
     .shop-item .emoji { font-size: 1.8rem; }
     .shop-item .name { font-weight: 700; margin: 3px 0; font-size: 0.9rem; }
     .shop-item .price { color: #e65100; font-weight: 700; font-size: 0.85rem; }
@@ -1086,6 +1068,52 @@
     .spot .red-dot { top: -4px; right: -4px; left: auto; }
     .pet-card .red-dot { top: 4px; right: 4px; }
     .btn .red-dot { top: 2px; right: 2px; }
+    .item-card .red-dot { top: 4px; right: 4px; }
+
+    /* 數量選擇彈窗（滑桿選擇要開幾個） */
+    .qty-pick-modal-box { max-width: 360px; width: 100%; }
+    .qty-slider-wrap { padding: 6px 4px 2px; }
+    .qty-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 10px; border-radius: 999px;
+      background: linear-gradient(90deg, #66bb6a var(--fill, 0%), #e3ecdf var(--fill, 0%));
+      outline: none; cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+      transition: background 0.05s linear;
+    }
+    .qty-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #66bb6a 55%, #388e3c);
+      border: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.28);
+      cursor: grab; margin-top: -1px;
+      transition: transform 0.12s ease;
+    }
+    .qty-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.15); }
+    .qty-slider::-moz-range-track {
+      height: 10px; border-radius: 999px; background: #e3ecdf;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .qty-slider::-moz-range-progress { height: 10px; border-radius: 999px; background: #66bb6a; }
+    .qty-slider::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #66bb6a 55%, #388e3c);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.28); cursor: grab;
+    }
+    .qty-slider-value {
+      text-align: center; font-weight: 900; font-size: 1.15rem; color: #2e7d32;
+      margin-top: 10px; letter-spacing: 0.02em;
+    }
+    .qty-quick-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .qty-quick-btn {
+      border: 2px solid #c8e6c9; background: #fff; color: #2e7d32;
+      font-family: inherit; font-weight: 800; font-size: 0.8rem;
+      padding: 5px 14px; border-radius: 999px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .qty-quick-btn:hover { background: #e8f5e9; }
+    .qty-quick-btn.active { background: #4caf50; border-color: #388e3c; color: #fff; }
 
     /* 手機版 ≤560；電腦版不變 */
     @media (max-width: 560px) {
@@ -1482,7 +1510,7 @@
 <body>
   <aside class="side-ad side-ad-left" aria-label="左側廣告">
     <ins class="adsbygoogle"
-         style="display:inline-block;width:120px;height:250px"
+         style="display:inline-block;width:160px;height:600px"
          data-ad-client="ca-pub-4837269887561375"
          data-ad-format="vertical"
          data-full-width-responsive="false"></ins>
@@ -1490,7 +1518,7 @@
   </aside>
   <aside class="side-ad side-ad-right" aria-label="右側廣告">
     <ins class="adsbygoogle"
-         style="display:inline-block;width:120px;height:250px"
+         style="display:inline-block;width:160px;height:600px"
          data-ad-client="ca-pub-4837269887561375"
          data-ad-format="vertical"
          data-full-width-responsive="false"></ins>
@@ -1498,14 +1526,14 @@
   </aside>
   <div class="game">
     <div class="header">
-      <span class="stat-chip" id="clock-chip" title="島嶼時間">🕒 --:--</span>
+      <span class="stat-chip" id="clock-chip" title="島嶼時間" style="display:none!important">🕒 --:--</span>
       <h1>🏝️ 波波島</h1>
       <div class="header-stats">
         <span class="stat-chip player-chip" id="player-chip" title="點擊查看玩家資訊">🧑‍🌾 冒險者 Lv.1</span>
         <span class="stat-chip" id="exp-display">✨ 0/30</span>
         <span class="stat-chip" id="coin-display">💰 0</span>
         <span class="stat-chip" id="pet-count">🐾 0</span>
-        <span class="stat-chip" id="user-display" style="display:none"></span>
+        <span class="stat-chip" id="user-display" style="display:none!important"></span>
         <button class="stat-chip" id="logout-btn" style="display:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;">🚪 登出</button>
         <!-- 連續簽到／公告／說明 已移至「更多」 -->
         <button class="stat-chip" id="streak-btn" style="display:none">🎁</button>
@@ -1609,6 +1637,22 @@
         </div>
         <button type="button" class="btn btn-primary" id="account-profile" data-more-act="profile" onclick="try{if(typeof showPlayerProfile==='function')showPlayerProfile()}catch(e){alert(e)}" style="width:100%;cursor:pointer">🧑 玩家資訊</button>
         <button type="button" class="btn btn-pink" id="account-admin-ann" onclick="try{openAdminAnnounceModal()}catch(e){alert(e)}" style="width:100%;cursor:pointer;display:none">📢 發送公告（管理員）</button>
+        <div id="account-pw-requests" style="display:none;padding:12px;border-radius:12px;background:#fff3e0;border:2px solid #ffb74d">
+          <div style="font-weight:900;color:#e65100;margin-bottom:8px">🔑 密碼重設申請</div>
+          <div id="account-pw-requests-list" style="font-size:0.85rem;color:#555;max-height:220px;overflow-y:auto"></div>
+          <button type="button" class="btn" id="account-pw-requests-refresh" style="width:100%;margin-top:8px;background:#ffe0b2;color:#e65100;font-weight:800">重新整理列表</button>
+        </div>
+        <div id="account-pw-box" style="padding:12px;border-radius:12px;background:#e3f2fd;border:2px solid #90caf9;display:none">
+          <div style="font-weight:800;margin-bottom:8px;color:#1565c0">🔐 變更密碼</div>
+          <input id="account-pw-old" type="password" placeholder="目前密碼" autocomplete="current-password"
+            style="width:100%;padding:10px 12px;border-radius:10px;border:2px solid #bbdefb;margin-bottom:8px;font-family:inherit;font-size:0.95rem;box-sizing:border-box">
+          <input id="account-pw-new" type="password" placeholder="新密碼（至少 6 碼）" autocomplete="new-password"
+            style="width:100%;padding:10px 12px;border-radius:10px;border:2px solid #bbdefb;margin-bottom:8px;font-family:inherit;font-size:0.95rem;box-sizing:border-box">
+          <input id="account-pw-new2" type="password" placeholder="再次輸入新密碼" autocomplete="new-password"
+            style="width:100%;padding:10px 12px;border-radius:10px;border:2px solid #bbdefb;margin-bottom:8px;font-family:inherit;font-size:0.95rem;box-sizing:border-box">
+          <div id="account-pw-msg" style="font-size:0.82rem;min-height:1.2em;margin-bottom:8px;color:#c62828"></div>
+          <button type="button" class="btn btn-primary" id="account-pw-submit" style="width:100%;cursor:pointer">確認變更密碼</button>
+        </div>
         <button type="button" class="btn btn-primary" id="account-login" data-more-act="login" onclick="try{if(typeof openLoginFromGuest==='function')openLoginFromGuest();else if(typeof doLogout==='function')doLogout()}catch(e){alert(e)}" style="width:100%;cursor:pointer;display:none">🔑 登入帳號（載入原資料）</button>
         <button type="button" class="btn btn-back" id="account-logout" data-more-act="logout" onclick="try{if(typeof doLogout==='function')doLogout()}catch(e){alert(e)}" style="width:100%;cursor:pointer">🚪 登出</button>
         <button type="button" class="btn" id="account-back-more" data-more-act="backMore" onclick="try{showScreen('more')}catch(e){alert(e)}" style="width:100%;background:#eee;color:#333;cursor:pointer">← 返回更多</button>
@@ -1649,7 +1693,6 @@
       <p style="text-align:center;font-size:0.82rem;color:#666;margin:0 0 8px">官方與系統訊息會出現在這裡</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
         <button type="button" class="btn" id="mail-claim-all-btn" style="padding:10px 22px;font-weight:900;font-size:0.95rem;color:#fff;background:linear-gradient(180deg,#ef6c00,#bf360c);border:2px solid #8d2b0b;box-shadow:0 3px 0 #6d1f08,0 4px 10px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)">🎁 一鍵領取全部附件</button>
-        <button type="button" class="btn" id="mail-delete-all-btn" style="padding:10px 22px;font-weight:900;font-size:0.95rem;color:#fff;background:linear-gradient(180deg,#78909c,#455a64);border:2px solid #37474f;box-shadow:0 3px 0 #263238,0 4px 10px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)">🗑️ 一鍵刪除</button>
       </div>
       <div id="mail-list" class="history-list"></div>
       <div id="mail-empty" style="text-align:center;color:#999;padding:24px;display:none">目前沒有郵件</div>
@@ -1724,6 +1767,24 @@
     </div>
   </div>
 
+
+  <div class="overlay hidden" id="forgot-pw-modal" style="z-index:900">
+    <div class="modal" style="max-width:min(400px,94vw);text-align:left">
+      <h2 style="text-align:center;margin:0 0 8px">🔑 忘記密碼</h2>
+      <p style="font-size:0.82rem;color:#666;line-height:1.5;margin-bottom:10px">
+        送出申請後，管理員會收到通知並協助重設（<b>不會</b>自動寄信，不佔用郵件額度）。
+      </p>
+      <input id="forgot-pw-user" type="text" placeholder="玩家名稱（必填）" maxlength="12" autocomplete="username"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #a5d6a7;margin-bottom:8px;font-family:inherit;font-size:0.9rem">
+      <input id="forgot-pw-contact" type="text" placeholder="聯絡方式（選填，如 Discord／Line）" maxlength="40"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #a5d6a7;margin-bottom:8px;font-family:inherit;font-size:0.9rem">
+      <textarea id="forgot-pw-note" placeholder="備註（選填）" maxlength="200" rows="2"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #a5d6a7;margin-bottom:8px;font-family:inherit;font-size:0.9rem;resize:vertical"></textarea>
+      <div id="forgot-pw-msg" style="font-size:0.82rem;min-height:1.3em;margin-bottom:8px;color:#c62828"></div>
+      <button type="button" class="btn btn-primary" id="forgot-pw-send" style="width:100%">送出申請</button>
+      <button type="button" class="btn btn-back" id="forgot-pw-close" style="width:100%;margin-top:8px">返回登入</button>
+    </div>
+  </div>
 <div class="overlay hidden" id="login-overlay">
     <div class="modal">
       <div class="big">🏝️</div>
@@ -1735,17 +1796,24 @@
         <input id="login-password" type="password" placeholder="密碼" autocomplete="off"
           style="padding:9px 12px;border-radius:20px;border:2px solid #a5d6a7;font-family:inherit;font-size:0.9rem;text-align:center;">
       </div>
+      <div style="text-align:center;margin:4px 0 8px">
+        <button type="button" id="forgot-pw-open" style="background:none;border:none;color:#1565c0;font-weight:800;font-size:0.85rem;cursor:pointer;text-decoration:underline;font-family:inherit">忘記密碼？</button>
+      </div>
       <div id="login-error" style="color:#e53935;font-size:0.8rem;margin-bottom:10px;display:none;"></div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-primary" id="login-btn">登入</button>
         <button class="btn btn-explore" id="register-btn">註冊新帳號</button>
         <button class="btn btn-back" id="guest-btn">👤 訪客模式</button>
       </div>
+      <p style="margin-top:10px;text-align:center">
+        </p>
       <p id="login-guest-tip" style="display:none;margin-top:8px;font-size:0.78rem;color:#e65100;font-weight:700;line-height:1.4"></p>
       <p style="margin-top:8px;font-size:0.72rem;color:#888;">訪客進度只存在此裝置，不會雲端同步。</p>
       <p style="margin-top:12px;font-size:0.68rem;color:#999;">＊進度會雲端存檔到你的帳號，換裝置登入同一帳號即可繼續。</p>
     </div>
   </div>
+
+  
 
   <div class="overlay hidden" id="levelup-modal">
     <div class="modal levelup-modal">
@@ -2479,6 +2547,7 @@ function getGameClock() {
 function updateClockChip() {
   try {
     const el = document.getElementById('clock-chip');
+    if (el) { el.style.display = 'none'; }
     if (!el) return;
     const c = getGameClock();
     el.textContent = '🕒 ' + (c.periodName || '') + ' ' + (c.labelShort || c.label);
@@ -2770,39 +2839,47 @@ function rewardScaleFromEnemy(wild) {
   return Math.max(1, lvMul * starMul);
 }
 
-/** 單隻敵的經驗區間 */
+/** 稀有度 → 基礎經驗（普通100、稀有150、史詩200…每階 +50） */
+function rarityExpBase(rarity) {
+  const order = ['普通', '稀有', '史詩', '傳說', '神話'];
+  const r = String(rarity || '普通');
+  let idx = order.indexOf(r);
+  if (idx < 0) {
+    // 英文／別名備援
+    const map = { normal:0, common:0, rare:1, epic:2, legend:3, legendary:3, myth:4, mythic:4 };
+    idx = map[r.toLowerCase()] != null ? map[r.toLowerCase()] : 0;
+  }
+  return 100 + idx * 50;
+}
+
+/**
+ * 經驗值公式：稀有度基礎 × (1 + 0.01 × 敵方等級)
+ * 例：普通 Lv.10 → 100 × 1.10 = 110
+ */
 function calcExpForOneEnemy(wild, win) {
-  const danger = (S.currentZone && S.currentZone.danger) ? S.currentZone.danger : 1;
-  const meta = wild && wild._spawnMeta ? wild._spawnMeta : null;
   const base = wild && wild.id ? getBase(wild.id) : null;
-  let petExp = 0;
-  let playerExp = 0;
-  if (base) {
-    if (base.dropPetExp && base.dropPetExp.length >= 2) {
-      petExp = rand(base.dropPetExp[0], base.dropPetExp[1]);
-    }
-    if (base.dropPlayerExp && base.dropPlayerExp.length >= 2) {
-      playerExp = rand(base.dropPlayerExp[0], base.dropPlayerExp[1]);
-    }
+  const rarity = (wild && wild.rarity) || (base && base.rarity) || '普通';
+  const lv = Math.max(1, Number(wild && wild.level) || 1);
+  const baseExp = rarityExpBase(rarity);
+  let exp = Math.max(1, Math.floor(baseExp * (1 + 0.01 * lv)));
+  if (S.currentZone && S.currentZone.hellTrial) {
+    exp = Math.max(1, Math.floor(exp * 1.55));
   }
-  if ((!petExp || petExp <= 0) && meta && meta.expTag) {
-    petExp = expByTag(meta.expTag, danger);
-  }
-  if ((!playerExp || playerExp <= 0) && meta && meta.expTag) {
-    playerExp = expByTag(meta.expTag, danger) + rand(2, 6);
-  }
-  if (!petExp || petExp <= 0) petExp = 12 + rand(5, 15) + danger * 2;
-  if (!playerExp || playerExp <= 0) playerExp = 12 + rand(5, 15) + danger * 3;
-  // 依敵方等級、星級加成
-  let scale = rewardScaleFromEnemy(wild);
-  if (S.currentZone && S.currentZone.hellTrial) scale *= 1.55;
-  petExp = Math.max(1, Math.floor(petExp * scale));
-  playerExp = Math.max(1, Math.floor(playerExp * scale));
   if (!win) {
-    petExp = Math.max(1, Math.floor(petExp * 0.25));
-    playerExp = Math.max(1, Math.floor(playerExp * 0.25));
+    const mul = (typeof getDefeatRewardMul === 'function') ? getDefeatRewardMul() : 0;
+    if (mul <= 0) exp = 0;
+    else exp = Math.max(1, Math.floor(exp * mul));
   }
-  return { petExp, playerExp, scale };
+  // 玩家與寵物本場共用同一套公式（寵物再依上場／候補倍率）
+  return { petExp: exp, playerExp: exp, scale: 1, rarityBase: baseExp, enemyLv: lv };
+}
+
+/** 敗北經驗倍率：勝場 <10 → 50%；<20 → 10%；≥20 → 0% */
+function getDefeatRewardMul() {
+  const w = Number(S && S.wins) || 0;
+  if (w < 10) return 0.5;
+  if (w < 20) return 0.1;
+  return 0;
 }
 
 /** 戰利品經驗：本場每隻敵各自計算後加總 */
@@ -2814,8 +2891,12 @@ function calcBattleExpRewards(win) {
     let petExp = 12 + rand(5, 15) + danger * 2;
     let playerExp = 12 + rand(5, 15) + danger * 3;
     if (!win) {
-      petExp = Math.max(1, Math.floor(petExp * 0.25));
-      playerExp = Math.max(1, Math.floor(playerExp * 0.25));
+      const mul = (typeof getDefeatRewardMul === 'function') ? getDefeatRewardMul() : 0;
+      if (mul <= 0) { petExp = 0; playerExp = 0; }
+      else {
+        petExp = Math.max(1, Math.floor(petExp * mul));
+        playerExp = Math.max(1, Math.floor(playerExp * mul));
+      }
     }
     return { petExp, playerExp, perEnemy: [] };
   }
@@ -3336,11 +3417,10 @@ function exchangeHuobaoFragsToShen() {
  * 消耗 PET_ASCEND_PET_COST 片基礎碎片
  */
 function ascendOwnedPet(ownedIdx) {
-  // 已停用：高階型只能靠碎片兌換或野外收服
-  alert('高階型只能用碎片兌換或野外收服，不能直接把寵物轉化。');
+  // 已關閉：高階型只能碎片兌換（B）或野外收服（C）
+  alert('不能直接把寵物轉成高階型。\n\n取得方式：\n① 背包把基礎碎片兌換成高階碎片後合成\n② 到對應地點野外收服');
   return false;
 }
-
 
 function onPetCaught(pet) {
   if (!pet) return;
@@ -4476,7 +4556,7 @@ const S = {
   streakClaimedDate: '' // 今日是否已領 YYYY-MM-DD
 };
 
-function expNeeded(lv){ lv = Math.max(1, Number(lv)||1); return Math.floor(lv * 95 + lv * lv * 2.2); } // 約真實 2 小時升 ~10 級
+function expNeeded(lv){ lv = Math.max(1, Number(lv)||1); return Math.floor(lv * 55 + lv * lv * 1.1); } // 放寬：玩家較易升級
 /** 把溢出的玩家經驗結算成等級（載入存檔／顯示時保底） */
 function normalizePlayerLevel() {
   if (S.level == null || S.level < 1) S.level = 1;
@@ -5852,7 +5932,7 @@ function updateHeader() {
   $('exp-display').textContent = '✨ ' + S.exp + '/' + need;
   $('coin-display').textContent = '💰 '+S.coins;
   if (typeof updateStreakButtonUI === 'function') updateStreakButtonUI();
-  $('pet-count').textContent = '🐾 '+S.owned.length + (clock ? ('　🕒'+clock.label) : '');
+  $('pet-count').textContent = '🐾 '+S.owned.length;
   if (typeof updateRedDots === 'function') updateRedDots();
 }
 
@@ -5869,28 +5949,10 @@ function showPlayerProfile() {
     '<br><span style="color:#888;font-size:0.8rem">升級會獲得金錢獎勵，並讓野生寵物等級範圍提升。</span>';
   $('player-modal').classList.remove('hidden');
 }
-function updateAdVisibility(screenId) {
-  try {
-    // 只有主畫面（島嶼 map）顯示廣告；不擋其他內容
-    const onMap = (screenId === 'map') && !(typeof S !== 'undefined' && S.battling);
-    if (onMap) document.body.classList.add('ads-on');
-    else document.body.classList.remove('ads-on');
-  } catch (e) {}
-}
-function setBattleAdsHidden(on) {
-  try {
-    if (on) document.body.classList.remove('ads-on');
-    else {
-      const active = document.querySelector('.screen.active');
-      updateAdVisibility(active ? active.id : '');
-    }
-  } catch (e) {}
-}
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
-  updateAdVisibility(id);
   if(id==='map'){ try{ if(typeof grantLadderDailyRewardMail==='function') grantLadderDailyRewardMail(); }catch(e){} renderIsland(); }
   if(id==='team') renderTeam();
   if(id==='more'){ try{if(typeof bindMoreMenu==='function')bindMoreMenu();}catch(e){} if(typeof updateMoreBadges==='function') updateMoreBadges(); }
@@ -6079,7 +6141,7 @@ async function enterGame(username, userId, savedData) {
   showLoginError('');
   $('login-overlay').classList.add('hidden');
   $('user-display').textContent = '👤 '+username;
-  $('user-display').style.display = 'inline-block';
+  $('user-display').style.display = 'none';
   $('logout-btn').style.display = 'inline-block';
   $('logout-btn').textContent = '🚪 登出';
 
@@ -6320,6 +6382,8 @@ function enterAsGuest() {
 
 function attachLoginHandlers() {
   $('login-btn').addEventListener('click', doLogin);
+  try { bindForgotPasswordUI(); } catch (e) {}
+
   $('register-btn').addEventListener('click', doRegister);
   $('logout-btn').addEventListener('click', doLogout);
   const guestBtn = $('guest-btn');
@@ -6340,7 +6404,6 @@ function bindGameHandlers() {
   if (typeof bindBattleLogUI === 'function') bindBattleLogUI();
   if (_handlersBound) return;
   _handlersBound = true;
-  try{ if(typeof updateAdVisibility==='function') updateAdVisibility('map'); }catch(e){}
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{ if(!S.battling && currentUser) showScreen(btn.dataset.screen); });
   });
@@ -6408,8 +6471,12 @@ function bindGameHandlers() {
   };
   const petAscendBtn = $('pet-info-ascend');
   if (petAscendBtn) {
-    petAscendBtn.style.display = 'none';
-    petAscendBtn.onclick = null;
+    petAscendBtn.onclick = function() {
+      if (window._petInfoIdx == null) return;
+      if (typeof ascendOwnedPet === 'function' && ascendOwnedPet(window._petInfoIdx)) {
+        if (typeof openPetInfo === 'function') openPetInfo(window._petInfoIdx);
+      }
+    };
   }
   const petDisBtn = $('pet-info-dismantle');
   if (petDisBtn) petDisBtn.onclick = () => {
@@ -7845,16 +7912,17 @@ function promoteOnLadderWin(oppId) {
 }
 
 /** 天梯每日排名獎勵（寄到郵件，每天一次） */
-/** 天梯結算日：每天 08:00 起算「今日」；8 點前仍屬前一日 */
+/** 天梯結算日：每天 20:15 起算「今日」；20:15 前仍屬前一日 */
 function getLadderSettleDayKey() {
   const now = new Date();
   const d = new Date(now.getTime());
-  if (d.getHours() < 8) d.setDate(d.getDate() - 1);
+  if (d.getHours() < 20 || (d.getHours() === 20 && d.getMinutes() < 15)) d.setDate(d.getDate() - 1);
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
-/** 是否已到今日 8:00 結算點（本機時間） */
+/** 是否已到今日 20:15 結算點（本機時間） */
 function isPastLadderSettleHour() {
-  return new Date().getHours() >= 8;
+  const now = new Date();
+  return now.getHours() > 20 || (now.getHours() === 20 && now.getMinutes() >= 15);
 }
 /** 隨機誕生石 ×30（可重複，盡量分散到不同種類） */
 function rollBirthstoneBundle(total) {
@@ -7870,26 +7938,29 @@ function rollBirthstoneBundle(total) {
 }
 function getLadderRankReward(rank) {
   rank = Number(rank) || 9999;
-  // 每日皆有：競技幣 + 隨機誕生石寶箱III（30 顆）
-  const baseBox = { arenaCoins: 20, birthstones: null, birthstoneBox: 30 };
+  // 每日皆有：金幣 + 競技幣 + 誕生石寶箱（寶箱本身寄到郵件，需自行到背包開啟）
   let pack;
-  if (rank <= 1) pack = { coins: 2000, arenaCoins: 120, label: '第 1 名：金幣 2000、競技幣 120、誕生石寶箱III' };
-  else if (rank <= 3) pack = { coins: 1200, arenaCoins: 80, label: '第 ' + rank + ' 名：金幣 1200、競技幣 80、誕生石寶箱III' };
-  else if (rank <= 10) pack = { coins: 800, arenaCoins: 50, label: '第 ' + rank + ' 名：金幣 800、競技幣 50、誕生石寶箱III' };
-  else if (rank <= 30) pack = { coins: 500, arenaCoins: 35, label: '第 ' + rank + ' 名：金幣 500、競技幣 35、誕生石寶箱III' };
-  else if (rank <= 100) pack = { coins: 300, arenaCoins: 25, label: '第 ' + rank + ' 名：金幣 300、競技幣 25、誕生石寶箱III' };
-  else if (rank <= 500) pack = { coins: 150, arenaCoins: 20, label: '第 ' + rank + ' 名：金幣 150、競技幣 20、誕生石寶箱III' };
-  else pack = { coins: 50, arenaCoins: 15, label: '第 ' + rank + ' 名：金幣 50、競技幣 15、誕生石寶箱III' };
+  if (rank <= 1) pack = { coins: 2000, arenaCoins: 120, boxId: 'birthstone_box_3', boxCount: 3 };
+  else if (rank <= 3) pack = { coins: 1200, arenaCoins: 80, boxId: 'birthstone_box_3', boxCount: 2 };
+  else if (rank <= 10) pack = { coins: 800, arenaCoins: 50, boxId: 'birthstone_box_3', boxCount: 1 };
+  else if (rank <= 30) pack = { coins: 500, arenaCoins: 35, boxId: 'birthstone_box_2', boxCount: 2 };
+  else if (rank <= 100) pack = { coins: 300, arenaCoins: 25, boxId: 'birthstone_box_2', boxCount: 1 };
+  else if (rank <= 500) pack = { coins: 150, arenaCoins: 20, boxId: 'birthstone_box_1', boxCount: 2 };
+  else pack = { coins: 50, arenaCoins: 15, boxId: 'birthstone_box_1', boxCount: 1 };
+  const boxDef = (typeof GIFT_BOX_DEFS !== 'undefined') ? GIFT_BOX_DEFS[pack.boxId] : null;
+  const boxName = (boxDef && boxDef.name) || pack.boxId;
+  const label = '金幣 ' + pack.coins + '、競技幣 ' + pack.arenaCoins + '、' + boxName + ' ×' + pack.boxCount;
   return {
     coins: pack.coins,
     arenaCoins: pack.arenaCoins,
-    birthstoneBox: 30,
-    label: pack.label + '（隨機誕生石 ×30）'
+    boxId: pack.boxId,
+    boxCount: pack.boxCount,
+    label: label
   };
 }
 function grantLadderDailyRewardMail() {
   try {
-    // 每天 8:00 後才發當日結算郵件
+    // 每天 20:15 後才發當日結算郵件
     if (!isPastLadderSettleHour()) return;
     if (typeof ensureLadderRoster === 'function') ensureLadderRoster();
     const day = getLadderSettleDayKey();
@@ -7902,11 +7973,12 @@ function grantLadderDailyRewardMail() {
       S.ladderRewardDay = day;
       return;
     }
-    const stones = rollBirthstoneBundle(rew.birthstoneBox || 30);
+    const boxes = {};
+    if (rew.boxId && rew.boxCount) boxes[rew.boxId] = rew.boxCount;
     S.mail.unshift({
       id: id,
       title: '🏆 天梯競技每日排名獎勵',
-      body: '【每日 8:00 結算】你的排名為第 ' + rank + ' 名。\n' + (rew.label || '') + '\n請領取附件（含競技幣與隨機誕生石寶箱III）！',
+      body: '【每日 20:15 結算】你的排名為第 ' + rank + ' 名。\n' + (rew.label || '') + '\n請領取附件！誕生石寶箱會直接進入背包，須自行到背包開啟。',
       from: '天梯競技委員會',
       at: Date.now(),
       read: false,
@@ -7914,7 +7986,7 @@ function grantLadderDailyRewardMail() {
       rewards: {
         coins: rew.coins || 0,
         arenaCoins: rew.arenaCoins || 0,
-        birthstones: stones
+        boxes: boxes
       }
     });
     S.ladderRewardDay = day;
@@ -8352,7 +8424,7 @@ function openLadderRewardModal() {
   let rows = table.map(function(row) {
     const rew = getLadderRankReward(row.r);
     return '<tr><td style="padding:8px;border:1px solid #ffe0b2;font-weight:800">' + row.range + '</td>' +
-      '<td style="padding:8px;border:1px solid #ffe0b2">' + (rew.label ? rew.label.replace(/^第[^：]*獎勵：/, '') : '—') + '</td></tr>';
+      '<td style="padding:8px;border:1px solid #ffe0b2">' + (rew.label || '—') + '</td></tr>';
   }).join('');
   let modal = document.getElementById('ladder-reward-modal');
   if (!modal) {
@@ -8762,6 +8834,7 @@ function renderEnemyCard(pet, slot) {
     statusTop +
     '<div class="bc-name">' + battlePetName(pet) + '</div>' +
     highBadge +
+    '<div style="text-align:center;font-size:0.75rem;font-weight:700;color:#33691e;margin:1px 0">Lv.' + (pet.level || 1) + '　' + starHtml + '</div>' +
     '<div class="bc-face">' + petFaceHtml(pet, 44) + '</div>' +
     '<div style="text-align:center;font-size:0.78rem;font-weight:900;color:#c62828;margin:2px 0">⚔️ ' + cp.toLocaleString() + '</div>' +
     '<div class="bc-bar-label">HP ' + Math.round(pet.hp) + '/' + Math.round(pet.maxHp) + '</div>' +
@@ -11481,7 +11554,6 @@ function tryFleeBattle() {
   addBLog('成功逃走了！', 'sys');
   setTimeout(() => {
     if (typeof archiveBattleLog === 'function') archiveBattleLog('flee');
-  try{setBattleAdsHidden(false);}catch(e){}
     S.battling = false;
     if (typeof clearBattleStatuses === 'function') clearBattleStatuses();
     if (typeof restoreAllPetsAfterBattle === 'function') restoreAllPetsAfterBattle();
@@ -11641,9 +11713,9 @@ function petExpNeeded(lv) {
 
 /** 寵物等級不得超過玩家等級 */
 function getPetLevelCap() {
-  // 玩家 Lv.n → 寵物上限 n+6（例：玩家2→寵8、玩家3→寵9）
+  // 玩家 Lv.n → 寵物上限 n+20（放寬成長空間）
   const pl = Math.max(1, Number(S.level) || 1);
-  return pl + 6;
+  return pl + 20;
 }
 
 /** 給指定寵物增加經驗（經驗包／系統用）；回傳升級資訊 */
@@ -11718,9 +11790,16 @@ function rollPetExpPackDrop(win, danger) {
 }
 
 
-/** 戰鬥後流程：寵物經驗改由經驗包，不再顯示「獲得經驗 +0」畫面 */
+/** 戰鬥後流程：先顯示獲得經驗畫面，再播升級佇列 */
 function runPostBattleFlow() {
-  S._pendingBattleExp = null; // 略過全員 EXP 畫面
+  const entries = S._pendingBattleExp;
+  S._pendingBattleExp = null;
+  if (entries && entries.length && typeof showBattleExpScreen === 'function') {
+    showBattleExpScreen(entries, function() {
+      showNextPendingLevelUp();
+    });
+    return;
+  }
   showNextPendingLevelUp();
 }
 
@@ -11922,8 +12001,6 @@ function showLevelUpScreen(info) {
 
 function endBattle(win){
   S.battling=false;
-  // 等離開戰鬥畫面（結果確定）後由 showScreen 再開廣告；此處先保持關閉
-
   if (typeof clearBattleStatuses === 'function') clearBattleStatuses();
   S.autoBattle = false;
   if (typeof updateAutoBattleBtn === 'function') updateAutoBattleBtn();
@@ -12388,7 +12465,13 @@ function getBattlePetExpMult(ownedIdx) {
     if (S._ladderLoseNote) { const rm=$('res-msg'); if(rm) rm.innerHTML = S._ladderLoseNote + (rm.innerHTML||''); S._ladderLoseNote=''; }
     let loseMsg = isArena
       ? ('本場天梯敗北。\n' + (S._ladderLoseNote ? '' : ''))
-      : ('寵物倒下了……本場敗北。\n（戰鬥結束後 HP／MP 已自動回滿，可再戰！）\n仍獲得少量經驗：玩家 +' + playerExpG + '　寵物 +' + expG);
+      : (function() {
+        const mul = (typeof getDefeatRewardMul === 'function') ? getDefeatRewardMul() : 0;
+        let t = '寵物倒下了……本場敗北。\n（戰鬥結束後 HP／MP 已自動回滿，可再戰！）';
+        if (mul <= 0) t += '\n勝場已達 20 以上，敗北不獲得經驗。';
+        else t += '\n敗北經驗（×' + Math.round(mul * 100) + '%）：玩家 +' + playerExpG + '　寵物 +' + expG;
+        return t;
+      })();
 
     if (drops.lines.length) loseMsg += '\n' + drops.lines.join('\n');
     $('res-msg').textContent = loseMsg;
@@ -13641,9 +13724,9 @@ function openPetInfo(idx) {
       }
     }
   }
-  // 本體不再轉化高階；僅碎片可兌換（背包）
+  // 不可直接轉化高階（僅碎片兌換／野外收服）
   const ascendBtn = $('pet-info-ascend');
-  if (ascendBtn) ascendBtn.style.display = 'none';
+  if (ascendBtn) { ascendBtn.style.display = 'none'; ascendBtn.onclick = null; }
   try { updatePetInfoExpPackBtn(); } catch (e) {}
   // 在詳情區補一行進化條件
   try {
@@ -13766,9 +13849,13 @@ function summonPetFromFragments(petId) {
   // 若隊伍未滿，自動加入
   if (S.team.length < 3) S.team.push(S.owned.length - 1);
   saveGame();
-  alert('🎉 成功合成「' + base.emoji + base.name + '」！');
+  const left = getFragmentCount(petId);
+  const again = (base.fragmentSummon || 0) > 0 && left >= (base.fragmentSummon || 0);
+  alert('🎉 成功合成「' + base.emoji + base.name + '」！\n剩餘碎片：' + left +
+    (again ? ('\n還可以再合成 ' + Math.floor(left / base.fragmentSummon) + ' 隻') : ''));
   renderTeam();
   if (typeof renderCodex === 'function') renderCodex();
+  if (typeof renderBag === 'function') renderBag();
   updateHeader();
   if (typeof updateRedDots === 'function') updateRedDots();
 }
@@ -13873,7 +13960,7 @@ function openPetExpPackForCurrentPet() {
   if (title) title.textContent = '📦 給「' + (pet.name || '寵物') + '」使用經驗包';
   if (desc) {
     desc.innerHTML = '目前 Lv.' + (pet.level || 1) + '　EXP ' + (pet.exp || 0) + '/' + petExpNeeded(pet.level || 1) +
-      '<br>寵物等級上限 Lv.' + cap + '（玩家等級+6）';
+      '<br>寵物等級上限 Lv.' + cap + '（玩家等級+20）';
   }
   list.innerHTML = (PET_EXP_PACKS || []).map(function(def) {
     const cnt = (S.items && S.items[def.id]) || 0;
@@ -13934,7 +14021,7 @@ function openPetExpPackPicker(packId) {
   const title = document.getElementById('pet-exp-pack-title');
   const desc = document.getElementById('pet-exp-pack-desc');
   if (title) title.textContent = (def.emoji || '📦') + ' ' + def.name;
-  if (desc) desc.innerHTML = '選擇一隻寵物，獲得 <b>' + def.exp + '</b> 經驗<br>寵物等級上限＝玩家等級+6';
+  if (desc) desc.innerHTML = '選擇一隻寵物，獲得 <b>' + def.exp + '</b> 經驗<br>寵物等級上限＝玩家等級+20';
   const list = document.getElementById('pet-exp-pack-list');
   const cap = getPetLevelCap();
   list.innerHTML = (S.owned || []).map(function(p, i) {
@@ -13995,6 +14082,13 @@ function renderBag(){
       window._bagTab = btn.getAttribute('data-bag-tab');
       renderBag();
     };
+    if (btn.getAttribute('data-bag-tab') === 'items') {
+      btn.style.position = 'relative';
+      let dot = btn.querySelector('.red-dot');
+      if (typeof hasAnyOpenableBox === 'function' && hasAnyOpenableBox()) {
+        if (!dot) { dot = document.createElement('span'); dot.className = 'red-dot'; btn.appendChild(dot); }
+      } else if (dot) dot.remove();
+    }
   });
 
   function card(html, border) {
@@ -14038,7 +14132,11 @@ function renderBag(){
       has = true;
       const d = card('<div class="emoji">' + (def.emoji || '🎁') + '</div><div class="name">' + def.name + '</div><div class="count">×' + cnt + '</div><div style="font-size:0.7rem;color:#666;margin-top:3px">' + (def.desc || '點擊開啟') + '</div>', '#ff9800');
       d.style.cursor = 'pointer';
-      d.onclick = function() { openGiftBoxFromBag(bid); };
+      d.style.position = 'relative';
+      const dot = document.createElement('span');
+      dot.className = 'red-dot';
+      d.appendChild(dot);
+      d.onclick = function() { openQuantityPickerForBox(bid); };
     });
     // 其他 items 鍵（非經驗包、非寶箱、非花蜜）
     Object.keys(S.items || {}).forEach(function(k) {
@@ -14068,16 +14166,54 @@ function renderBag(){
       has = true;
       const need = base.fragmentSummon || 0;
       const can = need > 0 && fr >= need;
+      const ascTo = (typeof getAscendTargetId === 'function') ? getAscendTargetId(base.id) : null;
+      const canEx = !!ascTo && fr >= PET_ASCEND_FRAG_RATE;
+      let sub = need ? ('合成需 ' + need + (can ? '　可合成' : '')) : '碎片';
+      if (ascTo) {
+        const tb = getBase(ascTo);
+        sub += '<br>每' + PET_ASCEND_FRAG_RATE + '片可換1片' + ((tb && tb.name) || '高階');
+      }
       const d = card(
         '<div class="emoji">' + (typeof petFaceHtml === 'function' ? petFaceHtml(base, 40) : (base.emoji || '🐾')) + '</div>' +
         '<div class="name">' + base.name + '碎片</div><div class="count">×' + fr + '</div>' +
-        '<div style="font-size:0.7rem;color:#666;margin-top:3px">' + (need ? ('合成需 ' + need + (can ? '　可合成' : '')) : '碎片') + '</div>',
-        can ? '#ab47bc' : '#ce93d8'
+        '<div style="font-size:0.7rem;color:#666;margin-top:3px">' + sub + '</div>',
+        (can || canEx) ? '#ab47bc' : '#ce93d8'
       );
-      if (can) {
-        d.style.cursor = 'pointer';
-        d.onclick = function() { summonPetFromFragments(base.id); renderBag(); };
-      }
+      d.style.cursor = 'pointer';
+      d.onclick = function() {
+        const opts = [];
+        if (can) opts.push('合成一隻' + base.name + '（消耗' + need + '片）');
+        if (canEx) {
+          const tb = getBase(ascTo);
+          opts.push('兌換' + ((tb && tb.name) || '高階') + '碎片（每' + PET_ASCEND_FRAG_RATE + '換1）');
+        }
+        if (!opts.length) {
+          alert(base.name + '碎片 ×' + fr + (need ? ('\n合成需要 ' + need + ' 片') : '') +
+            (ascTo ? ('\n兌換高階碎片需要每 ' + PET_ASCEND_FRAG_RATE + ' 片') : ''));
+          return;
+        }
+        if (opts.length === 1 && can) {
+          if (confirm('確定合成「' + base.name + '」？\n（可重複合成，每次消耗 ' + need + ' 片碎片）')) {
+            summonPetFromFragments(base.id);
+            renderBag();
+          }
+          return;
+        }
+        if (opts.length === 1 && canEx) {
+          exchangeAscendFragments(base.id);
+          return;
+        }
+        const choice = confirm(
+          '【' + base.name + '碎片 ×' + fr + '】\n\n' +
+          '確定 = 合成寵物\n取消 = 改為兌換高階碎片'
+        );
+        if (choice && can) {
+          summonPetFromFragments(base.id);
+          renderBag();
+        } else if (!choice && canEx) {
+          exchangeAscendFragments(base.id);
+        }
+      };
     });
   }
 
@@ -14324,6 +14460,13 @@ function canCraftOrUpgradeTreasure(treasureId) {
 function hasAnyCraftableTreasure() {
   if (typeof ALL_TREASURES === 'undefined') return false;
   return ALL_TREASURES.some(t => t && canCraftOrUpgradeTreasure(t.id));
+}
+
+/** 背包裡是否有可以點擊開啟的禮包／寶箱 */
+function hasAnyOpenableBox() {
+  if (typeof GIFT_BOX_DEFS === 'undefined' || !GIFT_BOX_DEFS) return false;
+  if (!S.items) return false;
+  return Object.keys(GIFT_BOX_DEFS).some(bid => (S.items[bid] || 0) > 0);
 }
 
 function setNavDot(screen, on) {
@@ -14661,26 +14804,142 @@ const GIFT_BOX_DEFS = {
       options: ['shuibo_bao', 'huobao_xiong'],
       boxName: '自選碎片寶箱I'
     }
+  },
+  birthstone_box_1: {
+    id: 'birthstone_box_1',
+    name: '誕生石寶箱I',
+    emoji: '💎',
+    desc: '開啟後獲得隨機誕生石 ×10',
+    randomBirthstones: { total: 10 }
+  },
+  birthstone_box_2: {
+    id: 'birthstone_box_2',
+    name: '誕生石寶箱II',
+    emoji: '💠',
+    desc: '開啟後獲得隨機誕生石 ×20',
+    randomBirthstones: { total: 20 }
+  },
+  birthstone_box_3: {
+    id: 'birthstone_box_3',
+    name: '誕生石寶箱III',
+    emoji: '🔷',
+    desc: '開啟後獲得隨機誕生石 ×30',
+    randomBirthstones: { total: 30 }
   }
 };
 function getGiftBoxDef(id) {
   return (typeof GIFT_BOX_DEFS !== 'undefined' && GIFT_BOX_DEFS[id]) ? GIFT_BOX_DEFS[id] : null;
 }
-function openGiftBoxFromBag(boxId) {
+function openGiftBoxFromBag(boxId, count) {
   const def = getGiftBoxDef(boxId);
   if (!def) { alert('未知寶箱'); return; }
-  const n = (S.items && S.items[boxId]) || 0;
-  if (n <= 0) { alert('沒有' + def.name); return; }
-  S.items[boxId] = n - 1;
+  const have = (S.items && S.items[boxId]) || 0;
+  if (have <= 0) { alert('沒有' + def.name); return; }
+  const n = Math.max(1, Math.min(have, parseInt(count, 10) || 1));
+  S.items[boxId] = have - n;
   if (typeof saveGame === 'function') saveGame();
   if (typeof renderBag === 'function') renderBag();
   if (def.choosePetFrags && typeof openGiftPetFragChooser === 'function') {
-    openGiftPetFragChooser(def.choosePetFrags);
+    const baseAmount = Math.max(1, Number(def.choosePetFrags.amount) || 1);
+    const cfg = Object.assign({}, def.choosePetFrags, { amount: baseAmount * n });
+    openGiftPetFragChooser(cfg);
   } else if (def.randomTreasureFrags) {
-    openRandomTreasureFragBox(def.randomTreasureFrags, def.name);
+    const baseTotal = Math.max(1, Number(def.randomTreasureFrags.total) || 1);
+    const cfg = Object.assign({}, def.randomTreasureFrags, { total: baseTotal * n });
+    openRandomTreasureFragBox(cfg, def.name + (n > 1 ? ' ×' + n : ''));
+  } else if (def.randomBirthstones) {
+    const baseTotal = Math.max(1, Number(def.randomBirthstones.total) || 1);
+    const total = baseTotal * n;
+    const stones = rollBirthstoneBundle(total);
+    if (!S.birthstones) S.birthstones = {};
+    const lines = Object.keys(stones).map(function(k) {
+      const bd = (typeof BIRTHSTONE_DEFS !== 'undefined') ? BIRTHSTONE_DEFS.find(function(x){ return x.id === k; }) : null;
+      S.birthstones[k] = (S.birthstones[k] || 0) + stones[k];
+      return ((bd && bd.emoji) || '💎') + ' ' + ((bd && bd.name) || k) + ' ×' + stones[k];
+    });
+    if (typeof saveGame === 'function') saveGame();
+    alert('🎁 ' + def.name + (n > 1 ? ' ×' + n : '') + ' 開啟！獲得誕生石 ×' + total + '\n' + lines.join('\n'));
   } else {
-    alert('已開啟 ' + def.name);
+    alert('已開啟 ' + def.name + (n > 1 ? ' ×' + n : ''));
   }
+}
+
+/** 開啟數量選擇器（滑桿）：選擇一次要開幾個寶箱／禮包 */
+function openQuantityPickerForBox(boxId) {
+  const def = getGiftBoxDef(boxId);
+  if (!def) return;
+  const have = (S.items && S.items[boxId]) || 0;
+  if (have <= 0) return;
+  if (have === 1) { openGiftBoxFromBag(boxId, 1); return; }
+
+  let modal = document.getElementById('qty-pick-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'overlay';
+    modal.id = 'qty-pick-modal';
+    modal.innerHTML =
+      '<div class="modal qty-pick-modal-box">' +
+        '<div style="text-align:center;font-size:2.6rem" id="qty-pick-emoji"></div>' +
+        '<h2 style="text-align:center" id="qty-pick-title"></h2>' +
+        '<p style="text-align:center;font-size:0.82rem;color:#666;margin:4px 0 18px" id="qty-pick-desc"></p>' +
+        '<div class="qty-slider-wrap">' +
+          '<input type="range" id="qty-pick-range" class="qty-slider" min="1" step="1">' +
+        '</div>' +
+        '<div class="qty-slider-value" id="qty-pick-value"></div>' +
+        '<div class="qty-quick-row" id="qty-quick-row"></div>' +
+        '<div class="action-row" style="margin-top:16px">' +
+          '<button type="button" class="btn btn-back" id="qty-pick-cancel">取消</button>' +
+          '<button type="button" class="btn btn-explore" id="qty-pick-confirm">開啟</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(modal);
+  }
+  const range = document.getElementById('qty-pick-range');
+  const valueEl = document.getElementById('qty-pick-value');
+  const emoji = document.getElementById('qty-pick-emoji');
+  const title = document.getElementById('qty-pick-title');
+  const desc = document.getElementById('qty-pick-desc');
+  const quickRow = document.getElementById('qty-quick-row');
+  emoji.textContent = def.emoji || '🎁';
+  title.textContent = def.name;
+  desc.textContent = (def.desc || '點擊開啟') + '　持有 ×' + have;
+  range.min = '1';
+  range.max = String(have);
+  range.value = '1';
+
+  function updateFill() {
+    const v = parseInt(range.value, 10) || 1;
+    const pct = have > 1 ? ((v - 1) / (have - 1)) * 100 : 100;
+    range.style.setProperty('--fill', pct + '%');
+    valueEl.textContent = '開啟 × ' + v;
+    quickRow.querySelectorAll('[data-qty]').forEach(function(b) {
+      b.classList.toggle('active', parseInt(b.getAttribute('data-qty'), 10) === v);
+    });
+  }
+  range.oninput = updateFill;
+
+  const quicks = Array.from(new Set([1, Math.max(1, Math.floor(have / 2)), have])).sort(function(a, b) { return a - b; });
+  quickRow.innerHTML = quicks.map(function(n) {
+    return '<button type="button" class="qty-quick-btn" data-qty="' + n + '">' + (n === have ? '全部(' + n + ')' : n) + '</button>';
+  }).join('');
+  quickRow.querySelectorAll('[data-qty]').forEach(function(btn) {
+    btn.onclick = function() {
+      range.value = btn.getAttribute('data-qty');
+      updateFill();
+    };
+  });
+
+  updateFill();
+
+  document.getElementById('qty-pick-cancel').onclick = function() { modal.classList.add('hidden'); };
+  document.getElementById('qty-pick-confirm').onclick = function() {
+    const n = Math.max(1, Math.min(have, parseInt(range.value, 10) || 1));
+    modal.classList.add('hidden');
+    openGiftBoxFromBag(boxId, n);
+  };
+
+  modal.classList.remove('hidden');
+  if (modal.parentNode) modal.parentNode.appendChild(modal);
 }
 
 /** 隨機分配寶物碎片（例：沙暴箱共 5 片） */
@@ -15178,7 +15437,216 @@ function openAccountScreen() {
     logoutBtn.textContent = isGuest ? '🚪 離開訪客' : '🚪 登出';
     logoutBtn.style.display = isGuest ? 'none' : 'block';
   }
+  const pwBox = $('account-pw-box');
+  if (pwBox) {
+    pwBox.style.display = isGuest ? 'none' : 'block';
+    ['account-pw-old','account-pw-new','account-pw-new2'].forEach(function(id) {
+      const el = $(id); if (el) el.value = '';
+    });
+    const msg = $('account-pw-msg');
+    if (msg) { msg.textContent = ''; msg.style.color = '#c62828'; }
+  }
+  const pwBtn = $('account-pw-submit');
+  if (pwBtn) pwBtn.onclick = function() { submitChangePassword(); };
+  const reqBox = $('account-pw-requests');
+  if (reqBox) {
+    const isAdm = (typeof isGameAdmin === 'function' && isGameAdmin());
+    reqBox.style.display = isAdm ? 'block' : 'none';
+    if (isAdm) {
+      loadPasswordRequests();
+      const rb = $('account-pw-requests-refresh');
+      if (rb) rb.onclick = function() { loadPasswordRequests(); };
+    }
+  }
 }
+
+async function submitChangePassword() {
+  const msg = $('account-pw-msg');
+  const setMsg = function(t, ok) {
+    if (!msg) return;
+    msg.style.color = ok ? '#2e7d32' : '#c62828';
+    msg.textContent = t || '';
+  };
+  if (!sb || !currentUserId) {
+    setMsg('請先登入帳號才能變更密碼');
+    return;
+  }
+  const oldPw = ($('account-pw-old') && $('account-pw-old').value) || '';
+  const newPw = ($('account-pw-new') && $('account-pw-new').value) || '';
+  const newPw2 = ($('account-pw-new2') && $('account-pw-new2').value) || '';
+  if (!oldPw || !newPw) { setMsg('請填寫目前密碼與新密碼'); return; }
+  if (newPw.length < 6) { setMsg('新密碼至少 6 個字元'); return; }
+  if (newPw !== newPw2) { setMsg('兩次新密碼不一致'); return; }
+  if (oldPw === newPw) { setMsg('新密碼不能與目前密碼相同'); return; }
+  setMsg('驗證中…', true);
+  try {
+    const email = (typeof usernameToEmail === 'function')
+      ? usernameToEmail(currentUser)
+      : (currentUser + '@boboisland.local');
+    const { error: loginErr } = await sb.auth.signInWithPassword({ email: email, password: oldPw });
+    if (loginErr) {
+      setMsg('目前密碼不正確');
+      return;
+    }
+    const { error: upErr } = await sb.auth.updateUser({ password: newPw });
+    if (upErr) {
+      setMsg('變更失敗：' + (upErr.message || '請稍後再試'));
+      return;
+    }
+    setMsg('✅ 密碼已成功變更！', true);
+    ['account-pw-old','account-pw-new','account-pw-new2'].forEach(function(id) {
+      const el = $(id); if (el) el.value = '';
+    });
+  } catch (e) {
+    setMsg('變更失敗：' + (e && e.message ? e.message : '網路錯誤'));
+  }
+}
+
+
+
+
+function openForgotPasswordModal() {
+  const m = $('forgot-pw-modal');
+  const msg = $('forgot-pw-msg');
+  if (msg) { msg.textContent = ''; msg.style.color = '#c62828'; }
+  const u = $('forgot-pw-user');
+  const loginU = $('login-username');
+  if (u && loginU && loginU.value) u.value = loginU.value.trim();
+  if (m) {
+    m.classList.remove('hidden');
+    m.style.display = 'flex';
+  }
+}
+function closeForgotPasswordModal() {
+  const m = $('forgot-pw-modal');
+  if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+}
+/** 忘記密碼：只送申請給管理員，不呼叫 Supabase 寄信 */
+async function submitPasswordResetRequest() {
+  const msg = $('forgot-pw-msg');
+  const setMsg = function(t, ok) {
+    if (!msg) return;
+    msg.style.color = ok ? '#2e7d32' : '#c62828';
+    msg.textContent = t || '';
+  };
+  const username = ($('forgot-pw-user') && $('forgot-pw-user').value || '').trim();
+  const contact = ($('forgot-pw-contact') && $('forgot-pw-contact').value || '').trim();
+  const note = ($('forgot-pw-note') && $('forgot-pw-note').value || '').trim();
+  if (!username) { setMsg('請填寫玩家名稱'); return; }
+  if (username.length < 2) { setMsg('玩家名稱太短'); return; }
+  setMsg('送出中…', true);
+  const row = {
+    username: username,
+    contact: contact || null,
+    note: note || null,
+    status: 'pending',
+    created_at: new Date().toISOString()
+  };
+  // 本機備份（管理員同瀏覽器可看）
+  try {
+    const key = 'bobo_pw_requests';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    list.unshift(Object.assign({ id: 'local_' + Date.now() }, row));
+    localStorage.setItem(key, JSON.stringify(list.slice(0, 100)));
+  } catch (e) {}
+  let cloudOk = false;
+  if (sb) {
+    try {
+      const { error } = await sb.from('password_requests').insert({
+        username: row.username,
+        contact: row.contact,
+        note: row.note,
+        status: 'pending'
+      });
+      if (!error) cloudOk = true;
+      else console.warn('password_requests insert', error);
+    } catch (e) { console.warn(e); }
+    // 備援：寫入 game_mail 給全服但標題標記（管理員列表也會抓）
+    if (!cloudOk) {
+      try {
+        await sb.from('game_mail').insert({
+          title: '[密碼申請] ' + username,
+          body: '玩家「' + username + '」申請重設密碼。\n聯絡：' + (contact || '無') + '\n備註：' + (note || '無'),
+          from_name: '系統',
+          target_user_id: null
+        });
+      } catch (e2) {}
+    }
+  }
+  setMsg(cloudOk
+    ? '✅ 已送出！請等待管理員協助重設密碼。'
+    : '✅ 已登記申請（若雲端未連線，請私訊管理員並告知玩家名稱）。', true);
+  setTimeout(function() { closeForgotPasswordModal(); }, 1600);
+}
+async function loadPasswordRequests() {
+  const box = $('account-pw-requests-list');
+  if (!box) return;
+  box.innerHTML = '<div style="color:#888">讀取中…</div>';
+  let rows = [];
+  // local
+  try {
+    const list = JSON.parse(localStorage.getItem('bobo_pw_requests') || '[]');
+    (list || []).forEach(function(r) {
+      if (r && r.status !== 'done') rows.push(r);
+    });
+  } catch (e) {}
+  if (sb) {
+    try {
+      const { data, error } = await sb.from('password_requests').select('*').order('created_at', { ascending: false }).limit(50);
+      if (!error && data && data.length) {
+        // 雲端優先
+        rows = data.filter(function(r) { return r && r.status !== 'done'; });
+      }
+    } catch (e) {}
+  }
+  if (!rows.length) {
+    box.innerHTML = '<div style="color:#888">目前沒有待處理申請</div>';
+    return;
+  }
+  box.innerHTML = rows.map(function(r, i) {
+    const t = r.created_at ? new Date(r.created_at).toLocaleString() : '';
+    const id = r.id != null ? r.id : ('i' + i);
+    return '<div style="padding:8px;margin-bottom:6px;background:#fff;border-radius:10px;border:1px solid #ffe0b2">' +
+      '<div style="font-weight:800;color:#bf360c">👤 ' + (r.username || '？') + '</div>' +
+      (r.contact ? ('<div>聯絡：' + r.contact + '</div>') : '') +
+      (r.note ? ('<div>備註：' + r.note + '</div>') : '') +
+      (t ? ('<div style="font-size:0.75rem;color:#999">' + t + '</div>') : '') +
+      '<button type="button" class="btn" data-pw-done="' + id + '" style="margin-top:6px;padding:4px 10px;font-size:0.78rem;background:#c8e6c9;color:#2e7d32">標記已處理</button>' +
+      '</div>';
+  }).join('');
+  box.querySelectorAll('[data-pw-done]').forEach(function(btn) {
+    btn.onclick = async function() {
+      const id = btn.getAttribute('data-pw-done');
+      try {
+        if (sb && id && !String(id).startsWith('local_') && !String(id).startsWith('i')) {
+          await sb.from('password_requests').update({ status: 'done' }).eq('id', id);
+        }
+      } catch (e) {}
+      try {
+        const key = 'bobo_pw_requests';
+        let list = JSON.parse(localStorage.getItem(key) || '[]');
+        list = list.map(function(r) {
+          if (r && (String(r.id) === String(id) || r.username === btn.parentNode.querySelector('div').textContent.replace('👤 ',''))) {
+            r.status = 'done';
+          }
+          return r;
+        });
+        localStorage.setItem(key, JSON.stringify(list));
+      } catch (e) {}
+      loadPasswordRequests();
+    };
+  });
+}
+function bindForgotPasswordUI() {
+  const openBtn = $('forgot-pw-open');
+  if (openBtn) openBtn.onclick = openForgotPasswordModal;
+  const closeBtn = $('forgot-pw-close');
+  if (closeBtn) closeBtn.onclick = closeForgotPasswordModal;
+  const sendBtn = $('forgot-pw-send');
+  if (sendBtn) sendBtn.onclick = submitPasswordResetRequest;
+}
+
+
 function updateMoreBadges() {
   try {
     const annBtn = $('more-announce');
@@ -15290,6 +15758,12 @@ function formatMailRewardIcons(rewards, opts) {
       items.push({ emoji: (def && def.emoji) || '💎', name: (def && def.name) || k, n: rewards.birthstones[k] });
     });
   }
+  if (rewards.boxes) {
+    Object.keys(rewards.boxes).forEach(function(k) {
+      const def = (typeof GIFT_BOX_DEFS !== 'undefined') ? GIFT_BOX_DEFS[k] : null;
+      items.push({ emoji: (def && def.emoji) || '🎁', name: (def && def.name) || k, n: rewards.boxes[k] });
+    });
+  }
   if (rewards.garnet) {
     items.push({ emoji: '🔴', name: '石榴石', n: rewards.garnet });
   }
@@ -15322,6 +15796,12 @@ function claimMailRewards(m) {
     if (!S.birthstones) S.birthstones = {};
     Object.keys(r.birthstones).forEach(function(k) {
       S.birthstones[k] = (S.birthstones[k] || 0) + Number(r.birthstones[k] || 0);
+    });
+  }
+  if (r.boxes) {
+    S.items = S.items || {};
+    Object.keys(r.boxes).forEach(function(k) {
+      S.items[k] = (S.items[k] || 0) + Number(r.boxes[k] || 0);
     });
   }
   if (r.frags && typeof addTreasureFragments === 'function') {
@@ -15371,25 +15851,6 @@ function claimAllMailRewards() {
   if (typeof updateRedDots === 'function') updateRedDots();
   alert(n > 0 ? ('已領取 ' + n + ' 封郵件的附件！') : '沒有可領取的附件');
 }
-function deleteAllMail() {
-  ensureMailState();
-  const list = S.mail || [];
-  if (!list.length) {
-    alert('目前沒有郵件');
-    return;
-  }
-  const unclaimed = list.filter(function(m) { return m && m.rewards && !m.claimed; }).length;
-  let msg = '確定刪除全部 ' + list.length + ' 封郵件？';
-  if (unclaimed > 0) {
-    msg += '\n\n⚠️ 其中有 ' + unclaimed + ' 封尚未領取附件，刪除後無法復原！\n建議先按「一鍵領取全部附件」。';
-  }
-  if (!confirm(msg)) return;
-  S.mail = [];
-  if (typeof saveGame === 'function') saveGame();
-  renderMail();
-  if (typeof updateRedDots === 'function') updateRedDots();
-  alert('已刪除全部郵件');
-}
 function renderMail() {
   ensureMailState();
   maybeSeedWelcomeMail();
@@ -15397,8 +15858,6 @@ function renderMail() {
   const empty = $('mail-empty');
   const claimAllBtn = $('mail-claim-all-btn');
   if (claimAllBtn) claimAllBtn.onclick = claimAllMailRewards;
-  const delAllBtn = $('mail-delete-all-btn');
-  if (delAllBtn) delAllBtn.onclick = deleteAllMail;
   if (!list) return;
   if (!S.mail.length) {
     list.innerHTML = '';
@@ -15486,6 +15945,7 @@ function updateRedDots() {
     const forgeReady = typeof hasAnyCraftableTreasure === 'function' && hasAnyCraftableTreasure();
     setNavDot('team', hasAnyStageEvolve() || hasAnyStarUp());
     setNavDot('map', hasExploreZone() || hasInjuredPet() || forgeReady);
+    setNavDot('bag', typeof hasAnyOpenableBox === 'function' && hasAnyOpenableBox());
     // 島嶼地點紅點
     document.querySelectorAll('.spot').forEach(s => {
       const d = s.querySelector('.red-dot');
@@ -16805,10 +17265,10 @@ document.addEventListener('click', function(ev) {
 </script>
   <div class="mobile-ad" aria-label="手機廣告">
     <ins class="adsbygoogle"
-         style="display:inline-block;width:100%;height:50px;max-height:50px;overflow:hidden"
+         style="display:block"
          data-ad-client="ca-pub-4837269887561375"
          data-ad-format="horizontal"
-         data-full-width-responsive="false"></ins>
+         data-full-width-responsive="true"></ins>
     <script>try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}</script>
   </div>
 </body>
