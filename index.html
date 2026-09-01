@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#4caf50">
-  <title>波波島 🏝️</title>
+  <title>波波島上的奇幻探索</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1527,7 +1527,7 @@
   <div class="game">
     <div class="header">
       <span class="stat-chip" id="clock-chip" title="島嶼時間" style="display:none!important">🕒 --:--</span>
-      <h1>🏝️ 波波島</h1>
+      <h1>波波島上的奇幻探索</h1>
       <div class="header-stats">
         <span class="stat-chip player-chip" id="player-chip" title="點擊查看玩家資訊">🧑‍🌾 冒險者 Lv.1</span>
         <span class="stat-chip" id="exp-display">✨ 0/30</span>
@@ -1606,6 +1606,7 @@
       <div class="section-title">⋯ 更多</div>
       <div class="more-menu" id="more-menu">
         <button type="button" class="more-circle" id="more-gift" data-more-act="gift" onclick="try{openGiftCodeModal()}catch(e){alert(e)}" title="輸入禮包碼"><span class="mc-ico">🎁</span><span class="mc-lab">禮包碼</span></button>
+        <button type="button" class="more-circle" id="more-ad-coin" data-more-act="adCoin" onclick="try{openAdCoinModal()}catch(e){alert(e)}" title="看廣告領金幣"><span class="mc-ico">📺</span><span class="mc-lab">看廣告</span></button>
         <button type="button" class="more-circle" id="more-help" data-more-act="help" onclick="try{if(typeof openHelp==='function')openHelp('guide')}catch(e){alert(e)}" title="說明"><span class="mc-ico">❓</span><span class="mc-lab">說明</span></button>
         <button type="button" class="more-circle" id="more-streak" data-more-act="streak" onclick="try{if(typeof openStreakModal==='function')openStreakModal(true)}catch(e){alert(e)}" title="連續簽到"><span class="mc-ico">📅</span><span class="mc-lab">簽到</span></button>
         <button type="button" class="more-circle" id="more-announce" data-more-act="announce" onclick="try{if(typeof openAnnounceModal==='function')openAnnounceModal()}catch(e){alert(e)}" title="公告"><span class="mc-ico">📢</span><span class="mc-lab">公告</span></button>
@@ -1673,6 +1674,23 @@
         <p id="admin-ann-msg" style="font-size:0.82rem;min-height:1.2em;text-align:center;margin:4px 0 8px"></p>
         <button type="button" class="btn btn-pink" id="admin-ann-send" onclick="try{submitAdminAnnouncement()}catch(e){alert(e)}" style="width:100%">送出公告</button>
         <button type="button" class="btn btn-back" id="admin-ann-close" onclick="try{var m=document.getElementById('admin-ann-modal');if(m)m.classList.add('hidden')}catch(e){}" style="width:100%;margin-top:8px">取消</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="ad-coin-modal" style="z-index:740">
+      <div class="modal" style="max-width:min(420px,94vw);width:100%;text-align:center">
+        <h2 style="text-align:center;margin-bottom:6px">看廣告領金幣</h2>
+        <p style="font-size:0.88rem;color:#555;margin:0 0 10px;line-height:1.5">觀看約 15 秒廣告後，可領取 <b style="color:#e65100">2000 金幣</b>。<br>每日最多 5 次。</p>
+        <div id="ad-coin-status" style="font-size:0.85rem;font-weight:800;color:#2e7d32;min-height:1.3em;margin-bottom:8px"></div>
+        <div id="ad-coin-slot" style="min-height:120px;background:#f5f5f5;border:2px dashed #c8e6c9;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;overflow:hidden;padding:8px">
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:100px"
+               data-ad-client="ca-pub-4837269887561375"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
+        <button type="button" class="btn btn-primary" id="ad-coin-claim" disabled style="width:100%;opacity:0.5;cursor:not-allowed">請先觀看廣告（15）</button>
+        <button type="button" class="btn btn-back" id="ad-coin-close" style="width:100%;margin-top:8px;cursor:pointer">關閉</button>
       </div>
     </div>
 
@@ -4522,7 +4540,7 @@ const S = {
   fragments:{},
   treasures:{},
   treasureFrags:{},
-  trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false,
+  trainerName:'', trainerEmoji:'🧑‍🌾', nameSet:false, adCoinDate:'', adCoinCount:0,
   unlocked:['plaza','meadow','coral_forge'],
   owned:[], team:[],
   discovered:[], // 圖鑑：遇過或擁有過的寵物 id
@@ -5989,6 +6007,8 @@ function getSaveData() {
     island: {
       coins: S.coins, level: S.level, exp: S.exp, wins: S.wins, ladderRating: getLadderRating(), ladderWins: S.ladderWins||0, ladderLosses: S.ladderLosses||0, ladderHistory: S.ladderHistory||[], mail: S.mail||[], mailClaimed: S.mailClaimed||{}, announcements: S.announcements||[], annReadIds: S.annReadIds||{}, redeemedCodes: S.redeemedCodes||{}, ladderRoster: S.ladderRoster||null, arenaCoins: S.arenaCoins||0, ladderBestRank: S.ladderBestRank||1800, birthstones: S.birthstones||{},
       trainerName: S.trainerName, trainerEmoji: S.trainerEmoji, nameSet: !!S.nameSet,
+      adCoinDate: S.adCoinDate || '',
+      adCoinCount: Math.max(0, Number(S.adCoinCount) || 0),
       unlocked: S.unlocked, owned: S.owned, shopDaily: S.shopDaily, team: S.team, items: S.items,
       fragments: S.fragments || {},
       treasures: S.treasures || {},
@@ -6028,6 +6048,8 @@ function loadGameData(saved) {
     S.ladderRoster = Array.isArray(d.ladderRoster) ? d.ladderRoster : null;
     if (typeof normalizePlayerLevel === 'function') normalizePlayerLevel();
     S.trainerName = d.trainerName || '';
+    S.adCoinDate = d.adCoinDate || '';
+    S.adCoinCount = Math.max(0, Number(d.adCoinCount) || 0);
     S.trainerEmoji = d.trainerEmoji || '🧑‍🌾';
     S.nameSet = !!(d.nameSet && d.trainerName);
     if (d.shopDaily) S.shopDaily = d.shopDaily;
@@ -14980,13 +15002,13 @@ function openRandomTreasureFragBox(cfg, boxName) {
 const GIFT_CODES = {
   'BOBO2026': {
     coins: 200,
-    expPacks: { exp_pack_normal: 2 },
-    label: '普通經驗包 ×2、金幣 ×200'
+    petFrags: { shuibo_bao: 2 },
+    label: '水波豹碎片 ×2、金幣 ×200'
   },
   'BOBOVIP': {
     coins: 100,
-    expPacks: { exp_pack_rare: 1 },
-    label: '稀有經驗包 ×1、金幣 ×100'
+    petFrags: { shen_huobao_xiong: 2 },
+    label: '神·火爆熊碎片 ×2、金幣 ×100'
   },
   'BOBOISLAND888': {
     // 進背包：自選碎片寶箱I ×2（使用時選水波豹／火爆熊碎片 ×5）
@@ -14997,6 +15019,122 @@ const GIFT_CODES = {
 function ensureGiftState() {
   if (!S.redeemedCodes || typeof S.redeemedCodes !== 'object') S.redeemedCodes = {};
 }
+
+/* ===== 看廣告領金幣 ===== */
+const AD_COIN_REWARD = 2000;
+const AD_COIN_DAILY_LIMIT = 5;
+const AD_COIN_WATCH_SEC = 15;
+var _adCoinTimer = null;
+var _adCoinLeft = 0;
+var _adCoinReady = false;
+
+function ensureAdCoinState() {
+  if (!S.adCoinDate) S.adCoinDate = '';
+  if (typeof S.adCoinCount !== 'number') S.adCoinCount = 0;
+  const today = (typeof getLocalDateStr === 'function')
+    ? getLocalDateStr()
+    : new Date().toISOString().slice(0, 10);
+  if (S.adCoinDate !== today) {
+    S.adCoinDate = today;
+    S.adCoinCount = 0;
+  }
+  return today;
+}
+function getAdCoinLeftToday() {
+  ensureAdCoinState();
+  return Math.max(0, AD_COIN_DAILY_LIMIT - (S.adCoinCount || 0));
+}
+function stopAdCoinTimer() {
+  if (_adCoinTimer) {
+    try { clearInterval(_adCoinTimer); } catch (e) {}
+    _adCoinTimer = null;
+  }
+}
+function openAdCoinModal() {
+  ensureAdCoinState();
+  const m = document.getElementById('ad-coin-modal');
+  const status = document.getElementById('ad-coin-status');
+  const claim = document.getElementById('ad-coin-claim');
+  const left = getAdCoinLeftToday();
+  _adCoinReady = false;
+  stopAdCoinTimer();
+  if (status) {
+    status.style.color = '#2e7d32';
+    status.textContent = left > 0
+      ? ('今日還可領取 ' + left + ' / ' + AD_COIN_DAILY_LIMIT + ' 次')
+      : '今日次數已用完，明天再來吧！';
+  }
+  if (claim) {
+    claim.disabled = true;
+    claim.style.opacity = '0.5';
+    claim.style.cursor = 'not-allowed';
+    claim.textContent = left > 0 ? ('請先觀看廣告（' + AD_COIN_WATCH_SEC + '）') : '今日已達上限';
+  }
+  if (m) {
+    m.classList.remove('hidden');
+    if (m.parentNode) m.parentNode.appendChild(m);
+  }
+  try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+  if (left <= 0) return;
+  _adCoinLeft = AD_COIN_WATCH_SEC;
+  _adCoinTimer = setInterval(function() {
+    _adCoinLeft -= 1;
+    if (_adCoinLeft <= 0) {
+      stopAdCoinTimer();
+      _adCoinReady = true;
+      if (claim) {
+        claim.disabled = false;
+        claim.style.opacity = '1';
+        claim.style.cursor = 'pointer';
+        claim.textContent = '領取 ' + AD_COIN_REWARD + ' 金幣';
+      }
+      if (status) {
+        status.style.color = '#e65100';
+        status.textContent = '可以領取獎勵了！';
+      }
+      return;
+    }
+    if (claim) claim.textContent = '請先觀看廣告（' + _adCoinLeft + '）';
+  }, 1000);
+}
+function closeAdCoinModal() {
+  stopAdCoinTimer();
+  _adCoinReady = false;
+  const m = document.getElementById('ad-coin-modal');
+  if (m) m.classList.add('hidden');
+}
+function claimAdCoinReward() {
+  ensureAdCoinState();
+  const status = document.getElementById('ad-coin-status');
+  if (!_adCoinReady) {
+    if (status) { status.style.color = '#c62828'; status.textContent = '請先看完廣告倒數'; }
+    return;
+  }
+  if (getAdCoinLeftToday() <= 0) {
+    if (status) { status.style.color = '#c62828'; status.textContent = '今日次數已用完'; }
+    return;
+  }
+  S.adCoinCount = (S.adCoinCount || 0) + 1;
+  S.coins = (S.coins || 0) + AD_COIN_REWARD;
+  _adCoinReady = false;
+  stopAdCoinTimer();
+  if (typeof updateHeader === 'function') updateHeader();
+  if (typeof saveGame === 'function') saveGame();
+  if (typeof addLog === 'function') addLog('map-log', '看廣告獲得 ' + AD_COIN_REWARD + ' 金幣！');
+  const claim = document.getElementById('ad-coin-claim');
+  const left = getAdCoinLeftToday();
+  if (status) {
+    status.style.color = '#2e7d32';
+    status.textContent = '已獲得 ' + AD_COIN_REWARD + ' 金幣！今日剩餘 ' + left + ' 次';
+  }
+  if (claim) {
+    claim.disabled = true;
+    claim.style.opacity = '0.5';
+    claim.style.cursor = 'not-allowed';
+    claim.textContent = left > 0 ? '關閉後可再看一次' : '今日已達上限';
+  }
+}
+
 function openGiftCodeModal() {
   ensureGiftState();
   const m = $('gift-code-modal');
@@ -15020,30 +15158,38 @@ function submitGiftCode() {
     return;
   }
   if (S.redeemedCodes[raw]) {
-    if (msg) { msg.textContent = '此禮包碼已兌換過'; msg.style.color = '#c62828'; }
+    if (msg) { msg.textContent = '這個禮包碼已經兌換完成了'; msg.style.color = '#2e7d32'; }
     return;
   }
+  // 先標記，避免連點造成重複發獎
+  S.redeemedCodes[raw] = Date.now();
   const gift = GIFT_CODES[raw];
   if (!gift) {
     tryRedeemCloudGift(raw);
     return;
   }
-  applyGiftReward(raw, gift);
+  applyGiftReward(raw, gift, true);
 }
 async function tryRedeemCloudGift(code) {
   const msg = $('gift-code-msg');
+  const clearMark = function() {
+    try { if (S.redeemedCodes) delete S.redeemedCodes[code]; } catch (e) {}
+  };
   if (!sb) {
+    clearMark();
     if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
     return;
   }
   try {
     const { data, error } = await sb.from('gift_codes').select('*').eq('code', code).limit(1);
     if (error || !data || !data.length) {
+      clearMark();
       if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
       return;
     }
     const row = data[0];
     if (row.active === false) {
+      clearMark();
       if (msg) { msg.textContent = '此禮包碼已停用'; msg.style.color = '#c62828'; }
       return;
     }
@@ -15054,12 +15200,13 @@ async function tryRedeemCloudGift(code) {
       expPacks: row.exp_packs || row.expPacks || null,
       choosePetFrags: row.choose_pet_frags || row.choosePetFrags || null,
       label: row.label || ('禮包：' + code)
-    });
+    }, true);
   } catch (e) {
+    clearMark();
     if (msg) { msg.textContent = '禮包碼無效'; msg.style.color = '#c62828'; }
   }
 }
-function applyGiftReward(code, gift) {
+function applyGiftReward(code, gift, alreadyMarked) {
   ensureGiftState();
   const msg = $('gift-code-msg');
   const lines = [];
@@ -15104,16 +15251,16 @@ function applyGiftReward(code, gift) {
       lines.push(bn + ' ×' + n);
     });
   }
-  S.redeemedCodes[code] = Date.now();
+  if (!alreadyMarked) S.redeemedCodes[code] = Date.now();
   if (typeof updateHeader === 'function') updateHeader();
   if (typeof saveGame === 'function') saveGame();
   if (typeof renderBag === 'function') renderBag();
   const label = gift.label || lines.join('、') || code;
   if (msg) {
     msg.style.color = '#2e7d32';
-    msg.textContent = '兌換成功！' + label;
+    msg.textContent = '兌換完成！' + label;
   }
-  addLog('map-log', '🎁 禮包碼兌換成功：' + label);
+  addLog('map-log', '🎁 禮包碼兌換完成：' + label);
   // 自選碎片寶箱
   const choose = gift.choosePetFrags;
   setTimeout(() => {
@@ -15322,8 +15469,9 @@ async function fetchGlobalTopPets(forceRefresh) {
         } else if (res.data) {
           res.data.forEach(function(row) {
             if (myUid && row.user_id === myUid) return;
-            var uname = row.username || '冒險者';
             var island = row.data && row.data.island ? row.data.island : null;
+            // 優先用玩家暱稱（trainerName），沒有才退回帳號名
+            var uname = (island && island.trainerName) || row.username || '冒險者';
             var owned = island && Array.isArray(island.owned) ? island.owned : null;
             if (!owned) return;
             owned.forEach(function(p) {
@@ -15396,7 +15544,7 @@ async function renderTopPetRanking() {
       '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + face + '</div>' +
       '<div style="flex:1;min-width:0">' +
         '<div style="font-weight:800">' + (x.petName || '寵物') + nick + meTag + '</div>' +
-        '<div style="font-size:0.78rem;color:#666;margin-top:2px">擁有者：' + (x.username || '—') +
+        '<div style="font-size:0.78rem;color:#666;margin-top:2px">玩家：' + (x.username || '—') +
           (x.level != null && x.level !== '—' ? ('　Lv.' + x.level) : '') +
           (x.type ? ('　' + x.type + '系') : '') + '</div>' +
         (starHtml ? ('<div style="margin-top:2px">' + starHtml + '</div>') : '') +
@@ -15680,6 +15828,16 @@ function bindMoreMenu() {
     if (el) el.onclick = function(e) { try { e && e.preventDefault && e.preventDefault(); fn(); } catch (err) { console.warn(id, err); } };
   };
   on('more-gift', () => openGiftCodeModal());
+  on('more-ad-coin', () => openAdCoinModal());
+  const adClose = $('ad-coin-close');
+  if (adClose) adClose.onclick = function() { closeAdCoinModal(); };
+  const adClaim = $('ad-coin-claim');
+  if (adClaim) adClaim.onclick = function() { claimAdCoinReward(); };
+  const adModal = $('ad-coin-modal');
+  if (adModal && !adModal._adBound) {
+    adModal._adBound = true;
+    adModal.addEventListener('click', function(e) { if (e.target === adModal) closeAdCoinModal(); });
+  }
   on('more-help', () => {
     if (typeof openHelp === 'function') openHelp('guide');
     else {
@@ -16385,6 +16543,7 @@ document.addEventListener('click', function(ev) {
     var act = el.getAttribute('data-more-act');
     if (!act) return;
     if (act === 'gift') openGiftCodeModal();
+    else if (act === 'adCoin') openAdCoinModal();
     else if (act === 'help') openHelp('guide');
     else if (act === 'streak') openStreakModal(true);
     else if (act === 'announce') openAnnounceModal();
